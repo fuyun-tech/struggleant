@@ -1,0 +1,61 @@
+<div class="carousel-wrap"
+     [class.m-carousel-wrap]="isMobile"
+     [class.p-carousel-wrap]="!isMobile" (mouseover)="pause()" (mouseout)="resume()">
+  <div class="carousel"
+       #carouselBody
+       [ngStyle]="{'width': (100 * (carousels.length)) + '%'}"
+       [style.transform]="'translateX(-' + (100 / carousels.length) * activeIndex + '%)'">
+    <div *ngFor="let carousel of carousels; let i = index"
+         class="carousel-slide"
+         [ngStyle]="{'width': (100 / (carousels.length)) + '%'}">
+      @if (i < 2) {
+        @if (!carousel.link) {
+          <div class="carousel-img"
+               [style.background-image]="'url(' + carousel.fullUrl + ')'"
+               [title]="carousel.caption"></div>
+        } @else {
+          <a class="carousel-link"
+             [href]="carousel.link"
+             [title]="carousel.caption"
+             (click)="logClick(carousel)"
+             [target]="carousel.target">
+            <div class="carousel-img" [style.background-image]="'url(' + carousel.fullUrl + ')'"></div>
+          </a>
+        }
+      }
+      @if (i > 1) {
+        @if (!carousel.link) {
+          <div class="carousel-img lazyload"
+               [title]="carousel.caption"
+               [attr.data-bg]="carousel.fullUrl"></div>
+        } @else {
+          <a class="carousel-link"
+             [href]="carousel.link"
+             [title]="carousel.caption"
+             (click)="logClick(carousel)"
+             [target]="carousel.target">
+            <div class="carousel-img lazyload" [attr.data-bg]="carousel.fullUrl"></div>
+          </a>
+        }
+      }
+    </div>
+  </div>
+  <div class="indicator">
+    <div class="caption">
+      <a *ngIf="carousels[activeIndex]"
+         [href]="carousels[activeIndex].link"
+         [title]="carousels[activeIndex].title"
+         (click)="logClick(carousels[activeIndex])">{{ carousels[activeIndex].title }}</a>
+    </div>
+    <ul class="dots">
+      @for (i of carousels.length - 1 | range; track i) {
+        <li [class.active]="activeIndex === i || i === 0 && activeIndex === carousels.length - 1"
+            [class.revert]="isRevert && activeIndex === i"
+            (click)="switchCarousel(i)">
+          <div class="before"></div>
+          <div class="after"></div>
+        </li>
+      }
+    </ul>
+  </div>
+</div>

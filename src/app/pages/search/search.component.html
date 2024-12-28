@@ -1,0 +1,14 @@
+<app-breadcrumb></app-breadcrumb>
+@if (total > 0) {
+  <div [class.post-list]="!isMobile" [class.m-post-list]="isMobile">
+    <ng-container *ngFor="let item of searchResult; let i = index">
+      <app-post-item [post]="$any(item.data)" [index]="i"></app-post-item>
+    </ng-container>
+  </div>
+} @else {
+  <div class="empty" [class.p-empty]="!isMobile" [class.m-empty]="isMobile">
+    <nz-empty nzNotFoundImage="simple"></nz-empty>
+  </div>
+}
+<app-make-money></app-make-money>
+<app-pagination></app-pagination>

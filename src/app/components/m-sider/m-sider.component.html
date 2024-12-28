@@ -1,0 +1,47 @@
+<div class="m-sider" [class.open]="siderVisible">
+  <aside class="m-sider-body">
+    <div class="m-sider-info">
+      <div class="m-sider-info-logo">
+        <img src="/favicon.png" [alt]="appInfo?.appName" />
+      </div>
+      <div class="m-sider-info-profile">
+        <h2 class="m-sider-info-profile-name">{{ appInfo?.appName }}</h2>
+        <div *ngIf="appInfo?.appSlogan" class="m-sider-info-profile-slogan">{{ appInfo?.appSlogan }}</div>
+      </div>
+    </div>
+    <div class="m-sider-tool">
+      <div title="深色模式: 关闭"><nz-icon nzType="sun" theme="fill" /></div>
+    </div>
+    <nav class="m-sider-nav">
+      <ul class="m-sider-nav-list">
+        <li [class.active]="indexInfo?.isHome">
+          <a routerLink=""><nz-icon nzType="home" /><span>首页</span></a>
+        </li>
+        <li [class.active]="indexInfo?.isPost && indexInfo?.subPage !== 'archive'">
+          <a routerLink="/post" title="期刊"><nz-icon nzType="form" /><span>期刊</span></a>
+        </li>
+        <li [class.active]="indexInfo?.subPage === 'about'">
+          <a routerLink="/about" title="关于"><nz-icon nzType="info-circle" /><span>关于</span></a>
+        </li>
+        <li [class.active]="indexInfo?.fullPage === 'post-archive'">
+          <a routerLink="/post/archive" title="期刊归档"><span class="fi fi-calendar-date"></span><span>期刊归档</span></a>
+        </li>
+        <div class="m-separator"></div>
+        <li>
+          <a (click)="showWechatCard()"><nz-icon nzType="heart" /><span>公众号</span></a>
+        </li>
+        <li>
+          <a routerLink="https://github.com/ifuyun"
+             title="Follow us on GitHub" target="_blank"><nz-icon nzType="github" /><span>GitHub</span></a>
+        </li>
+        <div class="m-separator"></div>
+        @if (isSignIn) {
+          <li><a (click)="gotoAdmin()"><nz-icon nzType="dashboard" /><span>个人中心</span></a></li>
+          <li><a (click)="logout()"><nz-icon nzType="logout" /><span>退出登录</span></a></li>
+        } @else {
+          <li><a routerLink="/user/login" title="登录"><nz-icon nzType="login" /><span>登录</span></a></li>
+        }
+      </ul>
+    </nav>
+  </aside>
+</div>
