@@ -17,15 +17,10 @@
     <div class="post-card-list post-card-list-4">
       <article *ngFor="let post of latestPosts" class="post-card-item post-card-item-wrap">
         <div class="post-card-item-body">
-          <div class="post-cover">
-            <a class="post-cover-link"
-               [routerLink]="post.post.postGuid"
-               [title]="post.post.postTitle">
-              <img class="lazyload"
-                   src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                   [attr.data-src]="post.post.cover"
-                   [alt]="post.post.postTitle" />
-              <div class="overlay"></div>
+          <div class="post-card-cover">
+            <a [routerLink]="post.post.postGuid" [title]="post.post.postTitle">
+              <span class="post-item-cover-img lazyload" [attr.data-bg]="post.post.cover"></span>
+              <span class="overlay"></span>
             </a>
           </div>
           <div class="post-content">
@@ -67,15 +62,10 @@
     <div class="post-card-list post-card-list-4">
       <article *ngFor="let post of randomPosts" class="post-card-item post-card-item-wrap">
         <div class="post-card-item-body">
-          <div class="post-cover">
-            <a class="post-cover-link"
-               [routerLink]="post.postGuid"
-               [title]="post.postTitle">
-              <img class="lazyload"
-                   src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                   [attr.data-src]="post.cover"
-                   [alt]="post.postTitle" />
-              <div class="overlay"></div>
+          <div class="post-card-cover">
+            <a [routerLink]="post.postGuid" [title]="post.postTitle">
+              <span class="post-item-cover-img lazyload" [attr.data-bg]="post.cover"></span>
+              <span class="overlay"></span>
             </a>
           </div>
           <div class="post-content">
