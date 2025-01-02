@@ -56,14 +56,15 @@ export class CommonService {
   }
 
   getReferrer() {
-    let referer = '';
     if (this.platform.isServer) {
-      referer = this.request.headers.referer || <string>this.request.headers['referrer'] || '';
-    } else {
-      referer = this.document.referrer;
+      const headers: any = this.request?.headers;
+      if (headers) {
+        const referrer: string = headers.get('referer') || headers.get('referrer') || '';
+        return referrer.replace(/^https?:\/\/[^/]+/i, '');
+      }
+      return '';
     }
-
-    return referer;
+    return this.document.referrer.replace(/^https?:\/\/[^/]+/i, '');
   }
 
   getTheme(): Theme {
