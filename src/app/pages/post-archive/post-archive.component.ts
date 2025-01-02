@@ -95,7 +95,7 @@ export class PostArchiveComponent implements OnInit {
     const breadcrumbs = [
       {
         label: '期刊',
-        tooltip: `文章列表`,
+        tooltip: `期刊文章列表`,
         url: '/post',
         isHeader: false
       },

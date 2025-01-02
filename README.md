@@ -1,6 +1,6 @@
 <br/>
 <p align="center">
-  <a href="https://www.struggleant.com" title="怀旧收藏家" target="_blank">
+  <a href="https://www.struggleant.com" title="过刊阅读平台 - 蚂蚁部落" target="_blank">
     <img src="./public/favicon.png" height="90" alt="Logo of struggleant.com" />
   </a>
 </p>

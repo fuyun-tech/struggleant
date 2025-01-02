@@ -193,11 +193,11 @@ export class PostListComponent implements OnInit {
     }
     if (this.keyword) {
       titles.unshift(this.keyword, '搜索');
-      description += `「${this.keyword}」文章搜索结果`;
+      description += `「${this.keyword}」期刊搜索结果`;
       keywords.unshift(this.keyword);
     } else {
       if (description) {
-        description += '文章列表';
+        description += '期刊文章列表';
       }
     }
     if (this.page > 1) {
@@ -223,7 +223,7 @@ export class PostListComponent implements OnInit {
     let breadcrumbs: BreadcrumbEntity[] = [
       {
         label: '期刊',
-        tooltip: `文章列表`,
+        tooltip: `期刊文章列表`,
         url: '/post',
         isHeader: false
       }
@@ -274,8 +274,8 @@ export class PostListComponent implements OnInit {
     if (this.keyword) {
       breadcrumbs.push(
         {
-          label: `文章搜索`,
-          tooltip: `文章搜索`,
+          label: `搜索`,
+          tooltip: `期刊搜索`,
           url: '',
           isHeader: false
         },

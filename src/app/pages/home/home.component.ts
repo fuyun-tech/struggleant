@@ -75,9 +75,9 @@ export class HomeComponent implements OnInit {
 
         this.updatePageInfo();
         this.getLatestPosts();
-        this.getRandomPosts();
         if (!this.isMobile) {
           this.getHotPosts();
+          this.getRandomPosts();
         }
       });
   }

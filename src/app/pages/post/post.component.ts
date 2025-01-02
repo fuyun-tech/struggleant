@@ -181,6 +181,7 @@ export class PostComponent implements OnInit {
 
   onPostClick(e: MouseEvent) {
     const $target = e.target as HTMLElement;
+
     if ($target.classList.contains('i-code-copy')) {
       e.preventDefault();
       e.stopPropagation();
@@ -209,6 +210,15 @@ export class PostComponent implements OnInit {
           .pipe(takeUntil(this.destroy$))
           .subscribe();
       }
+    } else if ($target instanceof HTMLImageElement) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      this.imageService.preview([
+        {
+          src: $target.src
+        }
+      ]);
     }
   }
 
@@ -337,7 +347,7 @@ export class PostComponent implements OnInit {
       }));
       this.breadcrumbs.unshift({
         label: '期刊',
-        tooltip: '文章列表',
+        tooltip: '期刊文章列表',
         url: '/post',
         isHeader: false
       });
