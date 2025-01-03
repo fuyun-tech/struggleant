@@ -45,6 +45,7 @@ export class CommonService {
       isHome: pageIndex === 'index',
       isPost: topPage === 'post',
       isAuth: topPage === 'auth',
+      isArticle: pageIndex === 'post-article',
       isPage: !['index', 'post', 'auth'].includes(topPage),
       fullPage: pageIndex,
       subPage
