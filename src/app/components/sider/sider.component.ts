@@ -5,11 +5,11 @@ import { isEmpty } from 'lodash';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { skipWhile, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { BookType } from '../../enums/book';
 import { BookEntity } from '../../interfaces/book';
 import { ArchiveData, PageIndexInfo } from '../../interfaces/common';
 import { OptionEntity } from '../../interfaces/option';
 import { PostEntity } from '../../interfaces/post';
+import { BookService } from '../../services/book.service';
 import { CommonService } from '../../services/common.service';
 import { DestroyService } from '../../services/destroy.service';
 import { OptionService } from '../../services/option.service';
@@ -37,13 +37,7 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
   activeBook?: BookEntity;
 
   get bookName() {
-    if (!this.activeBook) {
-      return '';
-    }
-    if ([BookType.BOOK, BookType.OTHER].includes(this.activeBook.bookType)) {
-      return `《${this.activeBook.bookName}》`;
-    }
-    return `《${this.activeBook.bookName}》（${this.activeBook.bookIssueNumber}）`;
+    return this.bookService.getBookName(this.activeBook).fullName;
   }
 
   get adsVisible() {
@@ -61,7 +55,8 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly platform: PlatformService,
     private readonly commonService: CommonService,
     private readonly optionService: OptionService,
-    private readonly postService: PostService
+    private readonly postService: PostService,
+    private readonly bookService: BookService
   ) {
   }
 

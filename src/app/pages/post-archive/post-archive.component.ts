@@ -85,7 +85,7 @@ export class PostArchiveComponent implements OnInit {
     const metaData: HTMLMetaData = {
       title: titles.join(' - '),
       description: `${this.appInfo.appName}期刊归档。${this.appInfo.appDescription}`,
-      keywords: this.options['post_keywords'],
+      keywords: this.appInfo.appKeywords,
       author: this.options['site_author']
     };
     this.metaService.updateHTMLMeta(metaData);
