@@ -15,23 +15,25 @@
     <nav class="m-sider-nav">
       <ul class="m-sider-nav-list">
         <li [class.active]="indexInfo?.isHome">
-          <a routerLink=""><nz-icon nzType="home" /><span>首页</span></a>
+          <a routerLink="/" (click)="closeSider()"><nz-icon nzType="home" /><span>首页</span></a>
         </li>
         <li [class.active]="indexInfo?.isPost && indexInfo?.subPage !== 'archive'">
-          <a routerLink="/post" title="期刊"><nz-icon nzType="form" /><span>期刊</span></a>
+          <a routerLink="/post" title="期刊" (click)="closeSider()"><nz-icon nzType="form" /><span>期刊</span></a>
         </li>
         <li [class.active]="indexInfo?.subPage === 'about'">
-          <a routerLink="/about" title="关于"><nz-icon nzType="info-circle" /><span>关于</span></a>
+          <a routerLink="/about" title="关于" (click)="closeSider()"><nz-icon nzType="info-circle" /><span>关于</span></a>
         </li>
         <li [class.active]="indexInfo?.fullPage === 'post-archive'">
-          <a routerLink="/post/archive" title="期刊归档"><span class="fi fi-calendar-date"></span><span>期刊归档</span></a>
+          <a routerLink="/post/archive"
+             title="期刊归档"
+             (click)="closeSider()"><span class="fi fi-calendar-date"></span><span>期刊归档</span></a>
         </li>
         <div class="m-separator"></div>
         <li>
           <a (click)="showWechatCard()"><nz-icon nzType="heart" /><span>公众号</span></a>
         </li>
         <li>
-          <a routerLink="https://github.com/ifuyun"
+          <a href="https://github.com/ifuyun"
              title="Follow us on GitHub" target="_blank"><nz-icon nzType="github" /><span>GitHub</span></a>
         </li>
         <div class="m-separator"></div>
@@ -39,7 +41,9 @@
           <li><a (click)="gotoAdmin()"><nz-icon nzType="dashboard" /><span>个人中心</span></a></li>
           <li><a (click)="logout()"><nz-icon nzType="logout" /><span>退出登录</span></a></li>
         } @else {
-          <li><a routerLink="/user/login" title="登录"><nz-icon nzType="login" /><span>登录</span></a></li>
+          <li>
+            <a routerLink="/user/login" title="登录" (click)="closeSider()"><nz-icon nzType="login" /><span>登录</span></a>
+          </li>
         }
       </ul>
     </nav>

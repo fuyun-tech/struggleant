@@ -66,6 +66,11 @@ export class MSiderComponent implements OnInit {
     });
   }
 
+  closeSider() {
+    this.siderVisible = false;
+    this.commonService.updateSiderVisible(false);
+  }
+
   showWechatCard() {
     this.siderVisible = false;
     this.commonService.updateSiderVisible(false);
