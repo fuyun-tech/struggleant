@@ -2,7 +2,7 @@
 @if (total > 0) {
   <div [class.post-list]="!isMobile" [class.m-post-list]="isMobile">
     <ng-container *ngFor="let item of searchResult; let i = index">
-      <app-post-item [post]="$any(item.data)" [index]="i"></app-post-item>
+      <app-post-item [post]="$any(item)" [index]="i"></app-post-item>
     </ng-container>
   </div>
 } @else {
