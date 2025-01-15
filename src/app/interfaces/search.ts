@@ -1,4 +1,3 @@
-import { SearchType } from '../enums/search';
 import { Post } from './post';
 
 export interface SearchParam {
@@ -7,8 +6,6 @@ export interface SearchParam {
   size?: number;
 }
 
-export interface SearchResponse {
-  type: SearchType;
-  data: Post;
+export interface SearchResponse extends Post {
   score: number;
 }
