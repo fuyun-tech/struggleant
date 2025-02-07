@@ -37,7 +37,7 @@ export class ApiService {
   httpPost<T extends HttpResponseEntity>(
     url: string,
     body: Record<string, any> | FormData = {},
-    showMessage = false
+    showMessage = true
   ): Observable<T> {
     return this.http
       .post<T>(this.getApiUrl(url), body, {

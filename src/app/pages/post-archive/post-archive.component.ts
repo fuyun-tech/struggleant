@@ -1,4 +1,4 @@
-import { NgForOf } from '@angular/common';
+import { NgFor } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty } from 'lodash';
@@ -19,7 +19,7 @@ import { UserAgentService } from '../../services/user-agent.service';
 
 @Component({
   selector: 'app-post-archive',
-  imports: [NgForOf, RouterLink, BreadcrumbComponent],
+  imports: [NgFor, RouterLink, BreadcrumbComponent],
   providers: [DestroyService],
   templateUrl: './post-archive.component.html',
   styleUrl: './post-archive.component.less'
@@ -84,7 +84,7 @@ export class PostArchiveComponent implements OnInit {
     const titles = ['归档', '期刊', this.appInfo.appName];
     const metaData: HTMLMetaData = {
       title: titles.join(' - '),
-      description: `${this.appInfo.appName}期刊归档。${this.appInfo.appDescription}`,
+      description: `${this.appInfo.appName}期刊文章归档。${this.appInfo.appDescription}`,
       keywords: this.appInfo.appKeywords,
       author: this.options['site_author']
     };
@@ -101,7 +101,7 @@ export class PostArchiveComponent implements OnInit {
       },
       {
         label: '归档',
-        tooltip: `期刊归档`,
+        tooltip: `期刊文章归档`,
         url: '/post/archive',
         isHeader: true
       }

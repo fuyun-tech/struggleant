@@ -11,7 +11,7 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class SearchService {
-  constructor(private apiService: ApiService) {}
+  constructor(private readonly apiService: ApiService) {}
 
   search(param: SearchParam): Observable<ResultList<SearchResponse>> {
     return this.apiService

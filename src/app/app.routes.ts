@@ -27,7 +27,7 @@ export const routes: Routes = [
       { path: 'archive/:year', component: PostListComponent },
       { path: 'archive/:year/:month', component: PostListComponent },
       { path: 'archive', component: PostArchiveComponent },
-      { path: ':postName', component: PostComponent }
+      { path: ':slug', component: PostComponent }
     ]
   },
   {
@@ -49,7 +49,7 @@ export const routes: Routes = [
     }
   },
   {
-    path: ':postName',
+    path: ':slug',
     component: ContentLayoutComponent,
     children: [{ path: '', pathMatch: 'full', component: PageComponent }]
   },

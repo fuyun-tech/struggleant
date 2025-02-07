@@ -13,7 +13,7 @@ echo -e "\033[95m[git]\033[0m pulling from GitHub..."
 echo -e "\033[95m[git]\033[0m path: \033[36m"$(pwd)"\033[0m"
 git fetch origin main && git reset --hard origin/main && git pull origin main
 git checkout main
-echo -e "\033[95m[git]\033[0m pulled."
+echo -e "\033[95m[git]\033[0m pulled main."
 # set version
 VERSION=v$(npm pkg get version | tr -d '"')
 # stop server

@@ -1,6 +1,7 @@
 import { ArchiveData } from './common';
 import { PostEntity } from './post';
-import { TagEntity, TaxonomyEntity } from './taxonomy';
+import { TagEntity } from './tag';
+import { TaxonomyEntity } from './taxonomy';
 
 export interface SitemapData {
   posts: PostEntity[];

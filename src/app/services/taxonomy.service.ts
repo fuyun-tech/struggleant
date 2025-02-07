@@ -9,7 +9,7 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class TaxonomyService {
-  constructor(private apiService: ApiService) {}
+  constructor(private readonly apiService: ApiService) {}
 
   getTaxonomies(): Observable<TaxonomyNode[]> {
     return this.apiService

@@ -8,7 +8,7 @@ export enum ApiUrl {
   // util
   SITEMAP = '/util/sitemap',
   // post
-  POST_LIST = '/posts',
+  POSTS = '/posts',
   POST = '/posts/post',
   POST_HOT = '/posts/hot',
   POST_RANDOM = '/posts/random',
@@ -24,7 +24,7 @@ export enum ApiUrl {
   LINK_FRIEND = '/links/friend',
   LINK_FAVORITE = '/links/favorites',
   // comment
-  COMMENT_LIST = '/comments',
+  COMMENTS = '/comments',
   COMMENT = '/comments/comment',
   // vote
   VOTE = '/votes/vote',
@@ -44,9 +44,9 @@ export enum ApiUrl {
   LEAVE_LOG = '/logs/leave',
   ACTION_LOG = '/logs/action',
   // wallpaper
-  WALLPAPER_LIST = '/wallpapers',
-  WALLPAPER_RANDOM = '/wallpapers/random',
+  WALLPAPERS = '/wallpapers',
   WALLPAPER_HOT = '/wallpapers/hot',
+  WALLPAPER_RANDOM = '/wallpapers/random',
   // app
   TENANT_APP = '/apps/app'
 }

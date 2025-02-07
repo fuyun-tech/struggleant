@@ -29,7 +29,7 @@ export class CommentService {
 
   getCommentsByPostId(postId: string): Observable<ResultList<Comment>> {
     return this.apiService
-      .httpGet(ApiUrl.COMMENT_LIST, {
+      .httpGet(ApiUrl.COMMENTS, {
         objectId: postId,
         objectType: CommentObjectType.POST,
         appId: APP_ID
@@ -53,7 +53,8 @@ export class CommentService {
     let tree = copies.filter((father) => {
       father.children = copies.filter((child) => {
         if (father.commentId === child.commentParent) {
-          child.parent = father;
+          // 不能直接赋值，否则会循环引用
+          child.parent = { ...father };
           return true;
         }
         return false;

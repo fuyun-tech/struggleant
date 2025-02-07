@@ -1,4 +1,4 @@
-import { NgForOf } from '@angular/common';
+import { NgFor } from '@angular/common';
 import { HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -28,7 +28,7 @@ import { UserAgentService } from '../../services/user-agent.service';
 @Component({
   selector: 'app-search',
   imports: [
-    NgForOf,
+    NgFor,
     NzEmptyModule,
     BreadcrumbComponent,
     PaginationComponent,
@@ -44,13 +44,13 @@ export class SearchComponent implements OnInit {
   page = 1;
   pageSize = 10;
   total = 0;
-  keyword = '';
   searchResult: SearchResponse[] = [];
 
   protected pageIndex = 'search';
 
   private appInfo!: TenantAppModel;
   private options: OptionEntity = {};
+  private keyword = '';
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -68,8 +68,6 @@ export class SearchComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.updatePageIndex();
-
     combineLatest([this.tenantAppService.appInfo$, this.optionService.options$, this.route.queryParamMap])
       .pipe(
         skipWhile(([appInfo, options]) => isEmpty(appInfo) || isEmpty(options)),
@@ -83,6 +81,7 @@ export class SearchComponent implements OnInit {
         this.page = Number(qp.get('page')) || 1;
         this.keyword = qp.get('keyword')?.trim() || '';
 
+        this.updatePageIndex();
         this.updatePageInfo();
         this.updateBreadcrumbs();
 
@@ -139,7 +138,9 @@ export class SearchComponent implements OnInit {
     this.metaService.updateHTMLMeta({
       title: titles.join(' - '),
       description,
-      keywords: uniq(keywords).join(','),
+      keywords: uniq(keywords)
+        .filter((item) => !!item)
+        .join(','),
       author: this.options['site_author']
     });
   }

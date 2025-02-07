@@ -12,11 +12,11 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class WallpaperService {
-  constructor(private apiService: ApiService) {}
+  constructor(private readonly apiService: ApiService) {}
 
   getWallpapers(param: WallpaperQueryParam): Observable<ResultList<Wallpaper>> {
     return this.apiService
-      .httpGet(ApiUrl.WALLPAPER_LIST, {
+      .httpGet(ApiUrl.WALLPAPERS, {
         ...param,
         appId: APP_ID
       })

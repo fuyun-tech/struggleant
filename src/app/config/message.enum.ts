@@ -9,8 +9,10 @@
 export enum Message {
   // todo: internationalize
   UNKNOWN_ERROR = 'Unknown error',
+  ADD_FAVORITE_MUST_LOGIN = '收藏文章请先登录',
   ADD_FAVORITE_SUCCESS = '收藏成功',
   VOTE_SUCCESS = '投票成功',
+  LOGIN_ERROR = '登录失败',
   ERROR_400 = 'Sorry, the request is invalid.',
   ERROR_403 = 'Sorry, you are not authorized to access this page.',
   ERROR_404 = 'Sorry, the page you visited does not exist.',
