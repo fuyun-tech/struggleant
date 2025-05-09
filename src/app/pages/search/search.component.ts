@@ -88,7 +88,7 @@ export class SearchComponent implements OnInit {
         if (!this.keyword) {
           throw new CustomError(Message.SEARCH_KEYWORD_IS_NULL, HttpStatusCode.BadRequest);
         }
-        this.getSearchResults();
+        this.search();
       });
   }
 
@@ -96,7 +96,7 @@ export class SearchComponent implements OnInit {
     this.commonService.updatePageIndex(this.pageIndex);
   }
 
-  private getSearchResults() {
+  private search() {
     this.searchService
       .search({
         keyword: this.keyword,
@@ -121,7 +121,7 @@ export class SearchComponent implements OnInit {
   }
 
   private updatePageInfo() {
-    const titles: string[] = ['搜索', this.appInfo.appName];
+    const titles: string[] = [this.keyword, '搜索', this.appInfo.appName];
     const keywords: string[] = [...this.appInfo.keywords];
     let description = `「${this.keyword}」搜索结果`;
     keywords.unshift(...this.keyword.split(/\s+/i));

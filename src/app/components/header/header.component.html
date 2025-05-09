@@ -62,7 +62,7 @@
         } @else {
           <div class="more-action-group">
             <div class="more-action-nav">
-              <nz-icon nzType="user" /><span>{{ user.userNickname }}</span><i class="nav-arrow"></i>
+              <nz-icon nzType="user" /><span>{{ user.userNickname }}</span><span class="nav-arrow"></span>
             </div>
             <div class="more-action-list">
               <div class="sub-nav-list">
@@ -91,7 +91,7 @@
               <ul>
                 <li>
                   <a class="sub-nav-link" (click)="showRedPacket()" title="支付宝扫码领红包">
-                    <nz-icon class="icon-red-packet" nzType="red-envelope" /><span>每日红包</span>
+                    <nz-icon class="icon-red-packet" nzType="red-envelope" /><span>支付宝每日红包</span>
                   </a>
                 </li>
                 <li>
@@ -136,6 +136,7 @@
                      #mSearchInput
                      type="text"
                      name="keyword"
+                     nzSize="large"
                      [(ngModel)]="keyword"
                      autocomplete="off"
                      placeholder="搜索全站（支持全文搜索）" />

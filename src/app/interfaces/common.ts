@@ -3,6 +3,7 @@ export interface PageIndexInfo {
   isPost: boolean;
   isArticle: boolean;
   isPage: boolean;
+  isSearch: boolean;
   isAuth: boolean;
   fullPage: string;
   subPage: string;

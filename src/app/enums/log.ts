@@ -20,7 +20,6 @@ export enum ActionType {
   SHOW_WECHAT_CARD = 'show_wechat_card',
   // rss
   OPEN_POST_RSS = 'open_post_rss',
-  OPEN_WALLPAPER_RSS = 'open_wallpaper_rss',
   // setting
   CHANGE_THEME = 'change_theme',
   CHANGE_LANG = 'change_lang',

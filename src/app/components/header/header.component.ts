@@ -196,10 +196,10 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
     this.commonService.updateSiderVisible(true);
   }
 
-  logRSS(isWallpaper = false) {
+  logRSS() {
     this.logService
       .logAction({
-        action: isWallpaper ? ActionType.OPEN_WALLPAPER_RSS : ActionType.OPEN_POST_RSS,
+        action: ActionType.OPEN_POST_RSS,
         objectType: ActionObjectType.HEADER
       })
       .pipe(takeUntil(this.destroy$))
