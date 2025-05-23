@@ -9,11 +9,13 @@ import { MSiderComponent } from './components/m-sider/m-sider.component';
 import { COOKIE_KEY_UV_ID, MEDIA_QUERY_THEME_DARK } from './config/common.constant';
 import { ResponseCode } from './config/response-code.enum';
 import { Theme } from './enums/common';
+import { AdsStatus } from './enums/log';
 import { ErrorState } from './interfaces/common';
 import { TaxonomyNode } from './interfaces/taxonomy';
 import { ForbiddenComponent } from './pages/error/forbidden/forbidden.component';
 import { NotFoundComponent } from './pages/error/not-found/not-found.component';
 import { ServerErrorComponent } from './pages/error/server-error/server-error.component';
+import { AdsService } from './services/ads.service';
 import { CommonService } from './services/common.service';
 import { ErrorService } from './services/error.service';
 import { LogService } from './services/log.service';
@@ -55,6 +57,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   private initialized = false;
   private accessLogId = '';
   private bodyOffset = 0;
+  private adsStatus: AdsStatus = AdsStatus.UNKNOWN;
 
   constructor(
     private readonly router: Router,
@@ -69,7 +72,8 @@ export class AppComponent implements OnInit, AfterViewInit {
     private readonly userService: UserService,
     private readonly tenantAppService: TenantAppService,
     private readonly taxonomyService: TaxonomyService,
-    private readonly logService: LogService
+    private readonly logService: LogService,
+    private readonly adsService: AdsService
   ) {
     this.isMobile = this.userAgentService.isMobile;
   }
@@ -111,10 +115,22 @@ export class AppComponent implements OnInit, AfterViewInit {
           });
           if (this.platform.isBrowser) {
             this.logService
-              .logAccess(this.logService.parseAccessLog(this.initialized, this.currentUrl, isNew, this.accessLogId))
+              .logAccess(
+                this.logService.parseAccessLog({
+                  initialized: this.initialized,
+                  referrer: this.currentUrl,
+                  isNew,
+                  adsStatus: this.adsStatus,
+                  logId: this.accessLogId
+                }))
               .subscribe((res) => {
                 if (res.code === ResponseCode.SUCCESS) {
+                  const oldAccessLogId = this.accessLogId;
+
                   this.accessLogId = res.data.logId || '';
+                  this.checkAdsStatus({
+                    oldLogId: oldAccessLogId
+                  });
                 }
               });
           }
@@ -149,6 +165,17 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       this.siderVisible = visible;
     });
+
+    if (this.platform.isBrowser) {
+      this.adsService.adsStatus$.subscribe((status) => {
+        const oldAdsStatus = this.adsStatus;
+
+        this.adsStatus = status;
+        this.checkAdsStatus({
+          oldStatus: oldAdsStatus
+        });
+      });
+    }
   }
 
   ngAfterViewInit(): void {
@@ -171,6 +198,15 @@ export class AppComponent implements OnInit, AfterViewInit {
   closeSider() {
     this.siderVisible = false;
     this.commonService.updateSiderVisible(false);
+  }
+
+  private checkAdsStatus(param: { oldLogId?: string; oldStatus?: AdsStatus }) {
+    const { oldLogId, oldStatus } = param;
+
+    // 同应用异步跳转直接合并在日志请求，无需额外请求
+    if (!oldLogId && this.accessLogId && this.adsStatus && this.adsStatus !== oldStatus) {
+      this.logService.logAdsStatus(this.accessLogId, this.adsStatus).subscribe(() => {});
+    }
   }
 
   private initTheme() {

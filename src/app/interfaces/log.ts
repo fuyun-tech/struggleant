@@ -2,31 +2,29 @@ import { Theme } from '../enums/common';
 import { ActionObjectType, ActionType } from '../enums/log';
 import { AppParam } from './common';
 
-export interface UserAgentData {
+export interface AccessLog {
+  li?: string;
+  faId?: string;
+  au: string;
+  s: 'web' | 'admin';
+  rf: string;
+  rm?: string;
+  rs: string;
+  cd: string;
+  im: 0 | 1;
+  ic: 0 | 1;
+  ia: 0 | 1;
+  in: 0 | 1;
+  as: number;
   os: string;
-  osVersion: string;
-  architecture: string;
-  browser: string;
-  browserVersion: string;
-  engine: string;
-  engineVersion: string;
-  isMobile: 0 | 1;
-  isCrawler: 0 | 1;
-  userAgent: string;
-}
-
-export interface AccessLog extends UserAgentData, AppParam {
-  logId: string;
-  accessUrl: string;
-  accessTime?: Date;
-  site: 'web' | 'admin';
-  referrer: string;
-  requestMethod?: string;
-  userIp?: string;
-  resolution: string;
-  colorDepth: string;
-  isAjax: 0 | 1;
-  isNew: 0 | 1;
+  ov: string;
+  a: string;
+  b: string;
+  bv: string;
+  e: string;
+  ev: string;
+  ua: string;
+  appId: string;
 }
 
 export interface LeaveLog {

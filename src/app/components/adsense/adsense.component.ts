@@ -2,8 +2,10 @@ import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } fro
 import { isEmpty, uniq } from 'lodash';
 import { skipWhile, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AdsStatus } from '../../enums/log';
 import { AdsenseOptions } from '../../interfaces/adsense';
 import { OptionEntity } from '../../interfaces/option';
+import { AdsService } from '../../services/ads.service';
 import { ConsoleService } from '../../services/console.service';
 import { DestroyService } from '../../services/destroy.service';
 import { OptionService } from '../../services/option.service';
@@ -59,6 +61,7 @@ export class AdsenseComponent implements AfterViewInit, OnDestroy {
     private readonly platform: PlatformService,
     private readonly userAgentService: UserAgentService,
     private readonly optionService: OptionService,
+    private readonly adsService: AdsService,
     private readonly console: ConsoleService
   ) {
     this.isMobile = this.userAgentService.isMobile;
@@ -151,14 +154,19 @@ export class AdsenseComponent implements AfterViewInit, OnDestroy {
 
           ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(ads);
           if (Array.isArray((window as any).adsbygoogle)) {
+            this.adsService.updateAdsStatus(AdsStatus.BLOCKED);
             this.console.warn('Ads is blocked.');
             this.hideAdsense();
+          } else {
+            this.adsService.updateAdsStatus(AdsStatus.ENABLED);
           }
         } catch (e: any) {
+          this.adsService.updateAdsStatus(AdsStatus.ERROR);
           this.console.error(e.message || 'Ads is not working.');
           this.hideAdsense();
         }
       } else {
+        this.adsService.updateAdsStatus(AdsStatus.DISABLED);
         this.console.warn('Ads is disabled.');
         this.hideAdsense();
       }
