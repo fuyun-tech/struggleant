@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { environment } from 'env/environment';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { takeUntil } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { Wallpaper } from '../../interfaces/wallpaper';
 import { DestroyService } from '../../services/destroy.service';
 import { WallpaperService } from '../../services/wallpaper.service';
@@ -49,7 +49,7 @@ export class WallpaperModalComponent implements OnChanges {
 
   gotoDetail() {
     const lang = this.activeWallpaper.isCn ? '' : '&lang=en';
-    window.open(`${environment.wallpaperHost}/wallpaper/${this.activeWallpaper.wallpaperId}?ref=sa_modal${lang}`);
+    window.open(`${environment.wallpaperHost}/detail/${this.activeWallpaper.wallpaperId}?ref=sa_modal${lang}`);
   }
 
   gotoSearch() {
@@ -57,7 +57,7 @@ export class WallpaperModalComponent implements OnChanges {
   }
 
   gotoWallpaper() {
-    window.open(`${environment.wallpaperHost}/wallpaper?ref=sa_modal`);
+    window.open(`${environment.wallpaperHost}/detail?ref=sa_modal`);
   }
 
   closeModal() {

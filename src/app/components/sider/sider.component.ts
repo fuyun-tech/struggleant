@@ -1,10 +1,10 @@
 import { NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { environment } from 'env/environment';
 import { isEmpty } from 'lodash';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { skipWhile, takeUntil } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { BookEntity } from '../../interfaces/book';
 import { ArchiveData, PageIndexInfo } from '../../interfaces/common';
 import { OptionEntity } from '../../interfaces/option';

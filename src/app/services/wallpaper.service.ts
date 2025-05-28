@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { environment } from 'env/environment';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
 import { ApiUrl } from '../config/api-url';
 import { APP_ID } from '../config/common.constant';
 import { ResultList } from '../interfaces/common';
@@ -94,6 +94,6 @@ export class WallpaperService {
   }
 
   getWallpaperLink(wallpaperId: string, isEn: boolean) {
-    return `${environment.wallpaperHost}/wallpaper/${wallpaperId}${isEn ? '?lang=en' : ''}`;
+    return `${environment.wallpaperHost}/detail/${wallpaperId}${isEn ? '?lang=en' : ''}`;
   }
 }

@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'env/environment';
 import { catchError, Observable, of } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { Message } from '../config/message.enum';
 import { HttpResponseEntity } from '../interfaces/http-response';
 import { MessageService } from './message.service';

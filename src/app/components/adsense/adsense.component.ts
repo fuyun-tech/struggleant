@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
+import { environment } from 'env/environment';
 import { isEmpty, uniq } from 'lodash';
 import { skipWhile, takeUntil } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import { AdsStatus } from '../../enums/log';
 import { AdsenseOptions } from '../../interfaces/adsense';
 import { OptionEntity } from '../../interfaces/option';
@@ -33,7 +33,7 @@ export class AdsenseComponent implements AfterViewInit, OnDestroy {
   @Input() responsive!: boolean | undefined;
   @Input() className!: string;
   @Input() style!: string;
-  @Input() display: string = 'inline-block';
+  @Input() display: string = 'block';
   @Input() width!: number | string;
   @Input() height!: number | string;
   @Input() minWidth!: number | string;
@@ -85,6 +85,11 @@ export class AdsenseComponent implements AfterViewInit, OnDestroy {
         this.initOptions();
         this.initAdsense();
       });
+    this.adsService.adsStatus$.pipe(takeUntil(this.destroy$)).subscribe((status) => {
+      if (status !== AdsStatus.ENABLED && status !== AdsStatus.UNKNOWN) {
+        this.hideAdsense();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -102,7 +107,7 @@ export class AdsenseComponent implements AfterViewInit, OnDestroy {
       format: '',
       className: '',
       style: '',
-      display: 'inline-block',
+      display: 'block',
       region: 'ad-' + Math.floor(Math.random() * 10000) + 1,
       testMode: false
     };
@@ -117,6 +122,7 @@ export class AdsenseComponent implements AfterViewInit, OnDestroy {
       ...defaults,
       ...adsenseOptions
     };
+
     this.clientId = this.clientId ?? adsenseOptions.clientId;
     this.slotId = this.slotId ?? adsenseOptions.slotId;
     this.format = this.format ?? adsenseOptions.format;
@@ -153,22 +159,11 @@ export class AdsenseComponent implements AfterViewInit, OnDestroy {
           this.renderAdsense();
 
           ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(ads);
-          if (Array.isArray((window as any).adsbygoogle)) {
-            this.adsService.updateAdsStatus(AdsStatus.BLOCKED);
-            this.console.warn('Ads is blocked.');
-            this.hideAdsense();
-          } else {
-            this.adsService.updateAdsStatus(AdsStatus.ENABLED);
-          }
         } catch (e: any) {
           this.adsService.updateAdsStatus(AdsStatus.ERROR);
-          this.console.error(e.message || 'Ads is not working.');
-          this.hideAdsense();
         }
       } else {
         this.adsService.updateAdsStatus(AdsStatus.DISABLED);
-        this.console.warn('Ads is disabled.');
-        this.hideAdsense();
       }
     }
   }

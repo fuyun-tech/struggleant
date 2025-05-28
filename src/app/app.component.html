@@ -21,6 +21,11 @@
       </div>
       <app-m-sider></app-m-sider>
     }
+    <img src="/assets/images/adimage.gif"
+         [style.display]="'none'"
+         (load)="checkAdsStatus(true)"
+         (error)="checkAdsStatus(false)"
+         alt="">
   } @else {
     <!--global errors-->
     <ng-container [ngSwitch]="errorState.code">

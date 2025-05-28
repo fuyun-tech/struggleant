@@ -7,5 +7,5 @@ export const environment = {
     domain: 'localhost',
     expires: 3
   },
-  wallpaperHost: 'https://www.ifuyun.com'
+  wallpaperHost: 'https://wallpaper.ifuyun.com'
 };

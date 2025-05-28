@@ -1,9 +1,9 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpStatusCode } from '@angular/common/http';
 import { ElementRef, Inject, Injectable, Optional, REQUEST, RESPONSE_INIT } from '@angular/core';
+import { environment } from 'env/environment';
 import { Request } from 'express';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { environment } from '../../environments/environment';
 import {
   COOKIE_KEY_THEME,
   COOKIE_KEY_USER_ID,

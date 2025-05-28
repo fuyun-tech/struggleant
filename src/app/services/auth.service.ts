@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { environment } from 'env/environment';
 import { Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
 import { ApiUrl } from '../config/api-url';
 import { APP_ID, COOKIE_KEY_USER_ID, COOKIE_KEY_USER_NAME, COOKIE_KEY_USER_TOKEN } from '../config/common.constant';
 import { ResponseCode } from '../config/response-code.enum';

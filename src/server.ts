@@ -6,6 +6,7 @@ import {
   writeResponseToNodeResponse
 } from '@angular/ssr/node';
 import { Feed } from '@fuyun/feed';
+import { environment } from 'env/environment';
 import express, { Request, Response } from 'express';
 import { uniq } from 'lodash';
 import { dirname, resolve } from 'node:path';
@@ -17,7 +18,6 @@ import { Message } from './app/config/message.enum';
 import { PostType } from './app/enums/post';
 import { Post } from './app/interfaces/post';
 import { SitemapData } from './app/interfaces/sitemap';
-import { environment } from './environments/environment';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');

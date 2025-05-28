@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/router';
-import { filter, tap } from 'rxjs/operators';
-import { environment } from '../environments/environment';
+import { environment } from 'env/environment';
+import { filter, takeWhile, tap } from 'rxjs/operators';
 import { FooterComponent } from './components/footer/footer.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MSiderComponent } from './components/m-sider/m-sider.component';
@@ -128,7 +128,7 @@ export class AppComponent implements OnInit, AfterViewInit {
                   const oldAccessLogId = this.accessLogId;
 
                   this.accessLogId = res.data.logId || '';
-                  this.checkAdsStatus({
+                  this.logAdsStatus({
                     oldLogId: oldAccessLogId
                   });
                 }
@@ -167,14 +167,16 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
 
     if (this.platform.isBrowser) {
-      this.adsService.adsStatus$.subscribe((status) => {
-        const oldAdsStatus = this.adsStatus;
+      this.adsService.adsStatus$
+        .pipe(takeWhile((status) => status !== AdsStatus.DISABLED, true))
+        .subscribe((status) => {
+          const oldAdsStatus = this.adsStatus;
 
-        this.adsStatus = status;
-        this.checkAdsStatus({
-          oldStatus: oldAdsStatus
+          this.adsStatus = status;
+          this.logAdsStatus({
+            oldStatus: oldAdsStatus
+          });
         });
-      });
     }
   }
 
@@ -200,7 +202,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.commonService.updateSiderVisible(false);
   }
 
-  private checkAdsStatus(param: { oldLogId?: string; oldStatus?: AdsStatus }) {
+  checkAdsStatus(isLoaded: boolean) {
+    this.adsService.updateAdsStatus(isLoaded ? AdsStatus.ENABLED : AdsStatus.BLOCKED);
+  }
+
+  private logAdsStatus(param: { oldLogId?: string; oldStatus?: AdsStatus }) {
     const { oldLogId, oldStatus } = param;
 
     // 同应用异步跳转直接合并在日志请求，无需额外请求
