@@ -123,7 +123,7 @@ export class SearchComponent implements OnInit {
   private updatePageInfo() {
     const titles: string[] = [this.keyword, '搜索', this.appInfo.appName];
     const keywords: string[] = [...this.appInfo.keywords];
-    let description = `「${this.keyword}」搜索结果`;
+    let description = `「${this.keyword}」期刊搜索结果`;
     keywords.unshift(...this.keyword.split(/\s+/i));
 
     if (this.page > 1) {

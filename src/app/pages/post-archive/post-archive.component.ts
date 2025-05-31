@@ -81,10 +81,10 @@ export class PostArchiveComponent implements OnInit {
   }
 
   private updatePageInfo() {
-    const titles = ['归档', '期刊', this.appInfo.appName];
+    const titles = ['期刊归档', this.appInfo.appName];
     const metaData: HTMLMetaData = {
       title: titles.join(' - '),
-      description: `${this.appInfo.appName}期刊文章归档。${this.appInfo.appDescription}`,
+      description: `${this.appInfo.appName}期刊归档。${this.appInfo.appDescription}`,
       keywords: this.appInfo.appKeywords,
       author: this.options['site_author']
     };
@@ -94,15 +94,9 @@ export class PostArchiveComponent implements OnInit {
   private updateBreadcrumbs(): void {
     const breadcrumbs = [
       {
-        label: '期刊',
-        tooltip: `期刊文章列表`,
-        url: '/post',
-        isHeader: false
-      },
-      {
-        label: '归档',
-        tooltip: `期刊文章归档`,
-        url: '/post/archive',
+        label: '期刊归档',
+        tooltip: `期刊归档`,
+        url: '/archive',
         isHeader: true
       }
     ];

@@ -21,13 +21,37 @@ export const routes: Routes = [
     path: 'post',
     component: ContentLayoutComponent,
     children: [
-      { path: '', pathMatch: 'full', component: PostListComponent },
-      { path: 'category/:category', component: PostListComponent },
-      { path: 'tag/:tag', component: PostListComponent },
-      { path: 'archive/:year', component: PostListComponent },
-      { path: 'archive/:year/:month', component: PostListComponent },
-      { path: 'archive', component: PostArchiveComponent },
       { path: ':slug', component: PostComponent }
+    ]
+  },
+  {
+    path: 'post-list',
+    component: ContentLayoutComponent,
+    children: [
+      { path: '', pathMatch: 'full', component: PostListComponent }
+    ]
+  },
+  {
+    path: 'category',
+    component: ContentLayoutComponent,
+    children: [
+      { path: ':category', component: PostListComponent }
+    ]
+  },
+  {
+    path: 'tag',
+    component: ContentLayoutComponent,
+    children: [
+      { path: ':tag', component: PostListComponent }
+    ]
+  },
+  {
+    path: 'archive',
+    component: ContentLayoutComponent,
+    children: [
+      { path: '', pathMatch: 'full', component: PostArchiveComponent },
+      { path: ':year', component: PostListComponent },
+      { path: ':year/:month', component: PostListComponent }
     ]
   },
   {

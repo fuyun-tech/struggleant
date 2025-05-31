@@ -353,28 +353,24 @@ export class PostComponent implements OnInit {
 
     this.postService.updateActivePostId(post.post.postId);
     this.postService.updateActiveBook(post.book);
-    this.updateBreadcrumbs(this.isArticle ? post.breadcrumbs : []);
+    this.updateBreadcrumbs();
     this.updatePageIndex();
     this.updatePageInfo();
   }
 
-  private updateBreadcrumbs(breadcrumbData?: BreadcrumbEntity[]) {
-    const breadcrumbs = (breadcrumbData || []).map((item) => ({
-      ...item,
-      url: `/post/category/${item.slug}`
-    }));
-    breadcrumbs.unshift({
+  private updateBreadcrumbs() {
+    const breadcrumbs: BreadcrumbEntity[] = [{
       label: '期刊',
       tooltip: '期刊文章列表',
-      url: '/post',
+      url: '/post-list',
       isHeader: false
-    });
+    }];
     if (this.postBook) {
       breadcrumbs[breadcrumbs.length - 1].isHeader = false;
       breadcrumbs.push({
-        label: this.postBookName.shortName,
+        label: this.postBookName.fullName,
         tooltip: this.postBookName.fullName,
-        url: '/post',
+        url: '/post-list',
         param: {
           bookId: this.postBook.bookId
         },

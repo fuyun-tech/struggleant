@@ -52,16 +52,16 @@ export class PostListComponent implements OnInit {
 
   get paginationUrl() {
     if (this.category) {
-      return `/post/category/${this.category}`;
+      return `/category/${this.category}`;
     }
     if (this.tag) {
-      return `/post/tag/${this.tag}`;
+      return `/tag/${this.tag}`;
     }
     if (this.year) {
-      return `/post/archive/${this.year}${this.month ? '/' + this.month : ''}`;
+      return `/archive/${this.year}${this.month ? '/' + this.month : ''}`;
     }
 
-    return '/post';
+    return '/post-list';
   }
 
   get paginationParam(): Params {
@@ -180,7 +180,7 @@ export class PostListComponent implements OnInit {
 
         const breadcrumbs = (res.breadcrumbs || []).map((item) => ({
           ...item,
-          url: `/post/category/${item.slug}`
+          url: `/category/${item.slug}`
         }));
         this.initData(breadcrumbs);
       });
@@ -218,26 +218,26 @@ export class PostListComponent implements OnInit {
   }
 
   private updatePageInfo(breadcrumbData: BreadcrumbEntity[]) {
-    const titles: string[] = ['期刊', this.appInfo.appName];
+    const titles: string[] = [this.appInfo.appName];
     const categories: string[] = [];
     const keywords: string[] = [...this.appInfo.keywords];
     let description = '';
 
     if (this.category && breadcrumbData.length > 0) {
       const label = breadcrumbData[breadcrumbData.length - 1].label;
-      titles.unshift(label);
+      titles.unshift(label, '分类');
       categories.push(label);
       keywords.unshift(label);
     }
     if (this.tag) {
-      titles.unshift(this.tag);
+      titles.unshift(this.tag, '标签');
       categories.push(this.tag);
       keywords.unshift(this.tag);
     }
     description += categories.length > 0 ? `「${categories.join('-')}」` : '';
     if (this.year) {
       const label = `${this.year}年${this.month ? this.month + '月' : ''}`;
-      titles.unshift(label);
+      titles.unshift(label, '期刊归档');
       description += label;
     }
     if (this.postBook) {
@@ -249,7 +249,10 @@ export class PostListComponent implements OnInit {
       keywords.unshift(this.postBook.bookName);
     }
     if (description) {
-      description += '文章列表';
+      description += '期刊文章列表';
+    }
+    if (titles.length < 2) {
+      titles.unshift('期刊文章列表');
     }
     if (this.page > 1) {
       titles.unshift(`第${this.page}页`);
@@ -273,14 +276,7 @@ export class PostListComponent implements OnInit {
   }
 
   private updateBreadcrumbs(breadcrumbData: BreadcrumbEntity[]) {
-    let breadcrumbs: BreadcrumbEntity[] = [
-      {
-        label: '期刊',
-        tooltip: `期刊文章列表`,
-        url: '/post',
-        isHeader: false
-      }
-    ];
+    let breadcrumbs: BreadcrumbEntity[] = [];
     if (this.tag) {
       breadcrumbs.push(
         {
@@ -292,7 +288,7 @@ export class PostListComponent implements OnInit {
         {
           label: this.tag,
           tooltip: this.tag,
-          url: `/post/tag/${this.tag}`,
+          url: `/tag/${this.tag}`,
           isHeader: true
         }
       );
@@ -300,15 +296,15 @@ export class PostListComponent implements OnInit {
     if (this.year) {
       breadcrumbs.push(
         {
-          label: '归档',
-          tooltip: `期刊文章归档`,
-          url: `/post/archive`,
+          label: '期刊归档',
+          tooltip: `期刊归档`,
+          url: `/archive`,
           isHeader: false
         },
         {
           label: `${this.year}年`,
           tooltip: `${this.year}年`,
-          url: `/post/archive/${this.year}`,
+          url: `/archive/${this.year}`,
           isHeader: !this.month
         }
       );
@@ -316,22 +312,43 @@ export class PostListComponent implements OnInit {
         breadcrumbs.push({
           label: `${Number(this.month)}月`,
           tooltip: `${this.year}年${this.month}月`,
-          url: `/post/archive/${this.year}/${this.month}`,
+          url: `/archive/${this.year}/${this.month}`,
           isHeader: true
         });
       }
     }
     if (breadcrumbData.length > 0) {
+      breadcrumbs.push(
+        {
+          label: '分类',
+          tooltip: '分类',
+          url: '',
+          isHeader: false
+        }
+      );
       breadcrumbs = breadcrumbs.concat(breadcrumbData);
     }
     if (this.postBook) {
       breadcrumbs.push({
+        label: '期刊',
+        tooltip: '期刊文章列表',
+        url: '/post-list',
+        isHeader: false
+      }, {
         label: this.postBookName.fullName,
         tooltip: this.postBookName.fullName,
-        url: '/post',
+        url: '/post-list',
         param: {
           bookId: this.bookId
         },
+        isHeader: true
+      });
+    }
+    if (breadcrumbs.length < 1) {
+      breadcrumbs.push({
+        label: '期刊',
+        tooltip: '期刊文章列表',
+        url: '/post-list',
         isHeader: true
       });
     }

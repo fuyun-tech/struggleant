@@ -110,12 +110,12 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
         priority: 1
       },
       {
-        url: appInfo.appUrl + '/post',
+        url: appInfo.appUrl + '/post-list',
         changefreq: EnumChangefreq.ALWAYS,
         priority: 1
       },
       {
-        url: appInfo.appUrl + '/post/archive',
+        url: appInfo.appUrl + '/archive',
         changefreq: EnumChangefreq.ALWAYS,
         priority: 0.8
       }
@@ -137,24 +137,24 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
         lastmod: new Date(item.postModified).toString()
       }));
     const postArchivesByMonth: SitemapItemLoose[] = sitemap.postArchives.map((item) => ({
-      url: `${appInfo.appUrl}/post/archive/${item.dateValue}`,
+      url: `${appInfo.appUrl}/archive/${item.dateValue}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
     const postArchivesByYear: SitemapItemLoose[] = uniq(
       sitemap.postArchives.map((item) => item.dateValue.split('/')[0])
     ).map((item) => ({
-      url: `${appInfo.appUrl}/post/archive/${item}`,
+      url: `${appInfo.appUrl}/archive/${item}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
     const taxonomies: SitemapItemLoose[] = sitemap.taxonomies.map((item) => ({
-      url: `${appInfo.appUrl}/post/category/${item.taxonomySlug}`,
+      url: `${appInfo.appUrl}/category/${item.taxonomySlug}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
     const tags: SitemapItemLoose[] = sitemap.tags.map((item) => ({
-      url: `${appInfo.appUrl}/post/tag/${item.tagName}`,
+      url: `${appInfo.appUrl}/tag/${item.tagName}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
