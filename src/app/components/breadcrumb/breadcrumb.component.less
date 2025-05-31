@@ -19,7 +19,14 @@
   > h3 {
     display: inline-flex;
 
-    > a {
+    span {
+      display: inline-flex;
+      overflow: hidden;
+    }
+
+    a {
+      display: inline-block;
+      max-width: 100%;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
