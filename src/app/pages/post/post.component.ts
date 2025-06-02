@@ -227,6 +227,10 @@ export class PostComponent implements OnInit {
     }
   }
 
+  onPostSelect() {
+    return !this.post.postPayFlag && (!this.post.postLoginFlag || this.isSignIn);
+  }
+
   vote() {
     if (this.voteLoading || this.isVoted) {
       return;

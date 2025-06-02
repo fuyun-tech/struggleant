@@ -6,7 +6,6 @@ import { AdsStatus } from '../../enums/log';
 import { AdsenseOptions } from '../../interfaces/adsense';
 import { OptionEntity } from '../../interfaces/option';
 import { AdsService } from '../../services/ads.service';
-import { ConsoleService } from '../../services/console.service';
 import { DestroyService } from '../../services/destroy.service';
 import { OptionService } from '../../services/option.service';
 import { PlatformService } from '../../services/platform.service';
@@ -61,8 +60,7 @@ export class AdsenseComponent implements AfterViewInit, OnDestroy {
     private readonly platform: PlatformService,
     private readonly userAgentService: UserAgentService,
     private readonly optionService: OptionService,
-    private readonly adsService: AdsService,
-    private readonly console: ConsoleService
+    private readonly adsService: AdsService
   ) {
     this.isMobile = this.userAgentService.isMobile;
   }
