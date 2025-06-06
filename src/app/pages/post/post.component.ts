@@ -393,8 +393,8 @@ export class PostComponent implements OnInit {
 
     if (this.postBook) {
       titles.unshift(this.postBook.bookName);
-      if (this.postBook.bookIssueNumber) {
-        titles.unshift(this.postBook.bookIssueNumber);
+      if (this.postBook.bookIssue) {
+        titles.unshift(this.postBook.bookIssue);
       }
       keywords.unshift(this.postBook.bookName);
     }
