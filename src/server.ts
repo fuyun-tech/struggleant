@@ -98,7 +98,7 @@ app.get('/rss.xml', async (req: Request, res: Response) => {
 app.get('/sitemap.xml', async (req: Request, res: Response) => {
   try {
     const { data: appInfo } = await request(ApiUrl.TENANT_APP);
-    const sitemap: SitemapData = (await request(ApiUrl.SITEMAP)).data;
+    const sitemap: SitemapData = (await request(ApiUrl.SITEMAP_POST)).data;
     const sitemapStream = new SitemapStream({
       hostname: appInfo.appUrl
     });
@@ -133,7 +133,7 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
       .map((item) => ({
         url: appInfo.appUrl + item.postGuid,
         changefreq: EnumChangefreq.ALWAYS,
-        priority: 0.9,
+        priority: 1,
         lastmod: new Date(item.postModified).toString()
       }));
     const postArchivesByMonth: SitemapItemLoose[] = sitemap.postArchives.map((item) => ({

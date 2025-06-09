@@ -6,7 +6,7 @@ export enum ApiUrl {
   OPTION_FRONTEND = '/options/frontend',
   OPTION_CAROUSELS = '/options/carousels',
   // util
-  SITEMAP = '/util/sitemap',
+  SITEMAP_POST = '/posts/post-sitemap',
   // post
   POSTS = '/posts',
   POST = '/posts/post',
