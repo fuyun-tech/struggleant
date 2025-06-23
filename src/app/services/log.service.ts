@@ -52,12 +52,12 @@ export class LogService {
   }
 
   logAccess(log: AccessLog): Observable<HttpResponseEntity> {
-    return this.apiService.httpPost(ApiUrl.LOG_ACCESS, log, false);
+    return this.apiService.httpPost(ApiUrl.ACCESS_LOG, log, false);
   }
 
   logAdsStatus(logId: string, status: AdsStatus): Observable<HttpResponseEntity> {
     return this.apiService.httpPost(
-      ApiUrl.LOG_ADS,
+      ApiUrl.ACCESS_LOG_PLUGIN,
       {
         logId,
         status,
@@ -70,7 +70,7 @@ export class LogService {
   logLeave(log: Omit<LeaveLog, 'appId'>): void {
     if (log.logId) {
       navigator.sendBeacon(
-        this.apiService.getApiUrl(ApiUrl.LOG_LEAVE),
+        this.apiService.getApiUrl(ApiUrl.ACCESS_LOG_LEAVE),
         JSON.stringify({
           ...log,
           appId: APP_ID
@@ -81,7 +81,7 @@ export class LogService {
 
   logAction(log: Omit<ActionLog, 'faId' | 'ref' | 'appId'>): Observable<HttpResponseEntity> {
     return this.apiService.httpPost(
-      ApiUrl.LOG_ACTION,
+      ApiUrl.ACTION_LOG,
       {
         ...log,
         ref: location.href,
