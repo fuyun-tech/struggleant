@@ -2,7 +2,6 @@ import { DOCUMENT } from '@angular/common';
 import { HttpStatusCode } from '@angular/common/http';
 import { ElementRef, Inject, Injectable, Optional, REQUEST, RESPONSE_INIT } from '@angular/core';
 import { environment } from 'env/environment';
-import { Request } from 'express';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import {
   COOKIE_KEY_THEME,
@@ -32,7 +31,7 @@ export class CommonService {
 
   constructor(
     @Inject(DOCUMENT) private readonly document: Document,
-    @Optional() @Inject(REQUEST) private readonly request: Request,
+    @Optional() @Inject(REQUEST) private readonly request: any,
     @Optional() @Inject(RESPONSE_INIT) private readonly response: any,
     private readonly platform: PlatformService,
     private readonly cookieService: SsrCookieService
@@ -62,16 +61,20 @@ export class CommonService {
     this.siderVisible.next(visible);
   }
 
-  getReferrer() {
+  getReferrer(onlyPath = false) {
+    let referrer: string;
     if (this.platform.isServer) {
-      const headers: any = this.request?.headers;
-      if (headers) {
-        const referrer: string = headers.get('referer') || headers.get('referrer') || '';
-        return referrer.replace(/^https?:\/\/[^/]+/i, '');
-      }
-      return '';
+      const headers = this.request?.headers;
+      referrer = headers ? headers.get('referer') || headers.get('referrer') || '' : '';
+    } else {
+      referrer = this.document.referrer || '';
     }
-    return this.document.referrer.replace(/^https?:\/\/[^/]+/i, '');
+
+    return onlyPath ? referrer.replace(/^https?:\/\/[^/]+/i, '') : referrer;
+  }
+
+  getResolution() {
+    return this.platform.isBrowser ? window.screen.width + 'x' + window.screen.height : '';
   }
 
   getShareURL(userId?: string) {
