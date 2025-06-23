@@ -237,7 +237,7 @@ export class PostListComponent implements OnInit {
     description += categories.length > 0 ? `「${categories.join('-')}」` : '';
     if (this.year) {
       const label = `${this.year}年${this.month ? this.month + '月' : ''}`;
-      titles.unshift(label, '期刊归档');
+      titles.unshift(label, '归档', '期刊');
       description += label;
     }
     if (this.postBook) {
@@ -276,7 +276,14 @@ export class PostListComponent implements OnInit {
   }
 
   private updateBreadcrumbs(breadcrumbData: BreadcrumbEntity[]) {
-    let breadcrumbs: BreadcrumbEntity[] = [];
+    let breadcrumbs: BreadcrumbEntity[] = [
+      {
+        label: '期刊',
+        tooltip: '期刊',
+        url: '/post-list',
+        isHeader: false
+      }
+    ];
     if (this.tag) {
       breadcrumbs.push(
         {
@@ -296,8 +303,8 @@ export class PostListComponent implements OnInit {
     if (this.year) {
       breadcrumbs.push(
         {
-          label: '期刊归档',
-          tooltip: `期刊归档`,
+          label: '归档',
+          tooltip: `归档`,
           url: `/archive`,
           isHeader: false
         },
@@ -318,37 +325,16 @@ export class PostListComponent implements OnInit {
       }
     }
     if (breadcrumbData.length > 0) {
-      breadcrumbs.push(
-        {
-          label: '分类',
-          tooltip: '分类',
-          url: '',
-          isHeader: false
-        }
-      );
       breadcrumbs = breadcrumbs.concat(breadcrumbData);
     }
     if (this.postBook) {
       breadcrumbs.push({
-        label: '期刊',
-        tooltip: '期刊文章列表',
-        url: '/post-list',
-        isHeader: false
-      }, {
         label: this.postBookName.fullName,
         tooltip: this.postBookName.fullName,
         url: '/post-list',
         param: {
           bookId: this.bookId
         },
-        isHeader: true
-      });
-    }
-    if (breadcrumbs.length < 1) {
-      breadcrumbs.push({
-        label: '期刊',
-        tooltip: '期刊文章列表',
-        url: '/post-list',
         isHeader: true
       });
     }

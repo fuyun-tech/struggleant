@@ -104,3 +104,27 @@ export function filterHtmlTag(str: string, replaceLineBreak = true): string {
   }
   return result.replace(/\n/gi, '');
 }
+
+export async function simpleRequest(payload: {
+  url: string;
+  param?: Record<string, any>;
+  appId: string;
+  apiBase: string;
+}) {
+  const { url, param, appId, apiBase } = payload;
+  const reqParam = Object.entries(param || {})
+    .map((item) => `${item[0]}=${item[1]}`)
+    .join('&');
+  const urlParam = `?appId=${appId}${reqParam ? '&' + reqParam : ''}`;
+  const response = await fetch(apiBase + url + urlParam, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Sorry, there is an error on server.');
+  }
+  return response.json();
+}
