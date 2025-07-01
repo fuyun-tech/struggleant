@@ -54,7 +54,7 @@
       </article>
     </div>
     <div class="post-more">
-      <a nz-button nzType="primary" routerLink="/post-list"><span>更多</span><nz-icon nzType="double-right" /></a>
+      <a nz-button nzType="primary" routerLink="/posts"><span>更多</span><nz-icon nzType="double-right" /></a>
     </div>
   </div>
   <div class="main-content">
@@ -99,16 +99,19 @@
       </article>
     </div>
     <div class="post-more">
-      <a nz-button nzType="primary" routerLink="/post-list"><span>更多</span><nz-icon nzType="double-right" /></a>
+      <a nz-button nzType="primary" routerLink="/posts"><span>更多</span><nz-icon nzType="double-right" /></a>
     </div>
   </div>
 } @else {
   <app-carousel></app-carousel>
   <div class="column-header m-column-header">最新文章</div>
   <div class="m-post-list">
-    <app-post-item *ngFor="let post of latestPosts; let i = index" [post]="post" [index]="i"></app-post-item>
+    <app-post-item *ngFor="let post of latestPosts; let i = index"
+                   [post]="post"
+                   [index]="i"
+                   [fromSection]="false"></app-post-item>
   </div>
   <div class="post-more">
-    <a nz-button nzType="primary" routerLink="/post-list"><span>更多</span><nz-icon nzType="double-right" /></a>
+    <a nz-button nzType="primary" routerLink="/posts"><span>更多</span><nz-icon nzType="double-right" /></a>
   </div>
 }

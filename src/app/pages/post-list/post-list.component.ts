@@ -4,6 +4,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { isEmpty, uniq } from 'lodash';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
+import { BookColumnEntity } from 'src/app/interfaces/book-column';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { MakeMoneyComponent } from '../../components/make-money/make-money.component';
 import { PaginationComponent } from '../../components/pagination/pagination.component';
@@ -37,6 +38,7 @@ export class PostListComponent implements OnInit {
   pageSize = 10;
   total = 0;
   posts: Post[] = [];
+  isSection = false;
 
   protected pageIndex = 'post-list';
 
@@ -48,9 +50,18 @@ export class PostListComponent implements OnInit {
   private year = '';
   private month = '';
   private bookId = '';
+  private bookColumnSlug = '';
+  private bookColumnId = '';
   private postBook?: BookEntity;
+  private postBookColumn?: BookColumnEntity;
 
   get paginationUrl() {
+    if (this.bookId) {
+      if (this.bookColumnSlug) {
+        return `/journal/${this.bookId}/section/${this.bookColumnSlug}`;
+      }
+      return `/journal/${this.bookId}/posts`;
+    }
     if (this.category) {
       return `/category/${this.category}`;
     }
@@ -61,16 +72,11 @@ export class PostListComponent implements OnInit {
       return `/archive/${this.year}${this.month ? '/' + this.month : ''}`;
     }
 
-    return '/post-list';
+    return '/posts';
   }
 
   get paginationParam(): Params {
-    const param: Params = {};
-    if (this.bookId) {
-      param['bookId'] = this.bookId;
-    }
-
-    return param;
+    return {};
   }
 
   private get postBookName() {
@@ -112,16 +118,22 @@ export class PostListComponent implements OnInit {
 
         this.pageSize = Number(this.options['post_page_size']) || 10;
         this.page = Number(qp.get('page')) || 1;
-        this.bookId = qp.get('bookId')?.trim() || '';
 
+        this.bookId = p.get('bookId')?.trim() || '';
+        this.bookColumnSlug = p.get('columnSlug')?.trim() || '';
+        this.bookColumnId = p.get('columnId')?.trim() || '';
         this.category = p.get('category')?.trim() || '';
         this.tag = p.get('tag')?.trim() || '';
         this.year = p.get('year')?.trim() || '';
         this.month = p.get('month')?.trim() || '';
 
+        this.isSection = !!this.bookId;
+
         const latestParam = JSON.stringify({
           page: this.page,
           bookId: this.bookId,
+          bookColumnSlug: this.bookColumnSlug,
+          bookColumnId: this.bookColumnId,
           category: this.category,
           tag: this.tag,
           year: this.year,
@@ -139,7 +151,7 @@ export class PostListComponent implements OnInit {
         }
 
         this.updatePageIndex();
-        if (this.bookId) {
+        if (this.bookId || this.bookColumnId) {
           this.getPostsByBookId();
         } else {
           this.getPosts();
@@ -154,7 +166,7 @@ export class PostListComponent implements OnInit {
   private getPosts() {
     const param: PostQueryParam = {
       page: this.page,
-      pageSize: this.pageSize
+      size: this.pageSize
     };
     if (this.category) {
       param.category = this.category;
@@ -177,6 +189,7 @@ export class PostListComponent implements OnInit {
         this.page = res.posts?.page || 1;
         this.total = res.posts?.total || 0;
         this.postBook = undefined;
+        this.postBookColumn = undefined;
 
         const breadcrumbs = (res.breadcrumbs || []).map((item) => ({
           ...item,
@@ -190,8 +203,10 @@ export class PostListComponent implements OnInit {
     this.postService
       .getPostsByBookId<PostList>({
         page: this.page,
-        pageSize: this.pageSize,
+        size: this.pageSize,
         bookId: this.bookId,
+        bookColumnSlug: this.bookColumnSlug,
+        bookColumnId: this.bookColumnId,
         simple: 0
       })
       .pipe(takeUntil(this.destroy$))
@@ -200,6 +215,7 @@ export class PostListComponent implements OnInit {
         this.page = res.posts?.page || 1;
         this.total = res.posts?.total || 0;
         this.postBook = res.book;
+        this.postBookColumn = res.bookColumn;
 
         this.initData([]);
       });
@@ -219,40 +235,43 @@ export class PostListComponent implements OnInit {
 
   private updatePageInfo(breadcrumbData: BreadcrumbEntity[]) {
     const titles: string[] = [this.appInfo.appName];
-    const categories: string[] = [];
     const keywords: string[] = [...this.appInfo.keywords];
     let description = '';
 
     if (this.category && breadcrumbData.length > 0) {
       const label = breadcrumbData[breadcrumbData.length - 1].label;
       titles.unshift(label, '分类');
-      categories.push(label);
       keywords.unshift(label);
-    }
-    if (this.tag) {
+
+      description += `「${label}」`;
+    } else if (this.tag) {
       titles.unshift(this.tag, '标签');
-      categories.push(this.tag);
       keywords.unshift(this.tag);
-    }
-    description += categories.length > 0 ? `「${categories.join('-')}」` : '';
-    if (this.year) {
+
+      description += `「${this.tag}」`;
+    } else if (this.year) {
       const label = `${this.year}年${this.month ? this.month + '月' : ''}`;
       titles.unshift(label, '归档', '期刊');
       description += label;
-    }
-    if (this.postBook) {
+    } else if (this.postBook) {
       titles.unshift(this.postBook.bookName);
       if (this.postBook.bookIssue) {
         titles.unshift(this.postBook.bookIssue);
       }
       description += this.postBookName.fullName;
       keywords.unshift(this.postBook.bookName);
+
+      if (this.postBookColumn) {
+        titles.unshift(this.postBookColumn.bookColumnName);
+        description += `「${this.postBookColumn.bookColumnName}」`;
+        keywords.unshift(this.postBookColumn.bookColumnName);
+      }
     }
     if (description) {
-      description += '期刊文章列表';
+      description += '文章列表';
     }
     if (titles.length < 2) {
-      titles.unshift('期刊文章列表');
+      titles.unshift('文章列表');
     }
     if (this.page > 1) {
       titles.unshift(`第${this.page}页`);
@@ -280,7 +299,7 @@ export class PostListComponent implements OnInit {
       {
         label: '期刊',
         tooltip: '期刊',
-        url: '/post-list',
+        url: '/posts',
         isHeader: false
       }
     ];
@@ -299,8 +318,7 @@ export class PostListComponent implements OnInit {
           isHeader: true
         }
       );
-    }
-    if (this.year) {
+    } else if (this.year) {
       breadcrumbs.push(
         {
           label: '归档',
@@ -323,20 +341,37 @@ export class PostListComponent implements OnInit {
           isHeader: true
         });
       }
-    }
-    if (breadcrumbData.length > 0) {
+    } else if (breadcrumbData.length > 0) {
       breadcrumbs = breadcrumbs.concat(breadcrumbData);
-    }
-    if (this.postBook) {
-      breadcrumbs.push({
-        label: this.postBookName.fullName,
-        tooltip: this.postBookName.fullName,
-        url: '/post-list',
-        param: {
-          bookId: this.bookId
-        },
-        isHeader: true
-      });
+    } else if (this.postBook) {
+      if (this.bookColumnId && this.postBookColumn) {
+        breadcrumbs.push({
+          label: '栏目',
+          tooltip: '栏目',
+          url: '',
+          isHeader: false
+        }, {
+          label: `《${this.postBook.bookName}》: ` + this.postBookColumn.bookColumnName,
+          tooltip: `《${this.postBook.bookName}》: ` + this.postBookColumn.bookColumnName,
+          url: '/column/' + this.postBookColumn.bookColumnId,
+          isHeader: true
+        });
+      } else {
+        breadcrumbs.push({
+          label: this.postBookName.fullName,
+          tooltip: this.postBookName.fullName,
+          url: '/journal/' + this.bookId,
+          isHeader: !this.bookColumnSlug
+        });
+        if (this.postBookColumn) {
+          breadcrumbs.push({
+            label: this.postBookColumn.bookColumnName,
+            tooltip: this.postBookColumn.bookColumnName,
+            url: '/journal/' + this.postBook.bookId + '/section/' + this.postBookColumn.bookColumnSlug,
+            isHeader: true
+          });
+        }
+      }
     }
     if (this.page > 1) {
       breadcrumbs.push({

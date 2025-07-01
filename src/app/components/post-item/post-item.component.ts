@@ -15,6 +15,7 @@ import { UserAgentService } from '../../services/user-agent.service';
 export class PostItemComponent {
   @Input() post!: Post;
   @Input() index!: number;
+  @Input() fromSection!: boolean;
 
   isMobile = false;
 

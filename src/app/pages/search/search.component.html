@@ -1,9 +1,10 @@
 <app-breadcrumb></app-breadcrumb>
 @if (total > 0) {
   <div [class.post-list]="!isMobile" [class.m-post-list]="isMobile">
-    <ng-container *ngFor="let item of searchResult; let i = index">
-      <app-post-item [post]="item" [index]="i"></app-post-item>
-    </ng-container>
+    <app-post-item *ngFor="let item of searchResult; let i = index"
+                   [post]="item"
+                   [index]="i"
+                   [fromSection]="false"></app-post-item>
   </div>
 } @else {
   <div class="empty" [class.p-empty]="!isMobile" [class.m-empty]="isMobile">

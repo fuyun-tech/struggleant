@@ -47,7 +47,7 @@
           <div class="post-meta-icon"><nz-icon nzType="folder" /></div>
           <ul class="post-meta-info">
             <li *ngFor="let cat of postCategories">
-              <a [routerLink]="'/category/' + cat.taxonomySlug"
+              <a [routerLink]="['/category', cat.taxonomySlug]"
                  title="{{ cat.taxonomyName }}"
                  rel="category">{{ cat.taxonomyName }}</a>
             </li>
@@ -57,9 +57,19 @@
           <div class="post-meta-icon"><nz-icon nzType="tag" /></div>
           <ul class="post-meta-info">
             <li *ngFor="let tag of postTags">
-              <a [routerLink]="'/tag/' + tag.tagName"
+              <a [routerLink]="['/tag', tag.tagName]"
                  title="{{ tag.tagName }}"
                  rel="category">{{ tag.tagName }}</a>
+            </li>
+          </ul>
+        </div>
+        <div class="post-meta" *ngIf="postBookColumn">
+          <div class="post-meta-icon"><nz-icon nzType="partition" /></div>
+          <ul class="post-meta-info">
+            <li>
+              <a [routerLink]="['/column', postBookColumn.bookColumnId]"
+                 title="{{ postBookColumn.bookColumnName }}"
+                 rel="category">{{ postBookColumn.bookColumnName }}</a>
             </li>
           </ul>
         </div>

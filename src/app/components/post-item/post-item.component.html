@@ -12,7 +12,7 @@
                  rel="bookmark">{{ post.post.postTitle }}</a></h2>
         </header>
         <div class="post-item-meta">
-          <div title="写于: {{ post.post.postDate | date:'yyyy-MM-dd' }}">
+          <div title="发布: {{ post.post.postDate | date:'yyyy-MM-dd' }}">
             <span class="fi fi-calendar-date"></span><span>{{ post.post.postDate | date:'yyyy-MM-dd' }}</span>
           </div>
           <div class="auto-fit" title="作者: {{ post.post.postAuthor || post.post.owner.userNickname }}">
@@ -47,15 +47,31 @@
         </a>
       </div>
     </div>
-    <div class="post-item-tag-wrap" *ngIf="post.tags.length > 0">
-      <div class="post-item-tag">
+    <div class="post-item-tag-wrap" *ngIf="post.bookColumn || post.tags.length > 0">
+      <div class="post-item-tag" *ngIf="post.bookColumn">
+        <div>
+          <div class="post-item-tag-icon"><nz-icon nzType="partition" /></div>
+          <ul>
+            <li>
+              @if (fromSection) {
+                <a [routerLink]="['/journal', post.post.bookId, 'section', post.bookColumn.bookColumnSlug]"
+                   [title]="post.bookColumn.bookColumnName"
+                   rel="category">{{ post.bookColumn.bookColumnName }}</a>
+              } @else {
+                <a [routerLink]="['/column', post.bookColumn.bookColumnId]"
+                   [title]="post.bookColumn.bookColumnName"
+                   rel="category">{{ post.bookColumn.bookColumnName }}</a>
+              }
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="post-item-tag" *ngIf="post.tags.length > 0">
         <div>
           <div class="post-item-tag-icon"><nz-icon nzType="tag" /></div>
           <ul>
             <li *ngFor="let tag of post.tags">
-              <a [routerLink]="'/tag/' + tag.tagName"
-                 [title]="tag.tagName"
-                 rel="category">{{ tag.tagName }}</a>
+              <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
             </li>
           </ul>
         </div>
@@ -69,9 +85,7 @@
         <span *ngIf="post.post.postSticky" class="m-meta-tag meta-tag-sticky"><nz-icon nzType="vertical-align-top" /></span>
         <span *ngIf="post.post.postPayFlag" class="m-meta-tag meta-tag-pay"><nz-icon nzType="lock" /></span>
         <span *ngIf="post.post.postLoginFlag" class="m-meta-tag meta-tag-vip"><nz-icon nzType="user-add" /></span>
-        <a [routerLink]="post.post.postGuid"
-           [title]="post.post.postTitle"
-           rel="bookmark">{{ post.post.postTitle }}</a>
+        <a [routerLink]="post.post.postGuid" [title]="post.post.postTitle" rel="bookmark">{{ post.post.postTitle }}</a>
       </h2>
       <div class="m-post-item-stat">
         <span><nz-icon nzType="eye" /><span>{{ post.post.postViews | numberView: 'K' }}</span></span>
@@ -116,7 +130,7 @@
         <div class="post-item-tag-icon m-post-item-tag-icon"><nz-icon nzType="tag" /></div>
         <ul>
           <li *ngFor="let tag of post.tags">
-            <a [routerLink]="'/tag/' + tag.tagName" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
+            <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
           </li>
         </ul>
       </div>

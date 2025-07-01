@@ -1,3 +1,4 @@
+import { BookColumnEntity } from 'src/app/interfaces/book-column';
 import { CommentFlag } from '../enums/comment';
 import { CopyType } from '../enums/copyright';
 import { PostFormat, PostScope, PostStatus, PostType } from '../enums/post';
@@ -23,6 +24,8 @@ export interface PostEntity {
   postTranslator?: string;
   postSource?: string;
   postSourceLink?: string;
+  bookId?: string;
+  bookColumnId?: string;
   postLoginFlag: number;
   postPayFlag: number;
   postPrice?: number;
@@ -63,6 +66,7 @@ export interface Post {
   categories: TaxonomyEntity[];
   tags: TagEntity[];
   book?: BookEntity;
+  bookColumn?: BookColumnEntity;
   breadcrumbs?: BreadcrumbEntity[];
   isFavorite: boolean;
   isVoted: boolean;
@@ -72,9 +76,11 @@ export interface PostQueryParam extends QueryParam {
   postType?: PostType;
   category?: string;
   tag?: string;
+  bookId?: string;
+  bookColumnSlug?: string;
+  bookColumnId?: string;
   year?: string;
   month?: string;
-  bookId?: string;
   sticky?: 0 | 1;
   simple?: 0 | 1;
 }
@@ -82,6 +88,7 @@ export interface PostQueryParam extends QueryParam {
 export interface PostList {
   posts: ResultList<Post>;
   book?: BookEntity;
+  bookColumn?: BookColumnEntity;
   breadcrumbs: BreadcrumbEntity[];
 }
 

@@ -90,7 +90,7 @@ export class HomeComponent implements OnInit {
     this.postService
       .getPosts({
         page: 1,
-        pageSize: this.isMobile ? 10 : 8,
+        size: this.isMobile ? 10 : 8,
         sticky: 0
       })
       .pipe(takeUntil(this.destroy$))

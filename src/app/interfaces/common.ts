@@ -35,7 +35,7 @@ export interface AppParam {
 
 export interface QueryParam {
   page: number;
-  pageSize?: number;
+  size?: number;
   keyword?: string;
   orderBy?: string[][];
 }

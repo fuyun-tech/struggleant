@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { JournalDetailComponent } from 'src/app/pages/journal-detail/journal-detail.component';
 import { LoginCallbackComponent } from './pages/auth/login-callback/login-callback.component';
 import { LoginComponent } from './pages/auth/login/login.component';
 import { SignupConfirmComponent } from './pages/auth/signup-confirm/signup-confirm.component';
@@ -18,6 +19,13 @@ import { SearchComponent } from './pages/search/search.component';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', component: HomeComponent },
   {
+    path: 'posts',
+    component: ContentLayoutComponent,
+    children: [
+      { path: '', pathMatch: 'full', component: PostListComponent },
+    ]
+  },
+  {
     path: 'post',
     component: ContentLayoutComponent,
     children: [
@@ -25,10 +33,12 @@ export const routes: Routes = [
     ]
   },
   {
-    path: 'post-list',
+    path: 'journal',
     component: ContentLayoutComponent,
     children: [
-      { path: '', pathMatch: 'full', component: PostListComponent }
+      { path: ':bookId', component: JournalDetailComponent },
+      { path: ':bookId/posts', component: PostListComponent },
+      { path: ':bookId/section/:columnSlug', component: PostListComponent },
     ]
   },
   {
@@ -43,6 +53,13 @@ export const routes: Routes = [
     component: ContentLayoutComponent,
     children: [
       { path: ':tag', component: PostListComponent }
+    ]
+  },
+  {
+    path: 'column',
+    component: ContentLayoutComponent,
+    children: [
+      { path: ':columnId', component: PostListComponent }
     ]
   },
   {

@@ -96,7 +96,7 @@ export class PostArchiveComponent implements OnInit {
       {
         label: '期刊',
         tooltip: '期刊',
-        url: '/post-list',
+        url: '/posts',
         isHeader: false
       },
       {

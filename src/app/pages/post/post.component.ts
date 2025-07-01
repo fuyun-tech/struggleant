@@ -6,6 +6,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzImageService } from 'ng-zorro-antd/image';
 import { ClipboardService } from 'ngx-clipboard';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
+import { BookColumnEntity } from 'src/app/interfaces/book-column';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { CommentComponent } from '../../components/comment/comment.component';
 import { LoginModalComponent } from '../../components/login-modal/login-modal.component';
@@ -88,6 +89,7 @@ export class PostComponent implements OnInit {
   postMeta: Record<string, any> = {};
   postCategories: TaxonomyEntity[] = [];
   postTags: TagEntity[] = [];
+  postBookColumn?: BookColumnEntity;
   isFavorite = false;
   isVoted = false;
   voteLoading = false;
@@ -341,6 +343,7 @@ export class PostComponent implements OnInit {
     this.post = post.post;
     this.post.postContent = result.content;
     this.postBook = post.book;
+    this.postBookColumn = post.bookColumn;
     this.codeList = result.codeList;
     this.post.postSource = this.postService.getPostSource(post);
     this.postMeta = post.meta;
@@ -366,7 +369,7 @@ export class PostComponent implements OnInit {
     const breadcrumbs: BreadcrumbEntity[] = [{
       label: '期刊',
       tooltip: '期刊文章列表',
-      url: '/post-list',
+      url: '/posts',
       isHeader: false
     }];
     if (this.postBook) {
@@ -374,12 +377,17 @@ export class PostComponent implements OnInit {
       breadcrumbs.push({
         label: this.postBookName.fullName,
         tooltip: this.postBookName.fullName,
-        url: '/post-list',
-        param: {
-          bookId: this.postBook.bookId
-        },
-        isHeader: true
+        url: '/journal/' + this.postBook.bookId,
+        isHeader: !this.postBookColumn
       });
+      if (this.postBookColumn) {
+        breadcrumbs.push({
+          label: this.postBookColumn.bookColumnName,
+          tooltip: this.postBookColumn.bookColumnName,
+          url: '/journal/' + this.postBook.bookId + '/section/' + this.postBookColumn.bookColumnSlug,
+          isHeader: true
+        });
+      }
     }
 
     this.breadcrumbService.updateBreadcrumbs(breadcrumbs);

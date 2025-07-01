@@ -18,7 +18,7 @@
           <a routerLink="/" (click)="closeSider()"><nz-icon nzType="home" /><span>首页</span></a>
         </li>
         <li [class.active]="indexInfo?.isPost && indexInfo?.subPage !== 'archive'">
-          <a routerLink="/post-list" title="期刊" (click)="closeSider()"><nz-icon nzType="form" /><span>期刊</span></a>
+          <a routerLink="/posts" title="期刊" (click)="closeSider()"><nz-icon nzType="form" /><span>期刊</span></a>
         </li>
         <li [class.active]="indexInfo?.subPage === 'about'">
           <a routerLink="/about" title="关于" (click)="closeSider()"><nz-icon nzType="info-circle" /><span>关于</span></a>
