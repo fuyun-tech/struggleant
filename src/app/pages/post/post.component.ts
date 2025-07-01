@@ -373,18 +373,25 @@ export class PostComponent implements OnInit {
       isHeader: false
     }];
     if (this.postBook) {
-      breadcrumbs[breadcrumbs.length - 1].isHeader = false;
       breadcrumbs.push({
-        label: this.postBookName.fullName,
-        tooltip: this.postBookName.fullName,
-        url: '/journal/' + this.postBook.bookId,
-        isHeader: !this.postBookColumn
+        label: this.postBook.bookName,
+        tooltip: this.postBook.bookName,
+        url: '',
+        isHeader: false
       });
+      if (this.postBook.bookIssue) {
+        breadcrumbs.push({
+          label: this.postBook.bookIssue,
+          tooltip: this.postBook.bookIssue,
+          url: '/journal/' + this.postBook.bookMetaId + '/' + this.postBook.bookId,
+          isHeader: !this.postBookColumn
+        });
+      }
       if (this.postBookColumn) {
         breadcrumbs.push({
           label: this.postBookColumn.bookColumnName,
           tooltip: this.postBookColumn.bookColumnName,
-          url: '/journal/' + this.postBook.bookId + '/section/' + this.postBookColumn.bookColumnSlug,
+          url: '/journal/' + this.postBook.bookMetaId + '/' + this.postBook.bookId + '/section/' + this.postBookColumn.bookColumnSlug,
           isHeader: true
         });
       }

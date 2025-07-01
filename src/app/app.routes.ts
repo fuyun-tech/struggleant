@@ -36,9 +36,9 @@ export const routes: Routes = [
     path: 'journal',
     component: ContentLayoutComponent,
     children: [
-      { path: ':bookId', component: JournalDetailComponent },
-      { path: ':bookId/posts', component: PostListComponent },
-      { path: ':bookId/section/:columnSlug', component: PostListComponent },
+      { path: ':bookMetaId/:bookId', component: JournalDetailComponent },
+      { path: ':bookMetaId/:bookId/posts', component: PostListComponent },
+      { path: ':bookMetaId/:bookId/section/:columnSlug', component: PostListComponent },
     ]
   },
   {
