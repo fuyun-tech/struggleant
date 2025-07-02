@@ -15,11 +15,14 @@ export enum ApiUrl {
   POST_RANDOM = '/posts/random',
   POST_RELATED = '/posts/related',
   POST_LIST_BY_BOOK = '/posts/list-by-book',
+  POST_LIST_WITH_COLUMN = '/posts/list-with-column',
   POST_LIST_FOR_RSS = '/posts/list-for-rss',
   POST_PREV_AND_NEXT = '/posts/prev-and-next',
   POST_ARCHIVES = '/posts/archives',
   // taxonomy
   TAXONOMY_TREE = '/taxonomies/taxonomy-tree',
+  // book
+  BOOK = '/books/book',
   // link
   LINK_FOOTER = '/links/footer',
   LINK_FRIEND = '/links/friend',

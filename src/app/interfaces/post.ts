@@ -1,3 +1,4 @@
+import { ColumnStatus } from 'src/app/enums/book-column';
 import { BookColumnEntity } from 'src/app/interfaces/book-column';
 import { CommentFlag } from '../enums/comment';
 import { CopyType } from '../enums/copyright';
@@ -58,6 +59,7 @@ export interface PostModel extends PostEntity {
   postPassword: string;
   postName: string;
   postMimeType: string;
+  bookColumn?: BookColumnEntity;
 }
 
 export interface Post {
@@ -109,4 +111,17 @@ export interface PostRelatedParam {
   postId: string;
   page?: number;
   size?: number;
+}
+
+export interface PostCatalog {
+  bookColumnId: string;
+  bookColumnName: string;
+  bookColumnSlug: string;
+  bookColumnOrder: number;
+  posts: Array<{
+    postId: string;
+    postTitle: string;
+    postGuid: string;
+    postCreated: number;
+  }>;
 }

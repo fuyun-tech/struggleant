@@ -354,9 +354,9 @@ export class PostListComponent implements OnInit {
           url: '',
           isHeader: false
         }, {
-          label: `《${this.postBook.bookName}》: ` + this.postBookColumn.bookColumnName,
-          tooltip: `《${this.postBook.bookName}》: ` + this.postBookColumn.bookColumnName,
-          url: '/column/' + this.postBookColumn.bookColumnId,
+          label: `《${this.postBook.bookName}》: ${this.postBookColumn.bookColumnName}`,
+          tooltip: `《${this.postBook.bookName}》: ${this.postBookColumn.bookColumnName}`,
+          url: `/column/${this.postBookColumn.bookColumnId}`,
           isHeader: true
         });
       } else {
@@ -370,7 +370,7 @@ export class PostListComponent implements OnInit {
           breadcrumbs.push({
             label: this.postBook.bookIssue,
             tooltip: this.postBook.bookIssue,
-            url: '/journal/' + this.postBook.bookMetaId + '/' + this.postBook.bookId,
+            url: `/journal/${this.postBook.bookMetaId}/${this.postBook.bookId}`,
             isHeader: !this.bookColumnSlug
           });
         }
@@ -378,7 +378,7 @@ export class PostListComponent implements OnInit {
           breadcrumbs.push({
             label: this.postBookColumn.bookColumnName,
             tooltip: this.postBookColumn.bookColumnName,
-            url: '/journal/' + this.postBook.bookMetaId + '/' + this.postBook.bookId + '/section/' + this.postBookColumn.bookColumnSlug,
+            url: `/journal/${this.postBook.bookMetaId}/${this.postBook.bookId}/section/${this.postBookColumn.bookColumnSlug}`,
             isHeader: true
           });
         }

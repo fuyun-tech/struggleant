@@ -57,7 +57,6 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
   isFocused = false;
 
   private adminUrl = '';
-  private botsUrl = '';
 
   constructor(
     private readonly destroy$: DestroyService,
@@ -85,7 +84,6 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
 
         const urlParam = format(ADMIN_URL_PARAM, this.authService.getToken(), APP_ID);
         this.adminUrl = this.appInfo.appAdminUrl + '?' + urlParam;
-        this.botsUrl = this.appInfo.appAdminUrl.replace(/\/$/i, '') + '/bots' + '?' + urlParam;
       });
     this.commonService.pageIndex$.pipe(takeUntil(this.destroy$)).subscribe((page) => {
       this.indexInfo = this.commonService.getPageIndexInfo(page);

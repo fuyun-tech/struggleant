@@ -7,7 +7,15 @@ import { BookType } from '../enums/book';
 import { PostType } from '../enums/post';
 import { BookEntity } from '../interfaces/book';
 import { ArchiveData, ArchiveDataMap, ArchiveList } from '../interfaces/common';
-import { Post, PostEntity, PostList, PostQueryParam, PostRelatedParam, PostSearchItem } from '../interfaces/post';
+import {
+  Post,
+  PostEntity,
+  PostList,
+  PostModel,
+  PostQueryParam,
+  PostRelatedParam,
+  PostSearchItem
+} from '../interfaces/post';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -38,6 +46,15 @@ export class PostService {
         appId: APP_ID
       })
       .pipe(map((res) => res?.data || {}));
+  }
+
+  getPostsWithColumn(bookId: string): Observable<PostModel[]> {
+    return this.apiService
+      .httpGet(ApiUrl.POST_LIST_WITH_COLUMN, {
+        bookId,
+        appId: APP_ID
+      })
+      .pipe(map((res) => res?.data || []));
   }
 
   getHotPosts(): Observable<PostEntity[]> {

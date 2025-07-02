@@ -1,1 +1,30 @@
-<p>journal-detail works!</p>
+<app-breadcrumb></app-breadcrumb>
+<div class="catalog" [class.p-catalog]="!isMobile" [class.m-catalog]="isMobile">
+  <header class="catalog-header">
+    <h1>
+      @if (book) {
+        <a [routerLink]="['/journal', book.bookMetaId, book.bookId]"
+           [title]="book.bookName + (book.bookIssue ? ' · ' + book.bookIssue : '')"
+           rel="bookmark">{{ book.bookName }}{{ book.bookIssue ? ' · ' + book.bookIssue : '' }}</a>
+      }
+    </h1>
+  </header>
+  <div class="divider"></div>
+  <div class="catalog-body">
+    <ng-container *ngFor="let catalog of catalogs">
+      <h2>
+        @if (catalog.bookColumnId) {
+          <a [routerLink]="['/journal', book.bookMetaId, book.bookId, 'section', catalog.bookColumnSlug]">{{ catalog.bookColumnName }}</a>
+        } @else {
+          <span>{{ catalog.bookColumnName }}</span>
+        }
+      </h2>
+      <ul *ngIf="catalog.posts.length > 0">
+        <li *ngFor="let post of catalog.posts; let i = index">
+          <span>{{ i + 1 }}</span><a [routerLink]="post.postGuid" [title]="post.postTitle" rel="bookmark">{{ post.postTitle }}</a>
+        </li>
+      </ul>
+    </ng-container>
+  </div>
+</div>
+<app-make-money></app-make-money>

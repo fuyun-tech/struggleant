@@ -1,0 +1,96 @@
+@import "../../../styles/variables";
+
+.catalog {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--primary-border-color);
+  border-radius: @primary-border-radius;
+
+  .catalog-header {
+    text-align: center;
+
+    > h1 {
+      margin-bottom: 12px;
+      line-height: 32px;
+      font-size: 20px;
+      font-weight: 600;
+
+      > a {
+        color: var(--base-font-color);
+
+        &:hover {
+          color: @primary-color-hover;
+        }
+      }
+    }
+  }
+
+  .catalog-body {
+    h2 {
+      font-size: 15px;
+      line-height: 32px;
+    }
+
+    ul {
+      line-height: 24px;
+
+      &:not(:last-child) {
+        margin-bottom: 16px;
+      }
+
+      li {
+        display: flex;
+
+        > span {
+          display: inline-block;
+          flex-shrink: 0;
+          width: 24px;
+          margin-left: 16px;
+          margin-right: 8px;
+          border-radius: 2px;
+          text-align: right;
+
+          &::after {
+            content: '.';
+          }
+        }
+      }
+    }
+
+    a {
+      color: var(--base-font-color);
+
+      &:hover {
+        color: @primary-color-hover;
+      }
+    }
+  }
+}
+
+.p-catalog {
+  .catalog-header {
+    padding: @content-header-margin @content-margin @primary-margin;
+  }
+
+  .catalog-body {
+    margin: @content-margin;
+  }
+
+  .divider {
+    margin: 0 @content-margin;
+  }
+}
+
+.m-catalog {
+  .catalog-header {
+    padding: 1.75rem @m-content-padding @m-content-padding;
+  }
+
+  .catalog-body {
+    margin: @m-content-padding;
+  }
+
+  .divider {
+    margin: 0 @m-primary-margin;
+  }
+}

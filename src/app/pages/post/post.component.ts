@@ -383,7 +383,7 @@ export class PostComponent implements OnInit {
         breadcrumbs.push({
           label: this.postBook.bookIssue,
           tooltip: this.postBook.bookIssue,
-          url: '/journal/' + this.postBook.bookMetaId + '/' + this.postBook.bookId,
+          url: `/journal/${this.postBook.bookMetaId}/${this.postBook.bookId}`,
           isHeader: !this.postBookColumn
         });
       }
@@ -391,7 +391,7 @@ export class PostComponent implements OnInit {
         breadcrumbs.push({
           label: this.postBookColumn.bookColumnName,
           tooltip: this.postBookColumn.bookColumnName,
-          url: '/journal/' + this.postBook.bookMetaId + '/' + this.postBook.bookId + '/section/' + this.postBookColumn.bookColumnSlug,
+          url: `/journal/${this.postBook.bookMetaId}/${this.postBook.bookId}/section/${this.postBookColumn.bookColumnSlug}`,
           isHeader: true
         });
       }

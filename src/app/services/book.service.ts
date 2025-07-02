@@ -1,4 +1,8 @@
 import { Injectable } from '@angular/core';
+import { map, Observable } from 'rxjs';
+import { ApiUrl } from 'src/app/config/api-url';
+import { APP_ID } from 'src/app/config/common.constant';
+import { ApiService } from 'src/app/services/api.service';
 import { BookType } from '../enums/book';
 import { BookEntity } from '../interfaces/book';
 
@@ -6,6 +10,17 @@ import { BookEntity } from '../interfaces/book';
   providedIn: 'root'
 })
 export class BookService {
+  constructor(private readonly apiService: ApiService) {}
+
+  getBookById(bookId: string): Observable<BookEntity> {
+    return this.apiService
+      .httpGet(ApiUrl.BOOK, {
+        bookId,
+        appId: APP_ID
+      })
+      .pipe(map((res) => res?.data || {}));
+  }
+
   getBookName(book?: BookEntity, withMark = true) {
     let shortName = '';
     let fullName = '';
@@ -29,6 +44,6 @@ export class BookService {
     return {
       shortName,
       fullName
-    }
+    };
   }
 }
