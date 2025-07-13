@@ -21,16 +21,12 @@ export const routes: Routes = [
   {
     path: 'posts',
     component: ContentLayoutComponent,
-    children: [
-      { path: '', pathMatch: 'full', component: PostListComponent },
-    ]
+    children: [{ path: '', pathMatch: 'full', component: PostListComponent }]
   },
   {
     path: 'post',
     component: ContentLayoutComponent,
-    children: [
-      { path: ':slug', component: PostComponent }
-    ]
+    children: [{ path: ':slug', component: PostComponent }]
   },
   {
     path: 'journal',
@@ -38,29 +34,23 @@ export const routes: Routes = [
     children: [
       { path: ':bookMetaId/:bookId', component: JournalDetailComponent },
       { path: ':bookMetaId/:bookId/posts', component: PostListComponent },
-      { path: ':bookMetaId/:bookId/section/:columnSlug', component: PostListComponent },
+      { path: ':bookMetaId/:bookId/section/:columnSlug', component: PostListComponent }
     ]
   },
   {
     path: 'category',
     component: ContentLayoutComponent,
-    children: [
-      { path: ':category', component: PostListComponent }
-    ]
+    children: [{ path: ':category', component: PostListComponent }]
   },
   {
     path: 'tag',
     component: ContentLayoutComponent,
-    children: [
-      { path: ':tag', component: PostListComponent }
-    ]
+    children: [{ path: ':tag', component: PostListComponent }]
   },
   {
     path: 'column',
     component: ContentLayoutComponent,
-    children: [
-      { path: ':columnId', component: PostListComponent }
-    ]
+    children: [{ path: ':columnId', component: PostListComponent }]
   },
   {
     path: 'archive',

@@ -348,17 +348,20 @@ export class PostListComponent implements OnInit {
       breadcrumbs = breadcrumbs.concat(breadcrumbData);
     } else if (this.postBook) {
       if (this.bookColumnId && this.postBookColumn) {
-        breadcrumbs.push({
-          label: '栏目',
-          tooltip: '栏目',
-          url: '',
-          isHeader: false
-        }, {
-          label: `《${this.postBook.bookName}》: ${this.postBookColumn.bookColumnName}`,
-          tooltip: `《${this.postBook.bookName}》: ${this.postBookColumn.bookColumnName}`,
-          url: `/column/${this.postBookColumn.bookColumnId}`,
-          isHeader: true
-        });
+        breadcrumbs.push(
+          {
+            label: '栏目',
+            tooltip: '栏目',
+            url: '',
+            isHeader: false
+          },
+          {
+            label: `《${this.postBook.bookName}》: ${this.postBookColumn.bookColumnName}`,
+            tooltip: `《${this.postBook.bookName}》: ${this.postBookColumn.bookColumnName}`,
+            url: `/column/${this.postBookColumn.bookColumnId}`,
+            isHeader: true
+          }
+        );
       } else {
         breadcrumbs.push({
           label: this.postBook.bookName,

@@ -25,7 +25,6 @@ import { DestroyService } from '../../../services/destroy.service';
 import { MetaService } from '../../../services/meta.service';
 import { OptionService } from '../../../services/option.service';
 import { TenantAppService } from '../../../services/tenant-app.service';
-import md5 from '../../../utils/md5';
 import {
   USER_EMAIL_LENGTH,
   USER_PASSWORD_MAX_LENGTH,
@@ -121,7 +120,7 @@ export class SignupComponent extends BaseComponent implements OnInit {
     this.authService
       .signup({
         userEmail: email,
-        userPassword: md5(password),
+        userPassword: password,
         userNickname: email.split('@')[0]
       })
       .pipe(takeUntil(this.destroy$))

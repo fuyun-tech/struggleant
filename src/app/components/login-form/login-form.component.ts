@@ -23,7 +23,6 @@ import { OptionService } from '../../services/option.service';
 import { TenantAppService } from '../../services/tenant-app.service';
 import { UserAgentService } from '../../services/user-agent.service';
 import { format } from '../../utils/helper';
-import md5 from '../../utils/md5';
 
 @Component({
   selector: 'app-login-form',
@@ -134,7 +133,7 @@ export class LoginFormComponent extends BaseComponent implements OnInit {
     this.authService
       .login({
         username,
-        password: md5(password)
+        password
       })
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {

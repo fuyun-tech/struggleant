@@ -1,4 +1,3 @@
-import { ColumnStatus } from 'src/app/enums/book-column';
 import { BookColumnEntity } from 'src/app/interfaces/book-column';
 import { CommentFlag } from '../enums/comment';
 import { CopyType } from '../enums/copyright';

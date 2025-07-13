@@ -54,11 +54,7 @@ export class JournalDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    combineLatest([
-      this.tenantAppService.appInfo$,
-      this.optionService.options$,
-      this.route.paramMap
-    ])
+    combineLatest([this.tenantAppService.appInfo$, this.optionService.options$, this.route.paramMap])
       .pipe(
         skipWhile(([appInfo, options]) => isEmpty(appInfo) || isEmpty(options)),
         takeUntil(this.destroy$)
@@ -106,10 +102,10 @@ export class JournalDetailComponent implements OnInit {
       .getPostsWithColumn(this.bookId)
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        const posts = (res || []).sort((a, b) => a.postCreated > b.postCreated ? 1 : -1);
+        const posts = (res || []).sort((a, b) => (a.postCreated > b.postCreated ? 1 : -1));
         const catalogMap: Record<string, PostCatalog> = {};
 
-        posts.forEach(post => {
+        posts.forEach((post) => {
           if (post.bookColumn) {
             if (catalogMap[post.bookColumn.bookColumnId]) {
               catalogMap[post.bookColumn.bookColumnId].posts.push({
@@ -121,12 +117,14 @@ export class JournalDetailComponent implements OnInit {
             } else {
               catalogMap[post.bookColumn.bookColumnId] = {
                 ...post.bookColumn,
-                posts: [{
-                  postId: post.postId,
-                  postTitle: post.postTitle,
-                  postGuid: post.postGuid,
-                  postCreated: post.postCreated
-                }]
+                posts: [
+                  {
+                    postId: post.postId,
+                    postTitle: post.postTitle,
+                    postGuid: post.postGuid,
+                    postCreated: post.postCreated
+                  }
+                ]
               };
             }
           } else {
@@ -143,18 +141,20 @@ export class JournalDetailComponent implements OnInit {
                 bookColumnName: '其它',
                 bookColumnSlug: 'others',
                 bookColumnOrder: 999,
-                posts: [{
-                  postId: post.postId,
-                  postTitle: post.postTitle,
-                  postGuid: post.postGuid,
-                  postCreated: post.postCreated
-                }]
+                posts: [
+                  {
+                    postId: post.postId,
+                    postTitle: post.postTitle,
+                    postGuid: post.postGuid,
+                    postCreated: post.postCreated
+                  }
+                ]
               };
             }
           }
         });
 
-        this.catalogs = Object.values(catalogMap).sort((a, b) => a.bookColumnOrder > b.bookColumnOrder ? 1 : -1);
+        this.catalogs = Object.values(catalogMap).sort((a, b) => (a.bookColumnOrder > b.bookColumnOrder ? 1 : -1));
       });
   }
 
@@ -186,7 +186,7 @@ export class JournalDetailComponent implements OnInit {
   }
 
   private updateBreadcrumbs() {
-    let breadcrumbs: BreadcrumbEntity[] = [
+    const breadcrumbs: BreadcrumbEntity[] = [
       {
         label: '期刊',
         tooltip: '期刊',

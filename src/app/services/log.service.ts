@@ -7,7 +7,6 @@ import { AdsStatus } from '../enums/log';
 import { HttpResponseEntity } from '../interfaces/http-response';
 import { AccessLog, ActionLog, LeaveLog } from '../interfaces/log';
 import { ApiService } from './api.service';
-import { UserAgentService } from './user-agent.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +14,6 @@ import { UserAgentService } from './user-agent.service';
 export class LogService {
   constructor(
     private readonly apiService: ApiService,
-    private readonly userAgentService: UserAgentService,
     private readonly commonService: CommonService
   ) {}
 
@@ -27,7 +25,6 @@ export class LogService {
     logId: string;
   }): AccessLog {
     const { initialized, referrer, isNew, adsStatus, logId } = param;
-    const uaInfo = this.userAgentService.uaInfo;
 
     return {
       li: logId,

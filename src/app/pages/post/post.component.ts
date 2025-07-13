@@ -366,12 +366,14 @@ export class PostComponent implements OnInit {
   }
 
   private updateBreadcrumbs() {
-    const breadcrumbs: BreadcrumbEntity[] = [{
-      label: '期刊',
-      tooltip: '期刊文章列表',
-      url: '/posts',
-      isHeader: false
-    }];
+    const breadcrumbs: BreadcrumbEntity[] = [
+      {
+        label: '期刊',
+        tooltip: '期刊文章列表',
+        url: '/posts',
+        isHeader: false
+      }
+    ];
     if (this.postBook) {
       breadcrumbs.push({
         label: this.postBook.bookName,
@@ -402,9 +404,7 @@ export class PostComponent implements OnInit {
 
   private updatePageInfo() {
     const titles: string[] = [this.appInfo.appName];
-    const keywords: string[] = this.postTags
-      .map((item) => item.tagName)
-      .concat(this.appInfo.keywords);
+    const keywords: string[] = this.postTags.map((item) => item.tagName).concat(this.appInfo.keywords);
 
     if (this.postBook) {
       titles.unshift(this.postBook.bookName);

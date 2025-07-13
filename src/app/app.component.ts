@@ -122,7 +122,8 @@ export class AppComponent implements OnInit, AfterViewInit {
                   isNew,
                   adsStatus: this.adsStatus,
                   logId: this.accessLogId
-                }))
+                })
+              )
               .subscribe((res) => {
                 if (res.code === ResponseCode.SUCCESS) {
                   const oldAccessLogId = this.accessLogId;

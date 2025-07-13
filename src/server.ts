@@ -169,16 +169,9 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
 
     streamToPromise(
       <Readable>(
-        Readable.from(
-          links.concat(
-            pages,
-            posts,
-            taxonomies,
-            tags,
-            postArchivesByYear,
-            postArchivesByMonth
-          )
-        ).pipe(sitemapStream)
+        Readable.from(links.concat(pages, posts, taxonomies, tags, postArchivesByYear, postArchivesByMonth)).pipe(
+          sitemapStream
+        )
       )
     ).then((data) => res.type('application/xml').send(data.toString()));
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

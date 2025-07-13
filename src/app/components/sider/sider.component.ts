@@ -57,8 +57,7 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly optionService: OptionService,
     private readonly postService: PostService,
     private readonly bookService: BookService
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     this.optionService.options$
