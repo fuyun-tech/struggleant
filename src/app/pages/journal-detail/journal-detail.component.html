@@ -11,7 +11,7 @@
   </header>
   <div class="divider"></div>
   <div class="catalog-body">
-    <ng-container *ngFor="let catalog of catalogs">
+    @for (catalog of catalogs; track catalog) {
       <h2>
         @if (catalog.bookColumnId) {
           <a [routerLink]="['/journal', book.bookMetaId, book.bookId, 'section', catalog.bookColumnSlug]">{{ catalog.bookColumnName }}</a>
@@ -19,12 +19,16 @@
           <span>{{ catalog.bookColumnName }}</span>
         }
       </h2>
-      <ul *ngIf="catalog.posts.length > 0">
-        <li *ngFor="let post of catalog.posts; let i = index">
-          <span>{{ i + 1 }}</span><a [routerLink]="post.postGuid" [title]="post.postTitle" rel="bookmark">{{ post.postTitle }}</a>
-        </li>
-      </ul>
-    </ng-container>
+      @if (catalog.posts.length > 0) {
+        <ul>
+          @for (post of catalog.posts; track post; let i = $index) {
+            <li>
+              <span>{{ i + 1 }}</span><a [routerLink]="post.postGuid" [title]="post.postTitle" rel="bookmark">{{ post.postTitle }}</a>
+            </li>
+          }
+        </ul>
+      }
+    }
   </div>
 </div>
 <app-make-money></app-make-money>

@@ -1,4 +1,3 @@
-import { NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { environment } from 'env/environment';
@@ -19,7 +18,7 @@ import { AdsenseComponent } from '../adsense/adsense.component';
 
 @Component({
   selector: 'app-sider',
-  imports: [RouterLink, NgIf, NgFor, NzIconModule, AdsenseComponent],
+  imports: [RouterLink, NzIconModule, AdsenseComponent],
   providers: [DestroyService],
   templateUrl: './sider.component.html',
   styleUrl: './sider.component.less'
@@ -29,7 +28,7 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
 
   readonly adsPlaceholder = true;
 
-  indexInfo!: PageIndexInfo;
+  indexInfo?: PageIndexInfo;
   hotPosts: PostEntity[] = [];
   randomPosts: PostEntity[] = [];
   postArchives: ArchiveData[] = [];

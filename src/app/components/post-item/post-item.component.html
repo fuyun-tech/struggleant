@@ -3,39 +3,48 @@
     <div class="post-item-body">
       <div class="post-item-content">
         <header>
-          <span *ngIf="post.post.postSticky" class="meta-tag meta-tag-sticky">置顶</span>
-          <span *ngIf="post.post.postOriginal === 1" class="meta-tag meta-tag-original">原创</span>
-          <span *ngIf="post.post.postPayFlag" class="meta-tag meta-tag-pay">付费</span>
-          <span *ngIf="post.post.postLoginFlag" class="meta-tag meta-tag-vip">会员</span>
+          @if (post.post.postSticky) {
+            <span class="meta-tag meta-tag-sticky">置顶</span>
+          }
+          @if (post.post.postOriginal === 1) {
+            <span class="meta-tag meta-tag-original">原创</span>
+          }
+          @if (post.post.postPayFlag) {
+            <span class="meta-tag meta-tag-pay">付费</span>
+          }
+          @if (post.post.postLoginFlag) {
+            <span class="meta-tag meta-tag-vip">会员</span>
+          }
           <h2><a [routerLink]="post.post.postGuid"
                  [title]="post.post.postTitle"
                  rel="bookmark">{{ post.post.postTitle }}</a></h2>
         </header>
         <div class="post-item-meta">
           <div class="auto-fit" title="作者: {{ post.post.postAuthor || post.post.owner.userNickname }}">
-            <nz-icon nzType="user" /><span>{{ post.post.postAuthor || post.post.owner.userNickname }}</span>
+            <nz-icon nzType="user"/><span>{{ post.post.postAuthor || post.post.owner.userNickname }}</span>
           </div>
-          <div *ngIf="post.book" [title]="post.book.bookName">
-            <nz-icon nzType="folder" /><span>{{post.book.bookName}}</span>
-          </div>
-          <a *ngIf="post.book && post.book.bookIssue"
-             [routerLink]="['/journal', post.book.bookMetaId, post.book.bookId]"
-             [title]="post.book.bookIssue">
-            <nz-icon nzType="book" /><span>{{post.book.bookIssue}}</span>
-          </a>
+          @if (post.book) {
+            <div [title]="post.book.bookName">
+              <nz-icon nzType="folder"/><span>{{ post.book.bookName }}</span>
+            </div>
+          }
+          @if (post.book && post.book.bookIssue) {
+            <a [routerLink]="['/journal', post.book.bookMetaId, post.book.bookId]" [title]="post.book.bookIssue">
+              <nz-icon nzType="book"/><span>{{ post.book.bookIssue }}</span>
+            </a>
+          }
           <div>
-            <nz-icon nzType="eye" /><span>{{ post.post.postViews | numberView: 'K' }}</span>
+            <nz-icon nzType="eye"/><span>{{ post.post.postViews | numberView: 'K' }}</span>
           </div>
-          <a *ngIf="post.post.commentFlag !== 'closed'"
-             [routerLink]="post.post.postGuid"
-             fragment="comments"
-             title="《{{ post.post.postTitle }}》评论">
-            @if (post.post.postComments > 0) {
-              <span class="fi fi-chat-square-dots"></span><span>{{ post.post.postComments | numberView: 'K' }}</span>
-            } @else {
-              <span class="fi fi-chat-square"></span><span>0</span>
-            }
-          </a>
+          @if (post.post.commentFlag !== 'closed') {
+            <a [routerLink]="post.post.postGuid" fragment="comments" title="《{{ post.post.postTitle }}》评论">
+              @if (post.post.postComments > 0) {
+                <span class="fi fi-chat-square-dots"></span><span>{{ post.post.postComments | numberView: 'K' }}</span>
+              } @else {
+                <span class="fi fi-chat-square"></span><span>0</span>
+              }
+            </a>
+          }
         </div>
         <div class="post-item-excerpt">
           <span [innerHTML]="post.post.postExcerpt"></span>
@@ -52,97 +61,119 @@
         </a>
       </div>
     </div>
-    <div class="post-item-meta-footer" *ngIf="post.bookColumn || post.tags.length > 0">
-      <div>
-        <div class="post-item-meta-row">
-          <div class="post-item-meta-icon"><span class="fi fi-calendar-date"></span></div>
-          <div title="发布: {{ post.post.postDate | date:'yyyy-MM-dd' }}">
-            <span>{{ post.post.postDate | date:'yyyy-MM-dd' }}</span>
+    @if (post.bookColumn || post.tags.length > 0) {
+      <div class="post-item-meta-footer">
+        <div>
+          <div class="post-item-meta-row">
+            <div class="post-item-meta-icon"><span class="fi fi-calendar-date"></span></div>
+            <div title="发布: {{ post.post.postDate | date:'yyyy-MM-dd' }}">
+              <span>{{ post.post.postDate | date:'yyyy-MM-dd' }}</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div *ngIf="post.bookColumn">
-        <div>
-          <div class="post-item-meta-icon"><nz-icon nzType="partition" /></div>
-          <ul>
-            <li>
-              @if (fromSection) {
-                @if (post.book) {
-                  <a
-                    [routerLink]="['/journal', post.book.bookMetaId, post.post.bookId, 'section', post.bookColumn.bookColumnSlug]"
-                    [title]="post.bookColumn.bookColumnName"
-                    rel="category">{{ post.bookColumn.bookColumnName }}</a>
+        @if (post.bookColumn) {
+          <div>
+            <div>
+              <div class="post-item-meta-icon">
+                <nz-icon nzType="partition"/>
+              </div>
+              <ul>
+                <li>
+                  @if (fromSection) {
+                    @if (post.book) {
+                      <a [routerLink]="['/journal', post.book.bookMetaId, post.post.bookId, 'section', post.bookColumn.bookColumnSlug]"
+                         [title]="post.bookColumn.bookColumnName"
+                         rel="category">{{ post.bookColumn.bookColumnName }}</a>
+                    }
+                  } @else {
+                    <a [routerLink]="['/column', post.bookColumn.bookColumnId]"
+                       [title]="post.bookColumn.bookColumnName"
+                       rel="category">{{ post.bookColumn.bookColumnName }}</a>
+                  }
+                </li>
+              </ul>
+            </div>
+          </div>
+        }
+        @if (post.tags.length > 0) {
+          <div>
+            <div>
+              <div class="post-item-meta-icon">
+                <nz-icon nzType="tag"/>
+              </div>
+              <ul>
+                @for (tag of post.tags; track tag) {
+                  <li>
+                    <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
+                  </li>
                 }
-              } @else {
-                <a [routerLink]="['/column', post.bookColumn.bookColumnId]"
-                   [title]="post.bookColumn.bookColumnName"
-                   rel="category">{{ post.bookColumn.bookColumnName }}</a>
-              }
-            </li>
-          </ul>
-        </div>
+              </ul>
+            </div>
+          </div>
+        }
       </div>
-      <div *ngIf="post.tags.length > 0">
-        <div>
-          <div class="post-item-meta-icon"><nz-icon nzType="tag" /></div>
-          <ul>
-            <li *ngFor="let tag of post.tags">
-              <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    }
   </article>
 } @else {
   <article class="m-post-item">
     <header>
       <h2>
-        <span *ngIf="post.post.postSticky" class="m-meta-tag meta-tag-sticky"><nz-icon nzType="vertical-align-top" /></span>
-        <span *ngIf="post.post.postPayFlag" class="m-meta-tag meta-tag-pay"><nz-icon nzType="lock" /></span>
-        <span *ngIf="post.post.postLoginFlag" class="m-meta-tag meta-tag-vip"><nz-icon nzType="user-add" /></span>
+        @if (post.post.postSticky) {
+          <span class="m-meta-tag meta-tag-sticky"><nz-icon nzType="vertical-align-top"/></span>
+        }
+        @if (post.post.postPayFlag) {
+          <span class="m-meta-tag meta-tag-pay"><nz-icon nzType="lock"/></span>
+        }
+        @if (post.post.postLoginFlag) {
+          <span class="m-meta-tag meta-tag-vip"><nz-icon nzType="user-add"/></span>
+        }
         <a [routerLink]="post.post.postGuid" [title]="post.post.postTitle" rel="bookmark">{{ post.post.postTitle }}</a>
       </h2>
       <div class="m-post-item-stat">
-        <span><nz-icon nzType="eye" /><span>{{ post.post.postViews | numberView: 'K' }}</span></span>
-        <a *ngIf="post.post.commentFlag !== 'closed'"
-           [routerLink]="post.post.postGuid"
-           fragment="comments"
-           title="《{{ post.post.postTitle }}》评论">
-          @if (post.post.postComments > 0) {
-            <span class="fi fi-chat-square-dots"></span><span>{{ post.post.postComments | numberView: 'K' }}</span>
-          } @else {
-            <span class="fi fi-chat-square"></span><span>0</span>
-          }
-        </a>
+        <span><nz-icon nzType="eye"/><span>{{ post.post.postViews | numberView: 'K' }}</span></span>
+        @if (post.post.commentFlag !== 'closed') {
+          <a [routerLink]="post.post.postGuid" fragment="comments" title="《{{ post.post.postTitle }}》评论">
+            @if (post.post.postComments > 0) {
+              <span class="fi fi-chat-square-dots"></span><span>{{ post.post.postComments | numberView: 'K' }}</span>
+            } @else {
+              <span class="fi fi-chat-square"></span><span>0</span>
+            }
+          </a>
+        }
       </div>
     </header>
     <div class="m-post-item-meta">
       <span class="auto-fit" title="作者: {{ post.post.postAuthor || post.post.owner.userNickname }}">
-        <nz-icon nzType="user" /><span>{{ post.post.postAuthor || post.post.owner.userNickname }}</span>
+        <nz-icon nzType="user"/><span>{{ post.post.postAuthor || post.post.owner.userNickname }}</span>
       </span>
-      <span *ngIf="post.book" [title]="post.book.bookName">
-        <nz-icon nzType="folder" /><span>{{post.book.bookName}}</span>
-      </span>
-      <a *ngIf="post.book && post.book.bookIssue"
-         [routerLink]="['/journal', post.book.bookMetaId, post.book.bookId]"
-         [title]="post.book.bookIssue">
-        <nz-icon nzType="book" /><span>{{post.book.bookIssue}}</span>
-      </a>
-      <span *ngIf="post.post.postOriginal === 1" title="{{ post.post.owner.userNickname }}原创">
-        <span class="fi fi-pencil"></span><span>原创</span>
-      </span>
-    </div>
-    <div class="m-post-item-cover" *ngIf="post.post.cover">
-      <a [routerLink]="post.post.postGuid" [title]="post.post.postTitle">
-        @if (index > 3) {
-          <span class="m-post-item-cover-img lazyload" [attr.data-bg]="post.post.cover"></span>
-        } @else {
-          <span class="m-post-item-cover-img" [style.background-image]="'url(' + post.post.cover + ')'"></span>
+      @if (post.book) {
+        <span [title]="post.book.bookName">
+          <nz-icon nzType="folder"/><span>{{ post.book.bookName }}</span>
+        </span>
+        @if (post.book.bookIssue) {
+          <a [routerLink]="['/journal', post.book.bookMetaId, post.book.bookId]" [title]="post.book.bookIssue">
+            <nz-icon nzType="book"/><span>{{ post.book.bookIssue }}</span>
+          </a>
         }
-        <span class="overlay"></span>
-      </a>
+      }
+      @if (post.post.postOriginal === 1) {
+        <span title="{{ post.post.owner.userNickname }}原创">
+          <span class="fi fi-pencil"></span><span>原创</span>
+        </span>
+      }
     </div>
+    @if (post.post.cover) {
+      <div class="m-post-item-cover">
+        <a [routerLink]="post.post.postGuid" [title]="post.post.postTitle">
+          @if (index > 3) {
+            <span class="m-post-item-cover-img lazyload" [attr.data-bg]="post.post.cover"></span>
+          } @else {
+            <span class="m-post-item-cover-img" [style.background-image]="'url(' + post.post.cover + ')'"></span>
+          }
+          <span class="overlay"></span>
+        </a>
+      </div>
+    }
     <div class="m-post-item-excerpt">
       <span [innerHTML]="post.post.postExcerpt"></span>
     </div>
@@ -153,33 +184,42 @@
           <span>{{ post.post.postDate | date:'yyyy-MM-dd' }}</span>
         </div>
       </div>
-      <div *ngIf="post.bookColumn">
-        <div class="m-post-item-meta-icon"><nz-icon nzType="partition" /></div>
-        <ul>
-          <li>
-            @if (fromSection) {
-              @if (post.book) {
-                <a
-                  [routerLink]="['/journal', post.book.bookMetaId, post.post.bookId, 'section', post.bookColumn.bookColumnSlug]"
-                  [title]="post.bookColumn.bookColumnName"
-                  rel="category">{{ post.bookColumn.bookColumnName }}</a>
+      @if (post.bookColumn) {
+        <div>
+          <div class="m-post-item-meta-icon">
+            <nz-icon nzType="partition"/>
+          </div>
+          <ul>
+            <li>
+              @if (fromSection) {
+                @if (post.book) {
+                  <a [routerLink]="['/journal', post.book.bookMetaId, post.post.bookId, 'section', post.bookColumn.bookColumnSlug]"
+                     [title]="post.bookColumn.bookColumnName"
+                     rel="category">{{ post.bookColumn.bookColumnName }}</a>
+                }
+              } @else {
+                <a [routerLink]="['/column', post.bookColumn.bookColumnId]"
+                   [title]="post.bookColumn.bookColumnName"
+                   rel="category">{{ post.bookColumn.bookColumnName }}</a>
               }
-            } @else {
-              <a [routerLink]="['/column', post.bookColumn.bookColumnId]"
-                 [title]="post.bookColumn.bookColumnName"
-                 rel="category">{{ post.bookColumn.bookColumnName }}</a>
+            </li>
+          </ul>
+        </div>
+      }
+      @if (post.tags.length > 0) {
+        <div>
+          <div class="m-post-item-meta-icon">
+            <nz-icon nzType="tag"/>
+          </div>
+          <ul>
+            @for (tag of post.tags; track tag) {
+              <li>
+                <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
+              </li>
             }
-          </li>
-        </ul>
-      </div>
-      <div *ngIf="post.tags.length > 0">
-        <div class="m-post-item-meta-icon"><nz-icon nzType="tag" /></div>
-        <ul>
-          <li *ngFor="let tag of post.tags">
-            <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
-          </li>
-        </ul>
-      </div>
+          </ul>
+        </div>
+      }
     </div>
   </article>
 }

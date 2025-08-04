@@ -1,4 +1,3 @@
-import { NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -27,7 +26,6 @@ import { format } from '../../utils/helper';
 @Component({
   selector: 'app-login-form',
   imports: [
-    NgIf,
     RouterLink,
     ReactiveFormsModule,
     NzFormModule,

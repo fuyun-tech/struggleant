@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -28,15 +27,7 @@ import { WallpaperModalComponent } from '../wallpaper-modal/wallpaper-modal.comp
 
 @Component({
   selector: 'app-header',
-  imports: [
-    RouterLink,
-    CommonModule,
-    FormsModule,
-    NzInputModule,
-    NzIconModule,
-    NzButtonModule,
-    WallpaperModalComponent
-  ],
+  imports: [RouterLink, FormsModule, NzInputModule, NzIconModule, NzButtonModule, WallpaperModalComponent],
   providers: [DestroyService, NzImageService],
   templateUrl: './header.component.html',
   styleUrl: './header.component.less'

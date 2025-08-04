@@ -1,4 +1,3 @@
-import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty } from 'lodash';
@@ -13,7 +12,7 @@ import { UserAgentService } from '../../services/user-agent.service';
 
 @Component({
   selector: 'app-breadcrumb',
-  imports: [NgIf, NgFor, RouterLink, NzIconModule],
+  imports: [RouterLink, NzIconModule],
   providers: [DestroyService],
   templateUrl: './breadcrumb.component.html',
   styleUrl: './breadcrumb.component.less'

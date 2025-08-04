@@ -1,4 +1,3 @@
-import { NgFor } from '@angular/common';
 import { HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -27,7 +26,7 @@ import { UserAgentService } from '../../services/user-agent.service';
 
 @Component({
   selector: 'app-search',
-  imports: [NgFor, NzEmptyModule, BreadcrumbComponent, PaginationComponent, PostItemComponent, MakeMoneyComponent],
+  imports: [NzEmptyModule, BreadcrumbComponent, PaginationComponent, PostItemComponent, MakeMoneyComponent],
   providers: [DestroyService],
   templateUrl: './search.component.html',
   styleUrl: './search.component.less'

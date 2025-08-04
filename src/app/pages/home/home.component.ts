@@ -1,4 +1,4 @@
-import { DatePipe, NgFor } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty, uniq } from 'lodash';
@@ -22,16 +22,7 @@ import { UserAgentService } from '../../services/user-agent.service';
 
 @Component({
   selector: 'app-home',
-  imports: [
-    NgFor,
-    RouterLink,
-    DatePipe,
-    NzButtonModule,
-    NzIconModule,
-    CarouselComponent,
-    NumberViewPipe,
-    PostItemComponent
-  ],
+  imports: [RouterLink, DatePipe, NzButtonModule, NzIconModule, CarouselComponent, NumberViewPipe, PostItemComponent],
   providers: [DestroyService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.less'

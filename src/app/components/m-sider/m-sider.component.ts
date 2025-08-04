@@ -1,4 +1,3 @@
-import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty } from 'lodash';
@@ -20,7 +19,7 @@ import { format } from '../../utils/helper';
 
 @Component({
   selector: 'app-m-sider',
-  imports: [NgIf, RouterLink, NzIconModule],
+  imports: [RouterLink, NzIconModule],
   providers: [DestroyService, NzImageService],
   templateUrl: './m-sider.component.html',
   styleUrl: './m-sider.component.less'

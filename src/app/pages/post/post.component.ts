@@ -1,4 +1,4 @@
-import { DatePipe, NgFor, NgIf, NgStyle } from '@angular/common';
+import { DatePipe, NgStyle } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { isEmpty, uniq } from 'lodash';
@@ -55,8 +55,6 @@ import { decodeEntities } from '../../utils/entities';
 @Component({
   selector: 'app-post',
   imports: [
-    NgIf,
-    NgFor,
     NgStyle,
     RouterLink,
     DatePipe,

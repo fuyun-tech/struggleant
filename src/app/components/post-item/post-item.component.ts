@@ -1,4 +1,4 @@
-import { DatePipe, NgFor, NgIf } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -8,7 +8,7 @@ import { UserAgentService } from '../../services/user-agent.service';
 
 @Component({
   selector: 'app-post-item',
-  imports: [NgIf, NgFor, RouterLink, NzIconModule, DatePipe, NumberViewPipe],
+  imports: [RouterLink, NzIconModule, DatePipe, NumberViewPipe],
   templateUrl: './post-item.component.html',
   styleUrl: './post-item.component.less'
 })

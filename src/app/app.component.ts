@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { environment } from 'env/environment';
@@ -33,7 +32,6 @@ import { generateUid } from './utils/helper';
   selector: 'app-root',
   imports: [
     RouterOutlet,
-    CommonModule,
     HeaderComponent,
     FooterComponent,
     NotFoundComponent,

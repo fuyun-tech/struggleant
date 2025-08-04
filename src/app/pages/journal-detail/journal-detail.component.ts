@@ -1,4 +1,3 @@
-import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { isEmpty, uniq } from 'lodash';
@@ -22,7 +21,7 @@ import { UserAgentService } from 'src/app/services/user-agent.service';
 
 @Component({
   selector: 'app-journal-detail',
-  imports: [NgIf, NgFor, RouterLink, BreadcrumbComponent, MakeMoneyComponent],
+  imports: [RouterLink, BreadcrumbComponent, MakeMoneyComponent],
   providers: [DestroyService],
   templateUrl: './journal-detail.component.html',
   styleUrl: './journal-detail.component.less'

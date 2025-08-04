@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgStyle } from '@angular/common';
+import { NgStyle } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { isEmpty } from 'lodash';
 import { skipWhile, takeUntil } from 'rxjs';
@@ -17,7 +17,7 @@ import { WallpaperService } from '../../services/wallpaper.service';
 
 @Component({
   selector: 'app-carousel',
-  imports: [NgFor, NgIf, NgStyle, RangePipe],
+  imports: [NgStyle, RangePipe],
   templateUrl: './carousel.component.html',
   styleUrl: './carousel.component.less'
 })
@@ -222,7 +222,7 @@ export class CarouselComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private initCarousels() {
     if (this.carousels.length > 0) {
-      this.carousels.push(this.carousels[0]);
+      this.carousels.push({ ...this.carousels[0] });
     }
   }
 

@@ -1,4 +1,3 @@
-import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Params, RouterLink } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -11,7 +10,7 @@ import { UserAgentService } from '../../services/user-agent.service';
 
 @Component({
   selector: 'app-pagination',
-  imports: [NgIf, RouterLink, NzIconModule, RangePipe],
+  imports: [RouterLink, NzIconModule, RangePipe],
   providers: [DestroyService],
   templateUrl: './pagination.component.html',
   styleUrl: './pagination.component.less'

@@ -1,4 +1,3 @@
-import { NgFor } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty } from 'lodash';
@@ -19,7 +18,7 @@ import { UserAgentService } from '../../services/user-agent.service';
 
 @Component({
   selector: 'app-post-archive',
-  imports: [NgFor, RouterLink, BreadcrumbComponent],
+  imports: [RouterLink, BreadcrumbComponent],
   providers: [DestroyService],
   templateUrl: './post-archive.component.html',
   styleUrl: './post-archive.component.less'
