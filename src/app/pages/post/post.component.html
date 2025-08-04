@@ -160,9 +160,9 @@
             <nz-icon nzType="heart" nzTheme="fill"/>
           </button>
           @if (isArticle) {
-            <button [class.liked]="isFavorite" (click)="addFavorite()" [title]="isFavorite ? '已收藏' : '收藏'">
-              <nz-icon nzType="star" nzTheme="fill"/>
-            </button>
+            <button [class.liked]="isFavorite"
+                    (click)="addFavorite()"
+                    [title]="isFavorite ? '已收藏' : '收藏'"><nz-icon nzType="star" nzTheme="fill"/></button>
           }
           @if (!isMobile) {
             <button (click)="showShareQrcode()" title="分享"><span class="fi fi-share-fill"></span></button>

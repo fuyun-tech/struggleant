@@ -56,15 +56,15 @@ app.get('/rss.xml', async (req: Request, res: Response) => {
       description: appInfo.appDescription,
       language: 'zh-cn',
       dcExtension: true,
-      id: appInfo.appUrl,
-      link: appInfo.appUrl,
+      id: environment.appUrl,
+      link: environment.appUrl,
       image: appInfo.appLogoUrl,
       favicon: appInfo.appFaviconUrl,
       copyright: `2024-${new Date().getFullYear()} ${appInfo.appDomain}`,
       updated: new Date(),
       generator: appInfo.appDomain,
       feedLinks: {
-        rss: `${appInfo.appUrl}/rss.xml`
+        rss: `${environment.appUrl}/rss.xml`
       },
       webMaster: options['site_author']
     });
@@ -74,7 +74,7 @@ app.get('/rss.xml', async (req: Request, res: Response) => {
       feed.addItem({
         title: post.postTitle,
         id: post.postId,
-        link: appInfo.appUrl + post.postGuid,
+        link: environment.appUrl + post.postGuid,
         description: post.postExcerpt,
         content: showDetail ? post.postContent : post.postExcerpt,
         creator: item.meta['post_author'] || post.owner.userNickname,
@@ -92,11 +92,6 @@ app.get('/rss.xml', async (req: Request, res: Response) => {
 });
 app.get('/sitemap.xml', async (req: Request, res: Response) => {
   try {
-    const { data: appInfo } = await simpleRequest({
-      url: ApiUrl.TENANT_APP,
-      appId: environment.appId,
-      apiBase: environment.apiBase
-    });
     const postList: SitemapData = (
       await simpleRequest({
         url: ApiUrl.SITEMAP_POST,
@@ -112,56 +107,56 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
       })
     ).data;
     const sitemapStream = new SitemapStream({
-      hostname: appInfo.appUrl
+      hostname: environment.appUrl
     });
 
     const links: SitemapItemLoose[] = [
       {
-        url: appInfo.appUrl,
+        url: environment.appUrl,
         changefreq: EnumChangefreq.ALWAYS,
         priority: 1
       },
       {
-        url: appInfo.appUrl + '/posts',
+        url: environment.appUrl + '/posts',
         changefreq: EnumChangefreq.ALWAYS,
         priority: 1
       },
       {
-        url: appInfo.appUrl + '/archive',
+        url: environment.appUrl + '/archive',
         changefreq: EnumChangefreq.ALWAYS,
         priority: 0.8
       }
     ];
     const posts: SitemapItemLoose[] = postList.posts.map((item) => ({
-      url: appInfo.appUrl + item.postGuid,
+      url: environment.appUrl + item.postGuid,
       changefreq: EnumChangefreq.ALWAYS,
       priority: 1,
       lastmod: new Date(item.postModified).toString()
     }));
     const postArchivesByMonth: SitemapItemLoose[] = postList.postArchives.map((item) => ({
-      url: `${appInfo.appUrl}/archive/${item.dateValue}`,
+      url: `${environment.appUrl}/archive/${item.dateValue}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
     const postArchivesByYear: SitemapItemLoose[] = uniq(
       postList.postArchives.map((item) => item.dateValue.split('/')[0])
     ).map((item) => ({
-      url: `${appInfo.appUrl}/archive/${item}`,
+      url: `${environment.appUrl}/archive/${item}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
     const taxonomies: SitemapItemLoose[] = postList.taxonomies.map((item) => ({
-      url: `${appInfo.appUrl}/category/${item.taxonomySlug}`,
+      url: `${environment.appUrl}/category/${item.taxonomySlug}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
     const tags: SitemapItemLoose[] = postList.tags.map((item) => ({
-      url: `${appInfo.appUrl}/tag/${item.tagName}`,
+      url: `${environment.appUrl}/tag/${item.tagName}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
     const pages: SitemapItemLoose[] = pageList.posts.map((item) => ({
-      url: appInfo.appUrl + item.postGuid,
+      url: environment.appUrl + item.postGuid,
       changefreq: EnumChangefreq.DAILY,
       priority: 1,
       lastmod: new Date(item.postModified).toString()

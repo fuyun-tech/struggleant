@@ -27,11 +27,11 @@
             <div [title]="post.book.bookName">
               <nz-icon nzType="folder"/><span>{{ post.book.bookName }}</span>
             </div>
-          }
-          @if (post.book && post.book.bookIssue) {
-            <a [routerLink]="['/journal', post.book.bookMetaId, post.book.bookId]" [title]="post.book.bookIssue">
-              <nz-icon nzType="book"/><span>{{ post.book.bookIssue }}</span>
-            </a>
+            @if (post.book.bookIssue) {
+              <a [routerLink]="['/journal', post.book.bookMetaId, post.book.bookId]" [title]="post.book.bookIssue">
+                <nz-icon nzType="book"/><span>{{ post.book.bookIssue }}</span>
+              </a>
+            }
           }
           <div>
             <nz-icon nzType="eye"/><span>{{ post.post.postViews | numberView: 'K' }}</span>

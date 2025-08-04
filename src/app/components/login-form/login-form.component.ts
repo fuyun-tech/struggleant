@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { environment } from 'env/environment';
 import { isEmpty } from 'lodash';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
@@ -149,7 +150,7 @@ export class LoginFormComponent extends BaseComponent implements OnInit {
                 redirectUrl = this.referrer + separator + urlParam;
               } else {
                 // 相对路径，不需要带上token
-                redirectUrl = this.appInfo.appUrl + '/' + this.referrer.replace(/^\//i, '');
+                redirectUrl = environment.appUrl + '/' + this.referrer.replace(/^\//i, '');
               }
             } else {
               redirectUrl = this.appInfo.appAdminUrl + '?' + urlParam;

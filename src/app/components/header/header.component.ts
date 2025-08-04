@@ -1,6 +1,7 @@
 import { AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { environment } from 'env/environment';
 import { isEmpty } from 'lodash';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -41,6 +42,7 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
   isSignIn = false;
   indexInfo?: PageIndexInfo;
   appInfo?: TenantAppModel;
+  appUrl = environment.appUrl;
   user!: UserModel;
   keyword = '';
   wallpaperModalVisible = false;
