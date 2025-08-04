@@ -34,5 +34,4 @@ export interface CarouselOptions {
   type: 'album' | 'wallpaper';
   orderBy?: 'hottest' | 'newest' | 'oldest' | 'random';
   size?: number;
-  resolution?: string;
 }
