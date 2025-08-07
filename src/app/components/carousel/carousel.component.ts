@@ -5,7 +5,7 @@ import { skipWhile, takeUntil } from 'rxjs';
 import { LinkTarget } from '../../enums/link';
 import { ActionObjectType, ActionType } from '../../enums/log';
 import { WallpaperLang } from '../../enums/wallpaper';
-import { CarouselOptions, CarouselVo } from '../../interfaces/option';
+import { Carousel, CarouselOptions } from '../../interfaces/option';
 import { HotWallpaper, Wallpaper } from '../../interfaces/wallpaper';
 import { RangePipe } from '../../pipes/range.pipe';
 import { DestroyService } from '../../services/destroy.service';
@@ -25,7 +25,7 @@ export class CarouselComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('carouselBody') carouselBody!: ElementRef;
 
   isMobile = false;
-  carousels: CarouselVo[] = [];
+  carousels: Carousel[] = [];
   activeIndex = 0;
   isRevert = false;
 
@@ -107,7 +107,7 @@ export class CarouselComponent implements OnInit, OnDestroy, AfterViewInit {
     this.update();
   }
 
-  logClick(carousel: CarouselVo) {
+  logClick(carousel: Carousel) {
     this.logService
       .logAction({
         action: ActionType.CLICK_CAROUSEL,
@@ -177,10 +177,7 @@ export class CarouselComponent implements OnInit, OnDestroy, AfterViewInit {
       .getCarousels()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.carousels = (res || []).map((item) => ({
-          ...item,
-          fullUrl: item.url
-        }));
+        this.carousels = res || [];
         this.initCarousels();
       });
   }
@@ -222,18 +219,22 @@ export class CarouselComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private initCarousels() {
     if (this.carousels.length > 0) {
-      this.carousels.push({ ...this.carousels[0] });
+      const firstCarousel = this.carousels[0];
+      const lastCarousel = this.carousels[this.carousels.length - 1];
+
+      if (this.carousels.length < 2 || firstCarousel.id !== lastCarousel.id) {
+        this.carousels.push({ ...this.carousels[0] });
+      }
     }
   }
 
-  private transformToCarousels(wallpapers: Wallpaper[] | HotWallpaper[]): CarouselVo[] {
+  private transformToCarousels(wallpapers: Wallpaper[] | HotWallpaper[]): Carousel[] {
     return wallpapers.map((item, index) => {
       return {
         id: item.wallpaperId,
         title: item.wallpaperTitle || item.wallpaperTitleEn,
         caption: item.wallpaperCopyright || item.wallpaperCopyrightEn,
         url: item.wallpaperUrl,
-        fullUrl: item.wallpaperUrl,
         link: this.wallpaperService.getWallpaperLink(item.wallpaperId, !item.isCn && item.isEn),
         target: LinkTarget.BLANK,
         order: index + 1
