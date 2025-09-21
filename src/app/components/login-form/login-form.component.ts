@@ -36,8 +36,7 @@ import { format } from '../../utils/helper';
     NzDividerModule
   ],
   providers: [DestroyService],
-  templateUrl: './login-form.component.html',
-  styleUrl: './login-form.component.less'
+  templateUrl: './login-form.component.html'
 })
 export class LoginFormComponent extends BaseComponent implements OnInit {
   @Input() isModal = true;

@@ -41,7 +41,7 @@ export class UserService {
   }
 
   thirdLogin(authCode: string, source: string): Observable<HttpResponseEntity> {
-    return this.apiService.httpPost(ApiUrl.USER_THIRD_LOGIN, {
+    return this.apiService.httpPost(ApiUrl.AUTH_THIRD_LOGIN, {
       authCode,
       source,
       appId: APP_ID

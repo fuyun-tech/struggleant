@@ -5,14 +5,18 @@ import { LoginFormComponent } from '../login-form/login-form.component';
 @Component({
   selector: 'app-login-modal',
   imports: [NzModalModule, LoginFormComponent],
-  templateUrl: './login-modal.component.html',
-  styleUrl: './login-modal.component.less'
+  templateUrl: './login-modal.component.html'
 })
 export class LoginModalComponent {
   @Input() visible = true;
+  @Input() closable = true;
   @Output() close = new EventEmitter();
 
   closeModal() {
+    if (!this.closable) {
+      return;
+    }
+    this.visible = false;
     this.close.emit();
   }
 }

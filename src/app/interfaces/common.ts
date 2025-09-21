@@ -69,6 +69,11 @@ export interface ArchiveList {
   yearList: string[];
 }
 
+export interface LoginModalOptions {
+  visible: boolean;
+  closable: boolean;
+}
+
 export interface IPAddress {
   country: string;
   province: string;

@@ -1,5 +1,5 @@
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
-import { Component, DOCUMENT, Inject, Input, OnInit } from '@angular/core';
+import { Component, DOCUMENT, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { isEmpty } from 'lodash';
@@ -9,6 +9,7 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
+import { CommonService } from 'src/app/services/common.service';
 import { BaseComponent } from '../../base.component';
 import { ResponseCode } from '../../config/response-code.enum';
 import { CommentObjectType } from '../../enums/comment';
@@ -25,7 +26,6 @@ import { TenantAppService } from '../../services/tenant-app.service';
 import { UserAgentService } from '../../services/user-agent.service';
 import { UserService } from '../../services/user.service';
 import { VoteService } from '../../services/vote.service';
-import { LoginModalComponent } from '../login-modal/login-modal.component';
 
 @Component({
   selector: 'app-comment',
@@ -40,16 +40,13 @@ import { LoginModalComponent } from '../login-modal/login-modal.component';
     NzInputModule,
     NzButtonModule,
     NzCheckboxModule,
-    NzIconModule,
-    LoginModalComponent
+    NzIconModule
   ],
   providers: [DestroyService],
   templateUrl: './comment.component.html',
   styleUrl: './comment.component.less'
 })
 export class CommentComponent extends BaseComponent implements OnInit {
-  @Input() enableAI = false;
-
   readonly maxContentLength = 400;
 
   isMobile = false;
@@ -61,7 +58,6 @@ export class CommentComponent extends BaseComponent implements OnInit {
   replyVisibleMap: Record<string, boolean> = {};
   commentVoteLoading: Record<string, boolean> = {};
   saveLoading = false;
-  loginVisible = false;
 
   private appInfo!: TenantAppModel;
   private options: OptionEntity = {};
@@ -90,6 +86,7 @@ export class CommentComponent extends BaseComponent implements OnInit {
     private readonly destroy$: DestroyService,
     private readonly fb: FormBuilder,
     private readonly userAgentService: UserAgentService,
+    private readonly commonService: CommonService,
     private readonly message: MessageService,
     private readonly tenantAppService: TenantAppService,
     private readonly optionService: OptionService,
@@ -225,11 +222,10 @@ export class CommentComponent extends BaseComponent implements OnInit {
   }
 
   showLoginModal() {
-    this.loginVisible = true;
-  }
-
-  closeLoginModal() {
-    this.loginVisible = false;
+    this.commonService.updateLoginModalVisible({
+      visible: true,
+      closable: true
+    });
   }
 
   private getComments(scroll = false) {

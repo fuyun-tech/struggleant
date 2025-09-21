@@ -12,7 +12,7 @@
           请输入用户名或邮箱
         }
         @if (control.hasError('maxlength')) {
-          用户名或邮箱最大长度为{{ maxLoginLength }}位
+          用户名或邮箱最大长度为 {{ maxLoginLength }} 位
         }
       </ng-template>
     </nz-form-control>
@@ -36,7 +36,7 @@
           请输入密码
         }
         @if (control.hasError('maxlength')) {
-          密码最大长度为{{ maxPasswordLength }}位
+          密码最大长度为 {{ maxPasswordLength }} 位
         }
       </ng-template>
     </nz-form-control>
@@ -45,8 +45,13 @@
     <div class="auth-actions">
       <div>
         @if (enableSignup) {
-          <a class="signup-link" [routerLink]="['/user/signup']" title="立即注册"><nz-icon nzType="user-add"/>立即注册</a>
+          <span class="auth-action">
+            <a class="auth-link" routerLink="/user/signup" title="立即注册"><nz-icon nzType="user-add"/>立即注册</a>
+          </span>
         }
+        <span class="auth-action">
+          <a class="auth-link" routerLink="/user/forgot" title="忘记密码"><nz-icon nzType="key"/>忘记密码</a>
+        </span>
       </div>
       <button nz-button nzType="primary" (click)="login()" [nzLoading]="loginLoading">登录</button>
     </div>

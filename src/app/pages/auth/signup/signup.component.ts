@@ -35,8 +35,7 @@ import {
   selector: 'app-signup',
   imports: [ReactiveFormsModule, NzFormModule, NzInputModule, NzButtonModule, NzIconModule],
   providers: [DestroyService],
-  templateUrl: './signup.component.html',
-  styleUrl: './signup.component.less'
+  templateUrl: './signup.component.html'
 })
 export class SignupComponent extends BaseComponent implements OnInit {
   readonly maxEmailLength = USER_EMAIL_LENGTH;

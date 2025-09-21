@@ -10,7 +10,7 @@ import {
 } from '../config/common.constant';
 import { Message } from '../config/message.enum';
 import { Theme } from '../enums/common';
-import { PageIndexInfo } from '../interfaces/common';
+import { LoginModalOptions, PageIndexInfo } from '../interfaces/common';
 import { CustomError } from '../interfaces/custom-error';
 import { PlatformService } from './platform.service';
 import { SsrCookieService } from './ssr-cookie.service';
@@ -27,6 +27,12 @@ export class CommonService {
 
   private darkMode: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public darkMode$: Observable<boolean> = this.darkMode.asObservable();
+
+  private loginVisible: BehaviorSubject<LoginModalOptions> = new BehaviorSubject<LoginModalOptions>({
+    visible: false,
+    closable: true
+  });
+  public loginVisible$: Observable<LoginModalOptions> = this.loginVisible.asObservable();
 
   constructor(
     @Inject(DOCUMENT) private readonly document: Document,
@@ -58,6 +64,10 @@ export class CommonService {
 
   updateSiderVisible(visible: boolean) {
     this.siderVisible.next(visible);
+  }
+
+  updateLoginModalVisible(options: LoginModalOptions) {
+    this.loginVisible.next(options);
   }
 
   getReferrer(onlyPath = false) {

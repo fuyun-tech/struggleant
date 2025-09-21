@@ -26,7 +26,7 @@ export class AuthService {
   login(payload: LoginEntity): Observable<HttpResponseEntity> {
     return this.apiService
       .httpPost(
-        ApiUrl.USER_LOGIN,
+        ApiUrl.AUTH_LOGIN,
         {
           ...payload,
           appId: APP_ID
@@ -46,7 +46,7 @@ export class AuthService {
   signup(payload: SignupEntity): Observable<UserModel> {
     return this.apiService
       .httpPost(
-        ApiUrl.USER_SIGNUP,
+        ApiUrl.AUTH_SIGNUP,
         {
           ...payload,
           appId: APP_ID
@@ -59,7 +59,7 @@ export class AuthService {
   verify(userId: string, code: string): Observable<LoginResponse> {
     return this.apiService
       .httpPost(
-        ApiUrl.USER_VERIFY,
+        ApiUrl.AUTH_VERIFY,
         {
           userId,
           code,
@@ -77,23 +77,23 @@ export class AuthService {
       );
   }
 
-  resend(userId: string): Observable<UserModel> {
+  sendCode(payload: { userId?: string; email?: string }): Observable<HttpResponseEntity> {
     return this.apiService
       .httpPost(
-        ApiUrl.USER_RESEND_CODE,
+        ApiUrl.AUTH_SEND_CODE,
         {
-          userId,
+          ...payload,
           appId: APP_ID
         },
         true
       )
-      .pipe(map((res) => <any>(res?.data || {})));
+      .pipe(map((res) => res || {}));
   }
 
   thirdLogin(authCode: string, source: string): Observable<HttpResponseEntity> {
     return this.apiService
       .httpPost(
-        ApiUrl.USER_THIRD_LOGIN,
+        ApiUrl.AUTH_THIRD_LOGIN,
         {
           authCode,
           source,
@@ -109,6 +109,19 @@ export class AuthService {
           }
         })
       );
+  }
+
+  resetPassword(payload: { email: string; code: string; password: string }): Observable<LoginResponse> {
+    return this.apiService
+      .httpPost(
+        ApiUrl.AUTH_RESET_PASSWORD,
+        {
+          ...payload,
+          appId: APP_ID
+        },
+        true
+      )
+      .pipe(map((res) => res?.data || {}));
   }
 
   getToken(): string {
@@ -201,7 +214,7 @@ export class AuthService {
   logout(): Observable<HttpResponseEntity> {
     return this.apiService
       .httpPost(
-        ApiUrl.USER_LOGOUT,
+        ApiUrl.AUTH_LOGOUT,
         {
           referer: location.href
         },

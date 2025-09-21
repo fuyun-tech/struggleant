@@ -9,7 +9,6 @@ import { combineLatest, skipWhile, takeUntil } from 'rxjs';
 import { BookColumnEntity } from 'src/app/interfaces/book-column';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { CommentComponent } from '../../components/comment/comment.component';
-import { LoginModalComponent } from '../../components/login-modal/login-modal.component';
 import { MakeMoneyComponent } from '../../components/make-money/make-money.component';
 import { PostPrevNextComponent } from '../../components/post-prev-next/post-prev-next.component';
 import { PostRelatedComponent } from '../../components/post-related/post-related.component';
@@ -68,7 +67,6 @@ import { decodeEntities } from '../../utils/entities';
     PostRelatedComponent,
     CommentComponent,
     ShareModalComponent,
-    LoginModalComponent,
     MakeMoneyComponent
   ],
   providers: [DestroyService, NzImageService],
@@ -163,8 +161,9 @@ export class PostComponent implements OnInit {
           this.commonService.redirectToNotFound();
           return;
         }
-        this.closeLoginModal();
+
         this.closeShareQrcode();
+
         if (REGEXP_ID.test(slug)) {
           this.postId = slug;
           this.getPost();
@@ -297,11 +296,10 @@ export class PostComponent implements OnInit {
   }
 
   showLoginModal() {
-    this.loginVisible = true;
-  }
-
-  closeLoginModal() {
-    this.loginVisible = false;
+    this.commonService.updateLoginModalVisible({
+      visible: true,
+      closable: true
+    });
   }
 
   protected updatePageIndex(): void {

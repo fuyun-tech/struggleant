@@ -160,9 +160,6 @@
         </div>
         <div class="comment-actions">
           <div>
-            <label nz-checkbox formControlName="aiComment" [nzDisabled]="!enableAI">向 AI 提问</label>
-          </div>
-          <div>
             @if (!isSignIn) {
               <button nz-button type="button" nzType="default" (click)="showLoginModal()">登录</button>
             }
@@ -179,6 +176,3 @@
     <ng-container *ngTemplateOutlet="commentFormTpl; context: { $implicit: commentForm }"></ng-container>
   }
 </div>
-@if (loginVisible) {
-  <app-login-modal (close)="closeLoginModal()"></app-login-modal>
-}

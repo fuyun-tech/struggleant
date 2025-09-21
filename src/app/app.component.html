@@ -23,6 +23,9 @@
       </div>
       <app-m-sider></app-m-sider>
     }
+    @if (loginOptions.visible) {
+      <app-login-modal [closable]="loginOptions.closable" (close)="closeLoginModal()"></app-login-modal>
+    }
     <img src="/assets/images/adimage.gif"
          [style.display]="'none'"
          (load)="checkAdsStatus(true)"

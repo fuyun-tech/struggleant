@@ -16,8 +16,7 @@ import { TenantAppService } from 'src/app/services/tenant-app.service';
   selector: 'app-login',
   imports: [LoginFormComponent],
   providers: [DestroyService],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.less'
+  templateUrl: './login.component.html'
 })
 export class LoginComponent extends BaseComponent implements OnInit {
   protected pageIndex = 'auth-login';
