@@ -10,6 +10,8 @@
   }
 
   .banner-post {
+    display: flex;
+    flex-direction: column;
     margin-left: @content-margin;
     flex-grow: 1;
     overflow: hidden;
@@ -69,10 +71,28 @@
       text-align: right;
     }
   }
+
+  .banner-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+  }
 }
 
 .main-content {
   margin-top: @content-margin;
+}
+
+.content-empty {
+  margin-top: @primary-margin;
+  margin-bottom: @primary-margin;
+}
+
+.m-content-empty {
+  margin-top: @m-content-margin;
+  margin-bottom: @m-content-margin;
 }
 
 .column-header {

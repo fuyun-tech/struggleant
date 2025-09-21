@@ -3,26 +3,36 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty, uniq } from 'lodash';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzEmptyComponent } from 'ng-zorro-antd/empty';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
-import { CarouselComponent } from '../../components/carousel/carousel.component';
-import { PostItemComponent } from '../../components/post-item/post-item.component';
-import { OptionEntity } from '../../interfaces/option';
-import { Post, PostEntity } from '../../interfaces/post';
-import { TenantAppModel } from '../../interfaces/tenant-app';
-import { NumberViewPipe } from '../../pipes/number-view.pipe';
-import { BreadcrumbService } from '../../services/breadcrumb.service';
-import { CommonService } from '../../services/common.service';
-import { DestroyService } from '../../services/destroy.service';
-import { MetaService } from '../../services/meta.service';
-import { OptionService } from '../../services/option.service';
-import { PostService } from '../../services/post.service';
-import { TenantAppService } from '../../services/tenant-app.service';
-import { UserAgentService } from '../../services/user-agent.service';
+import { CarouselComponent } from 'src/app/components/carousel/carousel.component';
+import { PostItemComponent } from 'src/app/components/post-item/post-item.component';
+import { OptionEntity } from 'src/app/interfaces/option';
+import { Post, PostEntity } from 'src/app/interfaces/post';
+import { TenantAppModel } from 'src/app/interfaces/tenant-app';
+import { NumberViewPipe } from 'src/app/pipes/number-view.pipe';
+import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { CommonService } from 'src/app/services/common.service';
+import { DestroyService } from 'src/app/services/destroy.service';
+import { MetaService } from 'src/app/services/meta.service';
+import { OptionService } from 'src/app/services/option.service';
+import { PostService } from 'src/app/services/post.service';
+import { TenantAppService } from 'src/app/services/tenant-app.service';
+import { UserAgentService } from 'src/app/services/user-agent.service';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, DatePipe, NzButtonModule, NzIconModule, CarouselComponent, NumberViewPipe, PostItemComponent],
+  imports: [
+    RouterLink,
+    DatePipe,
+    NzButtonModule,
+    NzIconModule,
+    NzEmptyComponent,
+    CarouselComponent,
+    NumberViewPipe,
+    PostItemComponent
+  ],
   providers: [DestroyService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.less'
