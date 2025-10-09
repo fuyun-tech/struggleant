@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
+import { UserLlmStatus } from 'src/app/enums/user';
+import { TenantAppModel } from 'src/app/interfaces/tenant-app';
+import { format } from 'src/app/utils/helper';
 import { ApiUrl } from '../config/api-url';
-import { APP_ID } from '../config/common.constant';
+import { APP_ID, URL_AVATAR_API } from '../config/common.constant';
 import { HttpResponseEntity } from '../interfaces/http-response';
 import { UserModel } from '../interfaces/user';
 import { ApiService } from './api.service';
@@ -14,6 +17,11 @@ export class UserService {
   private user: BehaviorSubject<UserModel> = new BehaviorSubject<UserModel>({
     userId: '',
     userNickname: '',
+    permissions: [],
+    userLlmStatus: UserLlmStatus.DISABLED,
+    userLlmModels: [],
+    userLlmExpiresAt: 0,
+    userLlmLimit: 0,
     appId: ''
   });
   user$: Observable<UserModel> = this.user.asObservable();
@@ -46,5 +54,17 @@ export class UserService {
       source,
       appId: APP_ID
     });
+  }
+
+  getUserAvatar(user: UserModel, avatarType: string, appInfo: TenantAppModel): string {
+    let avatar: string;
+    if (user.userAvatar) {
+      avatar = user.userAvatar;
+    } else {
+      avatar = user.userEmailHash
+        ? format(URL_AVATAR_API, user.userEmailHash, avatarType || 'monsterid')
+        : appInfo.appFaviconUrl;
+    }
+    return avatar;
   }
 }

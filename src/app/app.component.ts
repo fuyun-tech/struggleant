@@ -1,33 +1,41 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { environment } from 'env/environment';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
 import { filter, takeWhile, tap } from 'rxjs/operators';
-import { FooterComponent } from './components/footer/footer.component';
-import { HeaderComponent } from './components/header/header.component';
-import { LoginModalComponent } from './components/login-modal/login-modal.component';
-import { MSiderComponent } from './components/m-sider/m-sider.component';
-import { COOKIE_KEY_UV_ID, MEDIA_QUERY_THEME_DARK } from './config/common.constant';
-import { ResponseCode } from './config/response-code.enum';
-import { Theme } from './enums/common';
-import { AdsStatus } from './enums/log';
-import { ErrorState, LoginModalOptions } from './interfaces/common';
-import { TaxonomyNode } from './interfaces/taxonomy';
-import { ForbiddenComponent } from './pages/error/forbidden/forbidden.component';
-import { NotFoundComponent } from './pages/error/not-found/not-found.component';
-import { ServerErrorComponent } from './pages/error/server-error/server-error.component';
-import { AdsService } from './services/ads.service';
-import { CommonService } from './services/common.service';
-import { ErrorService } from './services/error.service';
-import { LogService } from './services/log.service';
-import { OptionService } from './services/option.service';
-import { PlatformService } from './services/platform.service';
-import { SsrCookieService } from './services/ssr-cookie.service';
-import { TaxonomyService } from './services/taxonomy.service';
-import { TenantAppService } from './services/tenant-app.service';
-import { UrlService } from './services/url.service';
-import { UserAgentService } from './services/user-agent.service';
-import { UserService } from './services/user.service';
-import { generateUid } from './utils/helper';
+import { BotChatComponent } from 'src/app/components/bot-chat/bot-chat.component';
+import { FooterComponent } from 'src/app/components/footer/footer.component';
+import { HeaderComponent } from 'src/app/components/header/header.component';
+import { LoginModalComponent } from 'src/app/components/login-modal/login-modal.component';
+import { MSiderComponent } from 'src/app/components/m-sider/m-sider.component';
+import { COOKIE_KEY_UV_ID, MEDIA_QUERY_THEME_DARK } from 'src/app/config/common.constant';
+import { ResponseCode } from 'src/app/config/response-code.enum';
+import { Theme } from 'src/app/enums/common';
+import { AdsStatus } from 'src/app/enums/log';
+import { PostScope, PostStatus } from 'src/app/enums/post';
+import { ErrorState, LoginModalOptions, PageIndexInfo } from 'src/app/interfaces/common';
+import { Post } from 'src/app/interfaces/post';
+import { TaxonomyNode } from 'src/app/interfaces/taxonomy';
+import { ForbiddenComponent } from 'src/app/pages/error/forbidden/forbidden.component';
+import { NotFoundComponent } from 'src/app/pages/error/not-found/not-found.component';
+import { ServerErrorComponent } from 'src/app/pages/error/server-error/server-error.component';
+import { AdsService } from 'src/app/services/ads.service';
+import { CommonService } from 'src/app/services/common.service';
+import { ErrorService } from 'src/app/services/error.service';
+import { LogService } from 'src/app/services/log.service';
+import { OptionService } from 'src/app/services/option.service';
+import { PlatformService } from 'src/app/services/platform.service';
+import { PostService } from 'src/app/services/post.service';
+import { SsrCookieService } from 'src/app/services/ssr-cookie.service';
+import { TaxonomyService } from 'src/app/services/taxonomy.service';
+import { TenantAppService } from 'src/app/services/tenant-app.service';
+import { UrlService } from 'src/app/services/url.service';
+import { UserAgentService } from 'src/app/services/user-agent.service';
+import { UserService } from 'src/app/services/user.service';
+import { generateUid } from 'src/app/utils/helper';
 
 @Component({
   selector: 'app-root',
@@ -39,7 +47,11 @@ import { generateUid } from './utils/helper';
     ForbiddenComponent,
     ServerErrorComponent,
     MSiderComponent,
-    LoginModalComponent
+    LoginModalComponent,
+    BotChatComponent,
+    NzButtonModule,
+    NzTooltipModule,
+    NzIconModule
   ],
   providers: [],
   templateUrl: './app.component.html',
@@ -52,11 +64,17 @@ export class AppComponent implements OnInit, AfterViewInit {
   errorPage = false;
   isBodyCentered = false;
   siderVisible = false;
+  indexInfo?: PageIndexInfo;
+  post: Post | null = null;
+  chatVisible = false;
+  conversationId = '';
+  chatPrompt = '';
   loginOptions: LoginModalOptions = {
     visible: false,
     closable: true
   };
 
+  private isSignIn = false;
   private currentUrl = '';
   private initialized = false;
   private accessLogId = '';
@@ -66,6 +84,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   constructor(
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly message: NzMessageService,
     private readonly platform: PlatformService,
     private readonly userAgentService: UserAgentService,
     private readonly cookieService: SsrCookieService,
@@ -77,6 +97,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     private readonly tenantAppService: TenantAppService,
     private readonly taxonomyService: TaxonomyService,
     private readonly logService: LogService,
+    private readonly postService: PostService,
     private readonly adsService: AdsService
   ) {
     this.isMobile = this.userAgentService.isMobile;
@@ -153,7 +174,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.initThemeListener();
     this.optionService.getOptions().subscribe();
     this.tenantAppService.getAppInfo().subscribe();
-    this.userService.getLoginUser().subscribe();
+    this.userService.getLoginUser().subscribe((user) => {
+      this.isSignIn = !!user.userId;
+    });
     this.commonService.siderVisible$.subscribe((visible) => {
       if (this.platform.isBrowser) {
         if (visible) {
@@ -171,10 +194,17 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
       this.siderVisible = visible;
     });
+    this.commonService.pageIndex$.subscribe((page) => {
+      this.indexInfo = this.commonService.getPageIndexInfo(page);
+      this.cdr.detectChanges();
+    });
     this.commonService.loginVisible$.subscribe((loginOptions) => {
       this.loginOptions = loginOptions;
     });
     this.taxonomyService.getTaxonomies().subscribe((taxonomies) => (this.postTaxonomies = taxonomies));
+    this.postService.activePost$.subscribe((post) => {
+      this.post = post;
+    });
     this.errorService.errorState$.subscribe((state) => {
       this.errorState = state;
     });
@@ -227,6 +257,30 @@ export class AppComponent implements OnInit, AfterViewInit {
       visible: false,
       closable: true
     });
+  }
+
+  showChat() {
+    if (!this.isSignIn) {
+      this.showLoginModal();
+      return;
+    }
+    if (!this.post) {
+      return;
+    }
+    if (!!this.post.post.postLoginFlag || !!this.post.post.postPayFlag) {
+      this.message.warning('会员或付费文章无法使用 AI 阅读助手功能');
+      return;
+    }
+    if (this.post.post.postStatus !== PostStatus.PUBLISH || this.post.post.postScope !== PostScope.PUBLIC) {
+      this.message.warning('非公开文章无法使用 AI 阅读助手功能');
+      return;
+    }
+    this.chatVisible = true;
+  }
+
+  closeChat() {
+    this.chatPrompt = '';
+    this.chatVisible = false;
   }
 
   checkAdsStatus(isLoaded: boolean) {

@@ -1,6 +1,6 @@
 {
   "name": "struggleant",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Website of struggleant.com",
   "keywords": [
     "Magazine",
@@ -53,10 +53,12 @@
     "@angular/router": "^20.3.1",
     "@angular/ssr": "^20.3.2",
     "@fuyun/feed": "^1.0.0",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "express": "^4.21.2",
     "highlight.js": "^11.11.1",
     "lazysizes": "^5.3.2",
     "lodash": "^4.17.21",
+    "marked": "^16.4.0",
     "moment": "^2.30.1",
     "murmurhash": "^2.0.1",
     "ng-zorro-antd": "^20.3.1",

@@ -1,3 +1,4 @@
+import { UserLlmStatus } from 'src/app/enums/user';
 import { AppParam } from './common';
 
 export interface UserEntity extends AppParam {
@@ -14,8 +15,13 @@ export interface UserModel extends UserEntity {
   userLink?: string;
   userEmailHash?: string;
   userAvatar?: string;
+  userLlmStatus: UserLlmStatus;
+  userLlmModels: string[];
+  userLlmExpiresAt: number;
+  userLlmLimit: number;
   isAdmin?: boolean;
   meta?: Record<string, string>;
+  permissions: string[];
 }
 
 export interface Guest {

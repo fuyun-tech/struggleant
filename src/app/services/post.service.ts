@@ -25,6 +25,9 @@ export class PostService {
   private activePostId: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public activePostId$: Observable<string> = this.activePostId.asObservable();
 
+  private activePost: BehaviorSubject<Post | null> = new BehaviorSubject<Post | null>(null);
+  public activePost$: Observable<Post | null> = this.activePost.asObservable();
+
   private activeBook: Subject<BookEntity | undefined> = new Subject<BookEntity | undefined>();
   public activeBook$: Observable<BookEntity | undefined> = this.activeBook.asObservable();
 
@@ -133,6 +136,10 @@ export class PostService {
 
   updateActivePostId(postId: string) {
     this.activePostId.next(postId);
+  }
+
+  updateActivePost(post: Post) {
+    this.activePost.next(post);
   }
 
   updateActiveBook(book?: BookEntity) {

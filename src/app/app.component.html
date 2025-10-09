@@ -8,6 +8,24 @@
         </div>
       </div>
       <app-footer></app-footer>
+      @if (indexInfo?.isPost && indexInfo?.isDetail) {
+        <div class="ai-widget">
+          <button nz-button
+                  nz-tooltip
+                  nzType="primary"
+                  nzShape="circle"
+                  nzSize="large"
+                  nzTooltipTitle="AI 阅读助手"
+                  nzTooltipPlacement="topRight"
+                  (click)="showChat()"><nz-icon nzType="comment"/></button>
+        </div>
+      }
+      @if (chatVisible) {
+        <app-bot-chat [conversationId]="conversationId"
+                      [prompt]="chatPrompt"
+                      [post]="post"
+                      (closeDrawer)="closeChat()"></app-bot-chat>
+      }
     } @else {
       <div class="m-body-wrap" [class.open]="siderVisible">
         <app-header [postTaxonomies]="postTaxonomies"></app-header>

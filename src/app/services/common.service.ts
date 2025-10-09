@@ -53,10 +53,11 @@ export class CommonService {
     return {
       isHome: pageIndex === 'index',
       isPost: topPage === 'post',
-      isSearch: topPage === 'search',
-      isAuth: topPage === 'auth',
       isArticle: pageIndex === 'post-article',
       isPage: topPage === 'page',
+      isDetail: subPage === 'detail',
+      isSearch: topPage === 'search',
+      isAuth: topPage === 'auth',
       fullPage: pageIndex,
       subPage
     };

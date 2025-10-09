@@ -105,7 +105,7 @@ export class PostComponent implements OnInit {
     return this.bookService.getBookName(this.postBook, false);
   }
 
-  protected pageIndex = 'post-article';
+  protected pageIndex = 'post-detail';
 
   private readonly copyHTML = '<span class="fi fi-copy"></span>Copy code';
   private readonly copiedHTML = '<span class="fi fi-check-lg"></span>Copied!';
@@ -349,12 +349,13 @@ export class PostComponent implements OnInit {
     this.isVoted = post.isVoted;
 
     if (this.isArticle) {
-      this.pageIndex = 'post-article';
+      this.pageIndex = 'post-detail';
     } else {
       this.pageIndex = 'page-' + this.post.postName;
     }
 
     this.postService.updateActivePostId(post.post.postId);
+    this.postService.updateActivePost(post);
     this.postService.updateActiveBook(post.book);
     this.updateBreadcrumbs();
     this.updatePageIndex();
