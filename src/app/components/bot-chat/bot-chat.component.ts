@@ -1,7 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source';
 import { isEmpty } from 'lodash';
 import { marked } from 'marked';
@@ -154,7 +153,6 @@ export class BotChatComponent extends BaseComponent implements OnInit, AfterView
 
   constructor(
     private readonly destroy$: DestroyService,
-    private readonly route: ActivatedRoute,
     private readonly message: NzMessageService,
     private readonly imageService: NzImageService,
     private readonly tenantAppService: TenantAppService,
