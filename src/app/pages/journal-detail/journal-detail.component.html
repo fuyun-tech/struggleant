@@ -1,34 +1,34 @@
 <app-breadcrumb></app-breadcrumb>
 <div class="catalog" [class.p-catalog]="!isMobile" [class.m-catalog]="isMobile">
-  <header class="catalog-header">
-    <h1>
-      @if (book) {
+  @if (book) {
+    <header class="catalog-header">
+      <h1>
         <a [routerLink]="['/journal', book.bookMetaId, book.bookId]"
            [title]="book.bookName + (book.bookIssue ? ' · ' + book.bookIssue : '')"
            rel="bookmark">{{ book.bookName }}{{ book.bookIssue ? ' · ' + book.bookIssue : '' }}</a>
-      }
-    </h1>
-  </header>
-  <div class="divider"></div>
-  <div class="catalog-body">
-    @for (catalog of catalogs; track catalog) {
-      <h2>
-        @if (catalog.bookColumnId) {
-          <a [routerLink]="['/journal', book.bookMetaId, book.bookId, 'section', catalog.bookColumnSlug]">{{ catalog.bookColumnName }}</a>
-        } @else {
-          <span>{{ catalog.bookColumnName }}</span>
-        }
-      </h2>
-      @if (catalog.posts.length > 0) {
-        <ul>
-          @for (post of catalog.posts; track post; let i = $index) {
-            <li>
-              <span>{{ i + 1 }}</span><a [routerLink]="post.postGuid" [title]="post.postTitle" rel="bookmark">{{ post.postTitle }}</a>
-            </li>
+      </h1>
+    </header>
+    <div class="divider"></div>
+    <div class="catalog-body">
+      @for (catalog of catalogs; track catalog) {
+        <h2>
+          @if (catalog.bookColumnId) {
+            <a [routerLink]="['/journal', book.bookMetaId, book.bookId, 'section', catalog.bookColumnSlug]">{{ catalog.bookColumnName }}</a>
+          } @else {
+            <span>{{ catalog.bookColumnName }}</span>
           }
-        </ul>
+        </h2>
+        @if (catalog.posts.length > 0) {
+          <ul>
+            @for (post of catalog.posts; track post; let i = $index) {
+              <li>
+                <span>{{ i + 1 }}</span><a [routerLink]="post.postGuid" [title]="post.postTitle" rel="bookmark">{{ post.postTitle }}</a>
+              </li>
+            }
+          </ul>
+        }
       }
-    }
-  </div>
+    </div>
+  }
 </div>
 <app-make-money></app-make-money>
