@@ -53,7 +53,7 @@ export class CommonService {
     return {
       isHome: pageIndex === 'index',
       isPost: topPage === 'post',
-      isArticle: pageIndex === 'post-article',
+      isArticle: pageIndex === 'post-detail',
       isPage: topPage === 'page',
       isDetail: subPage === 'detail',
       isSearch: topPage === 'search',
@@ -81,6 +81,14 @@ export class CommonService {
     }
 
     return onlyPath ? referrer.replace(/^https?:\/\/[^/]+/i, '') : referrer;
+  }
+
+  getScreenWidth() {
+    return this.platform.isBrowser ? window.screen.width : null;
+  }
+
+  getScreenHeight() {
+    return this.platform.isBrowser ? window.screen.height : null;
   }
 
   getResolution() {

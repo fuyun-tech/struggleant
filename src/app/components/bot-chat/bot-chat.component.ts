@@ -168,9 +168,14 @@ export class BotChatComponent extends BaseComponent implements OnInit, AfterView
   }
 
   ngOnInit() {
-    combineLatest([this.tenantAppService.appInfo$, this.optionService.options$, this.userService.user$, this.botChatService.getChatUsage()])
+    combineLatest([
+      this.tenantAppService.appInfo$,
+      this.optionService.options$,
+      this.userService.user$,
+      this.botChatService.getChatUsage()
+    ])
       .pipe(
-        skipWhile(([appInfo, options, user]) => isEmpty(options) || !user.userId),
+        skipWhile(([, options, user]) => isEmpty(options) || !user.userId),
         takeUntil(this.destroy$)
       )
       .subscribe(([appInfo, options, user, chatUsage]) => {
