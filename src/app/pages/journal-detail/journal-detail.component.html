@@ -10,7 +10,7 @@
     </header>
     <div class="divider"></div>
     <div class="catalog-body">
-      @for (catalog of catalogs; track catalog) {
+      @for (catalog of catalogs; track catalog.bookColumnId) {
         <h2>
           @if (catalog.bookColumnId) {
             <a [routerLink]="['/journal', book.bookMetaId, book.bookId, 'section', catalog.bookColumnSlug]">{{ catalog.bookColumnName }}</a>
@@ -20,7 +20,7 @@
         </h2>
         @if (catalog.posts.length > 0) {
           <ul>
-            @for (post of catalog.posts; track post; let i = $index) {
+            @for (post of catalog.posts; track post.postId; let i = $index) {
               <li>
                 <span>{{ i + 1 }}</span><a [routerLink]="post.postGuid" [title]="post.postTitle" rel="bookmark">{{ post.postTitle }}</a>
               </li>

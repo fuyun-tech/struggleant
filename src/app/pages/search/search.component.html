@@ -1,7 +1,7 @@
 <app-breadcrumb></app-breadcrumb>
 @if (total > 0) {
   <div [class.post-list]="!isMobile" [class.m-post-list]="isMobile">
-    @for (item of searchResult; track item; let i = $index) {
+    @for (item of searchResult; track item.post.postId; let i = $index) {
       <app-post-item [post]="item" [index]="i" [fromSection]="false"></app-post-item>
     }
   </div>

@@ -19,7 +19,7 @@
             <div class="sub-nav-wrap">
               <div class="sub-nav-list">
                 <ul>
-                  @for (taxonomy of postTaxonomies; track taxonomy) {
+                  @for (taxonomy of postTaxonomies; track taxonomy.taxonomyId) {
                     <li>
                       <a class="sub-nav-link"
                          [routerLink]="['/category', taxonomy.taxonomySlug]"
@@ -33,7 +33,7 @@
                         <div class="child-nav-wrap">
                           <div class="child-nav-list">
                             <ul>
-                              @for (subTaxonomy of taxonomy.children; track subTaxonomy) {
+                              @for (subTaxonomy of taxonomy.children; track subTaxonomy.taxonomyId) {
                                 <li>
                                   <a class="child-nav-link"
                                      [routerLink]="['/category', subTaxonomy.taxonomySlug]"
@@ -57,19 +57,14 @@
       </ul>
       <div class="actions">
         <div class="search">
-          <form method="get" action="/search" (ngSubmit)="search()">
-            <nz-input-group nzSearch [nzAddOnAfter]="searchBtnTpl">
-              <input nz-input
-                     type="text"
-                     name="keyword"
-                     [(ngModel)]="keyword"
-                     autocomplete="off"
-                     placeholder="搜索全站（支持全文搜索）"/>
-            </nz-input-group>
-            <ng-template #searchBtnTpl>
-              <button nz-button nzSearch type="submit" nzType="primary"><nz-icon nzType="search"/></button>
-            </ng-template>
-          </form>
+          <nz-input-search (nzSearch)="search()">
+            <input nz-input
+                   type="text"
+                   name="keyword"
+                   [(ngModel)]="keyword"
+                   autocomplete="off"
+                   placeholder="搜索全站（支持全文搜索）"/>
+          </nz-input-search>
         </div>
         @if (!isSignIn) {
           <a nz-button nzType="primary" routerLink="/user/login">登录</a>
@@ -144,8 +139,8 @@
         </div>
       } @else {
         <div class="m-header-search">
-          <form class="m-search-form" method="get" action="/search" (ngSubmit)="search()">
-            <nz-input-group nzSearch nzSize="large" [nzAddOnAfter]="mSearchBtnTpl">
+          <div class="m-search-form">
+            <nz-input-search (nzSearch)="search()">
               <input nz-input
                      #mSearchInput
                      type="text"
@@ -154,11 +149,8 @@
                      [(ngModel)]="keyword"
                      autocomplete="off"
                      placeholder="搜索全站（支持全文搜索）"/>
-            </nz-input-group>
-            <ng-template #mSearchBtnTpl>
-              <button nz-button nzSearch type="submit" nzType="primary"><nz-icon nzType="search"/></button>
-            </ng-template>
-          </form>
+            </nz-input-search>
+          </div>
           <div class="m-mask m-mask-search" (click)="hideSearch()"></div>
         </div>
       }

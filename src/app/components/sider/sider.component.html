@@ -11,7 +11,7 @@
           </span>
         </h3>
         <ul>
-          @for (post of bookPosts; track post) {
+          @for (post of bookPosts; track post.postId) {
             <li>
               <a [routerLink]="post.postGuid" [title]="post.postTitle">{{ post.postTitle }}</a>
             </li>
@@ -23,7 +23,7 @@
       <div class="widget">
         <h3 class="widget-title"><span><nz-icon nzType="fire"/><span>热门文章</span></span></h3>
         <ul class="hot-list">
-          @for (post of hotPosts; track post; let i = $index) {
+          @for (post of hotPosts; track post.postId; let i = $index) {
             <li>
               <span class="hot-num">{{ i + 1 }}</span>
               <a [routerLink]="post.postGuid" [title]="post.postTitle">{{ post.postTitle }}</a>
@@ -50,9 +50,9 @@
           </span>
         </h3>
         <ul>
-          @for (item of postArchives; track item) {
+          @for (item of postArchives; track item.dateValue) {
             <li>
-              <a [routerLink]="['/archive', item.dateValue]"
+              <a routerLink="/archive/{{ item.dateValue }}"
                  [title]="item.dateLabel">{{ item.dateLabel }}({{ item.count }})</a>
             </li>
           }
@@ -63,7 +63,7 @@
       <div class="widget">
         <h3 class="widget-title"><span><nz-icon nzType="gift"/><span>手气不错</span></span></h3>
         <ul>
-          @for (post of randomPosts; track post) {
+          @for (post of randomPosts; track post.postId) {
             <li>
               <a [routerLink]="post.postGuid" [title]="post.postTitle">{{ post.postTitle }}</a>
             </li>

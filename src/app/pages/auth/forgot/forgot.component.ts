@@ -6,6 +6,7 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzSpaceCompactComponent } from 'ng-zorro-antd/space';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
 import { BaseComponent } from 'src/app/base.component';
 import { ADMIN_URL_PARAM, APP_ID } from 'src/app/config/common.constant';
@@ -30,7 +31,15 @@ import { format } from 'src/app/utils/helper';
 
 @Component({
   selector: 'app-forgot',
-  imports: [FormsModule, ReactiveFormsModule, NzFormModule, NzIconModule, NzInputModule, NzButtonModule],
+  imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    NzFormModule,
+    NzIconModule,
+    NzInputModule,
+    NzButtonModule,
+    NzSpaceCompactComponent
+  ],
   providers: [DestroyService],
   templateUrl: './forgot.component.html'
 })

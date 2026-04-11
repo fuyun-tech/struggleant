@@ -14,7 +14,7 @@ import { CommonService } from 'src/app/services/common.service';
   styleUrl: '../error.component.less'
 })
 export class ServerErrorComponent implements OnInit {
-  @Input() errorState!: ErrorState;
+  @Input() errorState?: ErrorState;
 
   protected pageIndex = 'error-500';
 

@@ -102,7 +102,7 @@
                 <nz-icon nzType="tag"/>
               </div>
               <ul>
-                @for (tag of post.tags; track tag) {
+                @for (tag of post.tags; track tag.tagId) {
                   <li>
                     <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
                   </li>
@@ -212,7 +212,7 @@
             <nz-icon nzType="tag"/>
           </div>
           <ul>
-            @for (tag of post.tags; track tag) {
+            @for (tag of post.tags; track tag.tagId) {
               <li>
                 <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
               </li>

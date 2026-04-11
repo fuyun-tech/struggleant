@@ -5,7 +5,7 @@
       <div class="column-header">热门文章</div>
       @if (hotPosts.length > 0) {
         <ul class="banner-post-list">
-          @for (post of hotPosts; track post; let i = $index) {
+          @for (post of hotPosts; track post.postId; let i = $index) {
             <li class="banner-post-item">
               <span class="hot-num">{{ i + 1 }}</span>
               <a [routerLink]="post.postGuid" [title]="post.postTitle">{{ post.postTitle }}</a>
@@ -24,7 +24,7 @@
     <div class="column-header">最新文章</div>
     @if (latestPosts.length > 0) {
       <div class="post-card-list post-card-list-4">
-        @for (post of latestPosts; track post) {
+        @for (post of latestPosts; track post.post.postId) {
           <article class="post-card-item post-card-item-wrap">
             <div class="post-card-item-body">
               <div class="post-card-cover">
@@ -77,7 +77,7 @@
     <div class="column-header">手气不错</div>
     @if (randomPosts.length > 0) {
       <div class="post-card-list post-card-list-4">
-        @for (post of randomPosts; track post) {
+        @for (post of randomPosts; track post.postId) {
           <article class="post-card-item post-card-item-wrap">
             <div class="post-card-item-body">
               <div class="post-card-cover">
@@ -131,7 +131,7 @@
   <div class="column-header m-column-header">最新文章</div>
   @if (latestPosts.length > 0) {
     <div class="m-post-list">
-      @for (post of latestPosts; track post; let i = $index) {
+      @for (post of latestPosts; track post.post.postId; let i = $index) {
         <app-post-item [post]="post" [index]="i" [fromSection]="false"></app-post-item>
       }
     </div>

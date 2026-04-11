@@ -95,7 +95,7 @@ export class UserAgentService {
   }
 
   get isMac() {
-    return this.os.name === 'Mac OS';
+    return this.os.name === 'macOS';
   }
 
   get isMobile() {
