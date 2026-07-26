@@ -1,38 +1,38 @@
 <aside class="sider" #siderEle>
   <div>
-    @if (indexInfo?.isArticle && bookPosts && bookPosts.length > 0) {
+    @if (indexInfo()?.isArticle && bookPosts().length > 0) {
       <div class="widget">
         <h3 class="widget-title">
           <span><nz-icon nzType="bars"/><span>目录</span></span>
           <span class="more">
-            <a [routerLink]="['/journal', activeBook?.bookMetaId, activeBook?.bookId]" [title]="bookName">
+            <a [routerLink]="['/journal', activeBook()?.bookMeta?.id, activeBook()?.id]" [title]="bookName()">
               <span>更多</span><nz-icon nzType="double-right"/>
             </a>
           </span>
         </h3>
         <ul>
-          @for (post of bookPosts; track post.postId) {
+          @for (post of bookPosts(); track post.id) {
             <li>
-              <a [routerLink]="post.postGuid" [title]="post.postTitle">{{ post.postTitle }}</a>
+              <a [routerLink]="post.url" [title]="post.title">{{ post.title }}</a>
             </li>
           }
         </ul>
       </div>
     }
-    @if (hotPosts && hotPosts.length > 0) {
+    @if (hotPosts().length > 0) {
       <div class="widget">
         <h3 class="widget-title"><span><nz-icon nzType="fire"/><span>热门文章</span></span></h3>
         <ul class="hot-list">
-          @for (post of hotPosts; track post.postId; let i = $index) {
+          @for (post of hotPosts(); track post.id; let i = $index) {
             <li>
               <span class="hot-num">{{ i + 1 }}</span>
-              <a [routerLink]="post.postGuid" [title]="post.postTitle">{{ post.postTitle }}</a>
+              <a [routerLink]="post.url" [title]="post.title">{{ post.title }}</a>
             </li>
           }
         </ul>
       </div>
     }
-    @if (adsVisible) {
+    @if (adsVisible()) {
       <div class="widget-ads">
         <app-adsense [class.ads-sider-wrap]="adsPlaceholder"
                      wrapClass="ads-sider"
@@ -41,16 +41,16 @@
                      text="虚位以待"></app-adsense>
       </div>
     }
-    @if (postArchives && postArchives.length > 0) {
+    @if (postArchives().length > 0) {
       <div class="widget">
         <h3 class="widget-title">
-          <span><span class="fi fi-calendar-date"></span><span>期刊归档</span></span>
+          <span><fi-calendar-date class="fi"/><span>博客归档</span></span>
           <span class="more">
             <a routerLink="/archive" title="期刊归档"><span>更多</span><nz-icon nzType="double-right"/></a>
           </span>
         </h3>
         <ul>
-          @for (item of postArchives; track item.dateValue) {
+          @for (item of postArchives(); track item.dateValue) {
             <li>
               <a routerLink="/archive/{{ item.dateValue }}"
                  [title]="item.dateLabel">{{ item.dateLabel }}({{ item.count }})</a>
@@ -59,13 +59,13 @@
         </ul>
       </div>
     }
-    @if (randomPosts && randomPosts.length > 0) {
+    @if (randomPosts().length > 0) {
       <div class="widget">
         <h3 class="widget-title"><span><nz-icon nzType="gift"/><span>手气不错</span></span></h3>
         <ul>
-          @for (post of randomPosts; track post.postId) {
+          @for (post of randomPosts(); track post.id) {
             <li>
-              <a [routerLink]="post.postGuid" [title]="post.postTitle">{{ post.postTitle }}</a>
+              <a [routerLink]="post.url" [title]="post.title">{{ post.title }}</a>
             </li>
           }
         </ul>

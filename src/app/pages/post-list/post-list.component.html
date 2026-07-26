@@ -1,8 +1,8 @@
 <app-breadcrumb></app-breadcrumb>
-@if (total > 0) {
+@if (total() > 0) {
   <div [class.post-list]="!isMobile" [class.m-post-list]="isMobile">
-    @for (post of posts; track post.post.postId; let i = $index) {
-      <app-post-item [post]="post" [index]="i" [fromSection]="isSection"></app-post-item>
+    @for (post of posts(); track post.id; let i = $index) {
+      <app-post-item [post]="post" [index]="i" [fromSection]="isSection()"></app-post-item>
     }
   </div>
 } @else {
@@ -11,4 +11,4 @@
   </div>
 }
 <app-make-money></app-make-money>
-<app-pagination></app-pagination>
+<app-pagination [page]="page()" [total]="total()" [pageSize]="pageSize()" [url]="paginationUrl()"></app-pagination>

@@ -1,45 +1,27 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
-import { COOKIE_KEY_UV_ID } from '../config/common.constant';
-import { AuthService } from '../services/auth.service';
-import { SsrCookieService } from '../services/ssr-cookie.service';
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
+import { COOKIE_KEY_UV_ID } from 'src/app/config/common.constant';
+import { AuthService } from 'src/app/services/auth.service';
+import { SsrCookieService } from 'src/app/services/ssr-cookie.service';
 
-@Injectable()
-export class ApiRequestInterceptor implements HttpInterceptor {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly cookieService: SsrCookieService
-  ) {}
+export const apiRequestInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  const cookieService = inject(SsrCookieService);
+  const headers: Record<string, string> = {};
+  const token = authService.getToken();
+  const faId = cookieService.get(COOKIE_KEY_UV_ID);
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = this.authService.getToken();
-    if (token) {
-      req = req.clone({
-        setHeaders: {
-          Authorization: 'Bearer ' + token
-        }
-      });
-    }
-    const faId = this.cookieService.get(COOKIE_KEY_UV_ID);
-    if (faId) {
-      req = req.clone({
-        setHeaders: {
-          Faid: faId
-        }
-      });
-    }
-    const cookie = this.cookieService.getCookie();
-    if (cookie) {
-      req = req.clone({
-        setHeaders: {
-          Cookie: cookie
-        }
-      });
-    }
-    req = req.clone({
-      withCredentials: true
-    });
-    return next.handle(req).pipe(catchError((err) => throwError(() => err)));
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
-}
+  if (faId) {
+    headers['Faid'] = faId;
+  }
+
+  req = req.clone({
+    setHeaders: headers
+  });
+
+  return next(req).pipe(catchError((err) => throwError(() => err)));
+};

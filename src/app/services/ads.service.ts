@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AdsStatus } from '../enums/log';
+import { AdsStatus } from './log.service';
 
 @Injectable({
   providedIn: 'root'

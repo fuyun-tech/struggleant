@@ -1,21 +1,12 @@
 import { Injectable } from '@angular/core';
 import highlight from 'highlight.js';
-import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, Subject } from 'rxjs';
 import { ApiUrl } from '../config/api-url';
-import { APP_ID } from '../config/common.constant';
 import { BookType } from '../enums/book';
-import { PostType } from '../enums/post';
-import { BookEntity } from '../interfaces/book';
+import { ContentType } from '../enums/post';
+import { BookVo } from '../interfaces/book';
 import { ArchiveData, ArchiveDataMap, ArchiveList } from '../interfaces/common';
-import {
-  Post,
-  PostEntity,
-  PostList,
-  PostModel,
-  PostQueryParam,
-  PostRelatedParam,
-  PostSearchItem
-} from '../interfaces/post';
+import { PostEntity, PostList, PostModel, PostQueryParam, PostSearchItem, PostVo } from '../interfaces/post';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -25,64 +16,58 @@ export class PostService {
   private activePostId: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public activePostId$: Observable<string> = this.activePostId.asObservable();
 
-  private activePost: BehaviorSubject<Post | null> = new BehaviorSubject<Post | null>(null);
-  public activePost$: Observable<Post | null> = this.activePost.asObservable();
+  private activePost: BehaviorSubject<PostVo | null> = new BehaviorSubject<PostVo | null>(null);
+  public activePost$: Observable<PostVo | null> = this.activePost.asObservable();
 
-  private activeBook: Subject<BookEntity | undefined> = new Subject<BookEntity | undefined>();
-  public activeBook$: Observable<BookEntity | undefined> = this.activeBook.asObservable();
+  private activeBook: Subject<BookVo | undefined> = new Subject<BookVo | undefined>();
+  public activeBook$: Observable<BookVo | undefined> = this.activeBook.asObservable();
 
   constructor(private readonly apiService: ApiService) {}
 
   getPosts(param: PostQueryParam): Observable<PostList> {
-    return this.apiService
-      .httpGet(ApiUrl.POSTS, {
-        ...param,
-        appId: APP_ID
-      })
-      .pipe(map((res) => res?.data || {}));
+    return this.apiService.httpGet(ApiUrl.POSTS, param).pipe(map((res) => res?.data || {}));
   }
 
-  getPostsByBookId<T extends PostList | { posts: PostEntity[] }>(param: PostQueryParam): Observable<T> {
-    return this.apiService
-      .httpGet(ApiUrl.POST_LIST_BY_BOOK, {
-        ...param,
-        appId: APP_ID
-      })
-      .pipe(map((res) => res?.data || {}));
+  getPostsByBookId(param: PostQueryParam): Observable<PostList> {
+    if (!param.bookId) {
+      return of({ posts: { list: [], page: 0, total: 0 } });
+    }
+    return this.apiService.httpGet(ApiUrl.POST_LIST_BY_BOOK, param).pipe(map((res) => res?.data || {}));
   }
 
-  getPostsWithColumn(bookId: string): Observable<PostModel[]> {
+  getPostsWithColumn(bookId: string): Observable<PostVo[]> {
     return this.apiService
       .httpGet(ApiUrl.POST_LIST_WITH_COLUMN, {
-        bookId,
-        appId: APP_ID
+        bookId
       })
       .pipe(map((res) => res?.data || []));
   }
 
   getHotPosts(): Observable<PostEntity[]> {
+    return this.apiService.httpGet(ApiUrl.POST_HOT, {}).pipe(map((res) => res?.data || []));
+  }
+
+  getLatestPosts(size: number): Observable<PostVo[]> {
     return this.apiService
-      .httpGet(ApiUrl.POST_HOT, {
-        appId: APP_ID
+      .httpGet(ApiUrl.POST_LATEST, {
+        size
       })
       .pipe(map((res) => res?.data || []));
   }
 
-  getRandomPosts(size: number, detail: boolean): Observable<PostEntity[]> {
+  getRandomPosts(size: number, detail: boolean): Observable<PostModel[]> {
     return this.apiService
       .httpGet(ApiUrl.POST_RANDOM, {
         size,
-        detail: detail ? 1 : 0,
-        appId: APP_ID
+        detail: detail ? 1 : 0
       })
       .pipe(map((res) => res?.data || []));
   }
 
-  getRelatedPosts(param: PostRelatedParam): Observable<PostSearchItem[]> {
+  getRelatedPosts(id: string): Observable<PostSearchItem[]> {
     return this.apiService
       .httpGet(ApiUrl.POST_RELATED, {
-        ...param,
-        appId: APP_ID
+        id
       })
       .pipe(map((res) => res?.data || []));
   }
@@ -91,17 +76,15 @@ export class PostService {
     return this.apiService
       .httpGet(ApiUrl.POST_ARCHIVES, {
         showCount: showCount ? 1 : 0,
-        limit,
-        appId: APP_ID
+        limit
       })
       .pipe(map((res) => res?.data?.archives || []));
   }
 
-  getPostById(postId: string, postType: PostType, ref?: string): Observable<Post> {
+  getPostById(id: string, contentType: ContentType, ref?: string): Observable<PostVo> {
     const payload: Record<string, any> = {
-      postId,
-      postType,
-      appId: APP_ID
+      id,
+      contentType
     };
     if (ref?.trim()) {
       payload['ref'] = ref;
@@ -109,11 +92,10 @@ export class PostService {
     return this.apiService.httpGet(ApiUrl.POST, payload).pipe(map((res) => res?.data));
   }
 
-  getPostBySlug(slug: string, postType: PostType, ref?: string): Observable<Post> {
+  getPostBySlug(slug: string, contentType: ContentType, ref?: string): Observable<PostVo> {
     const payload: Record<string, any> = {
       slug,
-      postType,
-      appId: APP_ID
+      contentType
     };
     if (ref?.trim()) {
       payload['ref'] = ref;
@@ -122,14 +104,13 @@ export class PostService {
   }
 
   getPostsOfPrevAndNext(param: {
-    postId?: string;
-    postName?: string;
-    postType?: PostType;
-  }): Observable<{ prevPost: PostEntity; nextPost: PostEntity }> {
+    id?: string;
+    slug?: string;
+    contentType?: ContentType;
+  }): Observable<{ prevPost: PostModel; nextPost: PostModel }> {
     return this.apiService
       .httpGet(ApiUrl.POST_PREV_AND_NEXT, {
-        ...param,
-        appId: APP_ID
+        ...param
       })
       .pipe(map((res) => res?.data || {}));
   }
@@ -138,21 +119,21 @@ export class PostService {
     this.activePostId.next(postId);
   }
 
-  updateActivePost(post: Post) {
+  updateActivePost(post: PostVo) {
     this.activePost.next(post);
   }
 
-  updateActiveBook(book?: BookEntity) {
+  updateActiveBook(book?: BookVo) {
     this.activeBook.next(book);
   }
 
-  getPostSource(post: Post): string {
-    let source = post.post.postSource || '';
+  getPostSource(post: PostVo): string {
+    let source = post.source || '';
     if (post.book) {
-      if ([BookType.BOOK, BookType.OTHER].includes(post.book.bookType)) {
-        source = '《' + post.book.bookName + '》';
+      if ([BookType.BOOK, BookType.OTHER].includes(post.book.bookMeta.type)) {
+        source = '《' + post.book.bookMeta.name + '》';
       } else {
-        source = '《' + post.book.bookName + '》' + post.book.bookIssue;
+        source = '《' + post.book.bookMeta.name + '》' + post.book.issue;
       }
     }
 
@@ -216,7 +197,7 @@ export class PostService {
     };
   }
 
-  transformArchives(archiveData: ArchiveData[]): ArchiveList {
+  buildArchiveList(archiveData: ArchiveData[]): ArchiveList {
     const dateList: ArchiveDataMap = {};
     (archiveData || []).forEach((item) => {
       const dates = item.dateValue.split('/');

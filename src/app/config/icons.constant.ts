@@ -2,12 +2,12 @@ import { IconDefinition } from '@ant-design/icons-angular';
 import {
   AlipayOutline,
   AppstoreOutline,
+  ArrowUpOutline,
   BarsOutline,
   BookOutline,
   CheckOutline,
   ClockCircleOutline,
   CloseOutline,
-  CommentOutline,
   CopyOutline,
   CopyrightOutline,
   DashboardOutline,
@@ -57,19 +57,18 @@ import {
   UserOutline,
   VerticalAlignTopOutline,
   WechatOutline,
-  WeiboOutline,
-  WifiOutline
+  WeiboOutline
 } from '@ant-design/icons-angular/icons';
 
 export const icons: IconDefinition[] = [
   AlipayOutline,
   AppstoreOutline,
+  ArrowUpOutline,
   BarsOutline,
   BookOutline,
   CheckOutline,
   ClockCircleOutline,
   CloseOutline,
-  CommentOutline,
   CopyOutline,
   CopyrightOutline,
   DashboardOutline,
@@ -119,6 +118,5 @@ export const icons: IconDefinition[] = [
   UserOutline,
   VerticalAlignTopOutline,
   WechatOutline,
-  WeiboOutline,
-  WifiOutline
+  WeiboOutline
 ];

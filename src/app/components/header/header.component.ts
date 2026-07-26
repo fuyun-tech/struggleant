@@ -1,7 +1,16 @@
-import { AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewChecked,
+  Component,
+  ElementRef,
+  inject,
+  input,
+  model,
+  OnInit,
+  signal,
+  viewChild
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { environment } from 'env/environment';
 import { isEmpty } from 'lodash';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -11,60 +20,49 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { skipWhile, takeUntil } from 'rxjs';
 import { ADMIN_URL_PARAM, APP_ID } from '../../config/common.constant';
 import { ResponseCode } from '../../config/response-code.enum';
-import { ActionObjectType, ActionType } from '../../enums/log';
+import { CategoryNode } from '../../interfaces/category';
 import { PageIndexInfo } from '../../interfaces/common';
-import { TaxonomyNode } from '../../interfaces/taxonomy';
-import { TenantAppModel } from '../../interfaces/tenant-app';
+import { TenantAppVo } from '../../interfaces/tenant-app';
 import { UserModel } from '../../interfaces/user';
 import { AuthService } from '../../services/auth.service';
 import { CommonService } from '../../services/common.service';
 import { DestroyService } from '../../services/destroy.service';
-import { LogService } from '../../services/log.service';
 import { TenantAppService } from '../../services/tenant-app.service';
 import { UserAgentService } from '../../services/user-agent.service';
 import { UserService } from '../../services/user.service';
 import { format } from '../../utils/helper';
-import { WallpaperModalComponent } from '../wallpaper-modal/wallpaper-modal.component';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, FormsModule, NzInputModule, NzIconModule, NzButtonModule, WallpaperModalComponent],
+  imports: [RouterLink, FormsModule, NzInputModule, NzIconModule, NzButtonModule],
   providers: [DestroyService, NzImageService],
   templateUrl: './header.component.html',
   styleUrl: './header.component.less'
 })
 export class HeaderComponent implements OnInit, AfterViewChecked {
-  @Input() postTaxonomies: TaxonomyNode[] = [];
+  private readonly destroy$ = inject(DestroyService);
+  private readonly router = inject(Router);
+  private readonly uaService = inject(UserAgentService);
+  private readonly message = inject(NzMessageService);
+  private readonly commonService = inject(CommonService);
+  private readonly tenantAppService = inject(TenantAppService);
+  private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
 
-  @ViewChild('mSearchInput') mSearchInput!: ElementRef;
+  readonly categories = input<CategoryNode[]>([]);
 
-  isMobile = false;
-  isSignIn = false;
-  indexInfo?: PageIndexInfo;
-  appInfo?: TenantAppModel;
-  appUrl = environment.appUrl;
-  user!: UserModel;
-  keyword = '';
-  wallpaperModalVisible = false;
-  searchVisible = false;
-  isFocused = false;
+  readonly mSearchInput = viewChild<ElementRef<HTMLInputElement>>('mSearchInput');
 
-  private adminUrl = '';
+  readonly isMobile = this.uaService.isMobile;
+  readonly isSignIn = signal(false);
+  readonly indexInfo = signal<PageIndexInfo | null>(null);
+  readonly appInfo = signal<TenantAppVo | null>(null);
+  readonly user = signal<UserModel | null>(null);
+  readonly keyword = model('');
+  readonly searchVisible = signal(false);
+  readonly isFocused = signal(false);
 
-  constructor(
-    private readonly destroy$: DestroyService,
-    private readonly router: Router,
-    private readonly userAgentService: UserAgentService,
-    private readonly message: NzMessageService,
-    private readonly imageService: NzImageService,
-    private readonly commonService: CommonService,
-    private readonly tenantAppService: TenantAppService,
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-    private readonly logService: LogService
-  ) {
-    this.isMobile = this.userAgentService.isMobile;
-  }
+  private readonly adminUrl = signal('');
 
   ngOnInit(): void {
     this.tenantAppService.appInfo$
@@ -73,108 +71,66 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
         takeUntil(this.destroy$)
       )
       .subscribe((appInfo) => {
-        this.appInfo = appInfo;
-
         const urlParam = format(ADMIN_URL_PARAM, this.authService.getToken(), APP_ID);
-        this.adminUrl = this.appInfo.appAdminUrl + '?' + urlParam;
+
+        this.appInfo.set(appInfo);
+        if (appInfo.adminUrl) {
+          this.adminUrl.set(appInfo.adminUrl + '?' + urlParam);
+        }
       });
     this.commonService.pageIndex$.pipe(takeUntil(this.destroy$)).subscribe((page) => {
-      this.indexInfo = this.commonService.getPageIndexInfo(page);
+      this.indexInfo.set(this.commonService.getPageIndexInfo(page));
     });
     this.userService.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
-      this.user = user;
-      this.isSignIn = !!user.userId;
+      this.user.set(user);
+      this.isSignIn.set(!!user.id);
     });
   }
 
   ngAfterViewChecked(): void {
-    if (!this.isFocused && this.mSearchInput) {
-      this.mSearchInput.nativeElement.focus();
-      this.isFocused = true;
+    const $input = this.mSearchInput();
+    if (!this.isFocused() && $input) {
+      $input.nativeElement.focus();
+
+      this.isFocused.set(true);
     }
   }
 
   search(): void {
-    this.keyword = this.keyword.trim();
-    if (!this.keyword) {
+    const keyword = this.keyword().trim();
+    if (!keyword) {
       this.message.error('请输入搜索关键词');
+
       if (this.isMobile) {
-        this.mSearchInput.nativeElement.focus();
+        this.mSearchInput()?.nativeElement.focus();
       }
       return;
     }
-    this.router.navigate(['/search'], {
-      queryParams: {
-        keyword: this.keyword
-      }
-    });
+    this.router
+      .navigate(['/search'], {
+        queryParams: {
+          keyword
+        }
+      })
+      .then();
   }
 
   showSearch() {
-    this.searchVisible = true;
+    this.searchVisible.set(true);
   }
 
   hideSearch() {
-    this.searchVisible = false;
-    this.isFocused = false;
-  }
-
-  showWallpaperModal() {
-    this.wallpaperModalVisible = true;
-
-    this.logService
-      .logAction({
-        action: ActionType.SHOW_WALLPAPER_MODAL,
-        objectType: ActionObjectType.HEADER
-      })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
-  }
-
-  closeWallpaperModal() {
-    this.wallpaperModalVisible = false;
-  }
-
-  showRedPacket() {
-    const previewRef = this.imageService.preview([
-      {
-        src: '/assets/images/red-packet.png'
-      }
-    ]);
-    this.commonService.paddingPreview(previewRef.previewInstance.imagePreviewWrapper);
-
-    this.logService
-      .logAction({
-        action: ActionType.SHOW_RED_PACKET,
-        objectType: ActionObjectType.HEADER
-      })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
-  }
-
-  showWechatCard() {
-    this.imageService.preview([
-      {
-        src: '/assets/images/wechat-qrcode.jpg'
-      }
-    ]);
-
-    this.logService
-      .logAction({
-        action: ActionType.SHOW_WECHAT_CARD,
-        objectType: ActionObjectType.HEADER
-      })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
+    this.searchVisible.set(false);
+    this.isFocused.set(false);
   }
 
   gotoAdmin() {
-    window.open(this.adminUrl);
+    window.open(this.adminUrl());
   }
 
-  logout() {
+  signout() {
     this.authService
-      .logout()
+      .signout()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
         if (res.code === ResponseCode.SUCCESS) {
@@ -185,15 +141,5 @@ export class HeaderComponent implements OnInit, AfterViewChecked {
 
   showSider() {
     this.commonService.updateSiderVisible(true);
-  }
-
-  logRSS() {
-    this.logService
-      .logAction({
-        action: ActionType.OPEN_POST_RSS,
-        objectType: ActionObjectType.HEADER
-      })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
   }
 }

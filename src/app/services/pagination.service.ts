@@ -1,25 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { PaginationData, PaginationEntity, PaginationRange } from '../interfaces/pagination';
+import { PaginationEntity, PaginationRange } from '../interfaces/pagination';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PaginationService {
-  private pagination: BehaviorSubject<PaginationData> = new BehaviorSubject<PaginationData>({
-    page: 1,
-    total: 0,
-    pageSize: 10,
-    url: ''
-  });
-  public pagination$: Observable<PaginationData> = this.pagination.asObservable();
-
   private readonly defaultPageSize = 10;
   private readonly paginationSize = 9;
-
-  updatePagination(pagination: PaginationData) {
-    this.pagination.next(pagination);
-  }
 
   /**
    * 获取分页数据

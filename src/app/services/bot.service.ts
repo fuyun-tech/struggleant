@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Bot } from 'src/app/interfaces/bot';
-import { TenantAppModel } from 'src/app/interfaces/tenant-app';
+import { TenantAppVo } from 'src/app/interfaces/tenant-app';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BotService {
-  getBotAvatar(appInfo: TenantAppModel, bot?: Bot): string {
-    return bot?.botAvatar || appInfo.appFaviconUrl;
+  getBotAvatar(appInfo: TenantAppVo, bot?: Bot): string {
+    return bot?.avatarUrl || appInfo.faviconUrl;
   }
 }

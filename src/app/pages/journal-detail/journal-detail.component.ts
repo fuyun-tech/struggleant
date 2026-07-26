@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { isEmpty, uniq } from 'lodash';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
 import { BreadcrumbComponent } from 'src/app/components/breadcrumb/breadcrumb.component';
 import { MakeMoneyComponent } from 'src/app/components/make-money/make-money.component';
-import { BookEntity } from 'src/app/interfaces/book';
+import { BookVo } from 'src/app/interfaces/book';
 import { BreadcrumbEntity } from 'src/app/interfaces/breadcrumb';
 import { OptionEntity } from 'src/app/interfaces/option';
 import { PostCatalog } from 'src/app/interfaces/post';
-import { TenantAppModel } from 'src/app/interfaces/tenant-app';
+import { TenantAppVo } from 'src/app/interfaces/tenant-app';
 import { BookService } from 'src/app/services/book.service';
 import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { CommonService } from 'src/app/services/common.service';
@@ -27,30 +27,26 @@ import { UserAgentService } from 'src/app/services/user-agent.service';
   styleUrl: './journal-detail.component.less'
 })
 export class JournalDetailComponent implements OnInit {
-  isMobile = false;
-  book!: BookEntity;
-  catalogs: PostCatalog[] = [];
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroy$ = inject(DestroyService);
+  private readonly uaService = inject(UserAgentService);
+  private readonly commonService = inject(CommonService);
+  private readonly metaService = inject(MetaService);
+  private readonly breadcrumbService = inject(BreadcrumbService);
+  private readonly tenantAppService = inject(TenantAppService);
+  private readonly optionService = inject(OptionService);
+  private readonly postService = inject(PostService);
+  private readonly bookService = inject(BookService);
 
-  protected pageIndex = 'journal-detail';
+  readonly isMobile = this.uaService.isMobile;
+  readonly book = signal<BookVo | null>(null);
+  readonly catalogs = signal<PostCatalog[]>([]);
 
-  private appInfo!: TenantAppModel;
-  private options: OptionEntity = {};
-  private bookId = '';
+  protected readonly pageIndex = 'journal-detail';
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly destroy$: DestroyService,
-    private readonly userAgentService: UserAgentService,
-    private readonly commonService: CommonService,
-    private readonly metaService: MetaService,
-    private readonly breadcrumbService: BreadcrumbService,
-    private readonly tenantAppService: TenantAppService,
-    private readonly optionService: OptionService,
-    private readonly postService: PostService,
-    private readonly bookService: BookService
-  ) {
-    this.isMobile = this.userAgentService.isMobile;
-  }
+  private readonly appInfo = signal<TenantAppVo | null>(null);
+  private readonly options = signal<OptionEntity>({});
+  private readonly bookId = signal('');
 
   ngOnInit(): void {
     combineLatest([this.tenantAppService.appInfo$, this.optionService.options$, this.route.paramMap])
@@ -61,11 +57,12 @@ export class JournalDetailComponent implements OnInit {
       .subscribe(([appInfo, options]) => {
         const { paramMap: p } = this.route.snapshot;
 
-        this.appInfo = appInfo;
-        this.options = options;
+        this.appInfo.set(appInfo);
+        this.options.set(options);
 
-        this.bookId = p.get('bookId')?.trim() || '';
-        if (!this.bookId) {
+        this.bookId.set(p.get('bookId')?.trim() || '');
+
+        if (!this.bookId()) {
           this.commonService.redirectToNotFound();
           return;
         }
@@ -82,12 +79,12 @@ export class JournalDetailComponent implements OnInit {
 
   private getBook() {
     this.bookService
-      .getBookById(this.bookId)
+      .getBookById(this.bookId())
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.book = res || {};
+        this.book.set(res || {});
 
-        if (!res || !res.bookId) {
+        if (!res || !res.id) {
           this.commonService.redirectToNotFound();
           return;
         }
@@ -98,62 +95,38 @@ export class JournalDetailComponent implements OnInit {
 
   private getPostsWithColumn() {
     this.postService
-      .getPostsWithColumn(this.bookId)
+      .getPostsWithColumn(this.bookId())
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        const posts = (res || []).sort((a, b) => (a.postCreated > b.postCreated ? 1 : -1));
+        const posts = (res || []).sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
         const catalogMap: Record<string, PostCatalog> = {};
 
         posts.forEach((post) => {
           if (post.bookColumn) {
-            if (catalogMap[post.bookColumn.bookColumnId]) {
-              catalogMap[post.bookColumn.bookColumnId].posts.push({
-                postId: post.postId,
-                postTitle: post.postTitle,
-                postGuid: post.postGuid,
-                postCreated: post.postCreated
-              });
+            if (catalogMap[post.bookColumn.id]) {
+              catalogMap[post.bookColumn.id].posts.push(post);
             } else {
-              catalogMap[post.bookColumn.bookColumnId] = {
+              catalogMap[post.bookColumn.id] = {
                 ...post.bookColumn,
-                posts: [
-                  {
-                    postId: post.postId,
-                    postTitle: post.postTitle,
-                    postGuid: post.postGuid,
-                    postCreated: post.postCreated
-                  }
-                ]
+                posts: [post]
               };
             }
           } else {
             if (catalogMap['other']) {
-              catalogMap['other'].posts.push({
-                postId: post.postId,
-                postTitle: post.postTitle,
-                postGuid: post.postGuid,
-                postCreated: post.postCreated
-              });
+              catalogMap['other'].posts.push(post);
             } else {
               catalogMap['other'] = {
-                bookColumnId: '',
-                bookColumnName: '其它',
-                bookColumnSlug: 'others',
-                bookColumnOrder: 999,
-                posts: [
-                  {
-                    postId: post.postId,
-                    postTitle: post.postTitle,
-                    postGuid: post.postGuid,
-                    postCreated: post.postCreated
-                  }
-                ]
+                id: '',
+                name: '其它',
+                slug: 'others',
+                sort: 999,
+                posts: [post]
               };
             }
           }
         });
 
-        this.catalogs = Object.values(catalogMap).sort((a, b) => (a.bookColumnOrder > b.bookColumnOrder ? 1 : -1));
+        this.catalogs.set(Object.values(catalogMap).sort((a, b) => (a.sort > b.sort ? 1 : -1)));
       });
   }
 
@@ -163,16 +136,18 @@ export class JournalDetailComponent implements OnInit {
   }
 
   private updatePageInfo() {
-    const titles: string[] = [this.book.bookName, this.appInfo.appName];
-    const keywords: string[] = [this.book.bookName, ...this.appInfo.keywords];
-    let description = this.book.bookName;
+    const appInfo = this.appInfo()!;
+    const book = this.book()!;
+    const titles: string[] = [book.bookMeta.name, appInfo.name];
+    const keywords: string[] = [book.bookMeta.name, ...appInfo.keywords];
+    let description = book.bookMeta.name;
 
-    if (this.book.bookIssue) {
-      titles.unshift(this.book.bookIssue);
-      description += this.book.bookIssue + '。';
+    if (book.issue) {
+      titles.unshift(book.issue);
+      description += book.issue + '。';
     }
 
-    description += this.appInfo.appDescription;
+    description += appInfo.description;
 
     this.metaService.updateHTMLMeta({
       title: titles.join(' - '),
@@ -180,30 +155,31 @@ export class JournalDetailComponent implements OnInit {
       keywords: uniq(keywords)
         .filter((item) => !!item)
         .join(','),
-      author: this.options['site_author']
+      author: this.options()['site_author']
     });
   }
 
   private updateBreadcrumbs() {
+    const book = this.book()!;
     const breadcrumbs: BreadcrumbEntity[] = [
       {
         label: '期刊',
         tooltip: '期刊',
         url: '/posts',
         isHeader: false
+      },
+      {
+        label: book.bookMeta.name,
+        tooltip: book.bookMeta.name,
+        url: '',
+        isHeader: !book.issue
       }
     ];
-    breadcrumbs.push({
-      label: this.book.bookName,
-      tooltip: this.book.bookName,
-      url: '',
-      isHeader: !this.book.bookIssue
-    });
-    if (this.book.bookIssue) {
+    if (book.issue) {
       breadcrumbs.push({
-        label: this.book.bookIssue,
-        tooltip: this.book.bookIssue,
-        url: `/journal/${this.book.bookMetaId}/${this.book.bookId}`,
+        label: book.issue,
+        tooltip: book.issue,
+        url: `/journal/${book.bookMeta.id}/${book.id}`,
         isHeader: true
       });
     }

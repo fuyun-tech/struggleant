@@ -1,5 +1,5 @@
-<form nz-form nzLayout="vertical" class="auth-form auth-form-padding" [formGroup]="signupForm">
-  <nz-form-item>
+<form nz-form nzLayout="vertical" class="auth-form auth-form-padding" [formGroup]="signupForm" (ngSubmit)="signup()">
+<nz-form-item>
     <nz-form-label nzRequired>邮箱</nz-form-label>
     <nz-form-control [nzErrorTip]="nameErrorTpl">
       <input nz-input
@@ -23,16 +23,13 @@
   <nz-form-item>
     <nz-form-label nzRequired>密码</nz-form-label>
     <nz-form-control [nzErrorTip]="pwdErrorTpl">
-      <nz-input-group [nzSuffix]="pwdSuffix">
+      <nz-input-password>
         <input nz-input
-               [type]="passwordVisible ? 'text' : 'password'"
                formControlName="password"
                [maxlength]="maxPasswordLength"
-               placeholder="{{ minPasswordLength }}-{{ maxPasswordLength }} 位密码，字母、数字、符号组合"/>
-      </nz-input-group>
-      <ng-template #pwdSuffix>
-        <nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" (click)="passwordVisible = !passwordVisible"/>
-      </ng-template>
+               autocomplete="off"
+               placeholder="{{minPasswordLength}}-{{maxPasswordLength}} 位密码，字母、数字、符号组合"/>
+      </nz-input-password>
       <ng-template #pwdErrorTpl let-control>
         @if (control.hasError('required')) {
           请输入密码
@@ -52,7 +49,7 @@
   <nz-form-item>
     <div class="auth-actions">
       <div></div>
-      <button nz-button nzType="primary" (click)="signup()" [nzLoading]="signupLoading">注册</button>
+      <button nz-button type="submit" nzType="primary" (click)="signup()" [nzLoading]="signupLoading()">注册</button>
     </div>
   </nz-form-item>
 </form>

@@ -10,28 +10,17 @@ export interface PageIndexInfo {
   subPage: string;
 }
 
-export interface UserAgentInfo {
-  os: string;
-  osVersion: string;
-  architecture: string;
-  browser: string;
-  browserVersion: string;
-  engine: string;
-  engineVersion: string;
-  isMobile: boolean;
-  isDesktop: boolean;
-  isCrawler: boolean;
-  userAgent: string;
+export interface HTMLMetaData {
+  title: string;
+  description: string;
+  author?: string;
+  keywords?: string;
 }
 
 export interface ErrorState {
   code: number;
   message: string;
   visible: boolean;
-}
-
-export interface AppParam {
-  appId: string;
 }
 
 export interface QueryParam {
@@ -45,11 +34,6 @@ export interface ResultList<T> {
   list: T[];
   page: number;
   total: number;
-}
-
-export interface MetaData {
-  metaKey: string;
-  metaValue: string;
 }
 
 export interface ArchiveData {
@@ -70,7 +54,7 @@ export interface ArchiveList {
   yearList: string[];
 }
 
-export interface LoginModalOptions {
+export interface SigninModalOptions {
   visible: boolean;
   closable: boolean;
 }

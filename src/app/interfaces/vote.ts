@@ -1,7 +1,7 @@
 import { VoteType, VoteValue } from '../enums/vote';
 
-export interface VoteEntity {
-  objectId: string;
+export interface VoteDto {
+  targetId: string;
   value: VoteValue;
   type: VoteType;
 }

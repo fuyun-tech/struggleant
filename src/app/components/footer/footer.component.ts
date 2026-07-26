@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty } from 'lodash';
 import { skipWhile, takeUntil } from 'rxjs';
-import { LinkEntity } from '../../interfaces/link';
+import { LinkVo } from '../../interfaces/link';
 import { OptionEntity } from '../../interfaces/option';
 import { DestroyService } from '../../services/destroy.service';
 import { LinkService } from '../../services/link.service';
@@ -18,38 +18,36 @@ import { UserAgentService } from '../../services/user-agent.service';
   styleUrl: './footer.component.less'
 })
 export class FooterComponent implements OnInit {
-  isMobile = false;
-  options: OptionEntity = {};
-  footerLinks: LinkEntity[] = [];
-  friendLinks: LinkEntity[] = [];
+  private readonly destroy$ = inject(DestroyService);
+  private readonly uaService = inject(UserAgentService);
+  private readonly optionService = inject(OptionService);
+  private readonly linkService = inject(LinkService);
+  private readonly urlService = inject(UrlService);
 
-  get copyright() {
-    if (this.options['copyright_notice']) {
-      return this.options['copyright_notice'].replace('$now', new Date().getFullYear() + '');
+  readonly isMobile = this.uaService.isMobile;
+  readonly options = signal<OptionEntity>({});
+  readonly footerLinks = signal<LinkVo[]>([]);
+  readonly friendLinks = signal<LinkVo[]>([]);
+  readonly copyright = computed(() => {
+    const copyright = this.options()['copyright_notice'];
+
+    if (copyright) {
+      return copyright.replace('$now', new Date().getFullYear() + '');
     }
     return '';
-  }
+  });
+  readonly recordCode = computed(() => {
+    const recordCode = this.options()['record_code'];
 
-  get recordCode() {
-    if (this.options['record_code']) {
-      return this.options['record_code'].replace(/[^\d]/gi, '');
+    if (recordCode) {
+      return recordCode.replace(/[^\d]/gi, '');
     }
     return '';
-  }
+  });
 
-  private isLoaded = false;
-  private isHome = false;
-  private isHomeChanged = false;
-
-  constructor(
-    private readonly destroy$: DestroyService,
-    private readonly userAgentService: UserAgentService,
-    private readonly optionService: OptionService,
-    private readonly linkService: LinkService,
-    private readonly urlService: UrlService
-  ) {
-    this.isMobile = this.userAgentService.isMobile;
-  }
+  private readonly isLoaded = signal(false);
+  private readonly isHome = signal(false);
+  private readonly isHomeChanged = signal(false);
 
   ngOnInit(): void {
     this.optionService.options$
@@ -57,20 +55,22 @@ export class FooterComponent implements OnInit {
         skipWhile((options) => isEmpty(options)),
         takeUntil(this.destroy$)
       )
-      .subscribe((options) => (this.options = options));
+      .subscribe((options) => this.options.set(options));
+
     this.getFooterLinks();
+
     this.urlService.urlInfo$.pipe(takeUntil(this.destroy$)).subscribe((url) => {
       const isHome = url.current.split('?')[0] === '/';
 
-      this.isHomeChanged = isHome !== this.isHome;
-      if (!this.isLoaded || this.isHomeChanged) {
-        this.isHome = isHome;
+      this.isHomeChanged.set(isHome !== this.isHome());
+      if (!this.isLoaded() || this.isHomeChanged()) {
+        this.isHome.set(isHome);
 
         if (!this.isMobile) {
           this.getFriendLinks();
         }
       }
-      this.isLoaded = true;
+      this.isLoaded.set(true);
     });
   }
 
@@ -79,21 +79,23 @@ export class FooterComponent implements OnInit {
       .getFooterLinks()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.footerLinks = (res || []).map((item) => {
-          return {
-            ...item,
-            isExternal: /^https?:\/\//i.test(item.linkUrl)
-          };
-        });
+        this.footerLinks.set(
+          (res || []).map((item) => {
+            return {
+              ...item,
+              isExternal: /^https?:\/\//i.test(item.url)
+            };
+          })
+        );
       });
   }
 
   private getFriendLinks() {
     this.linkService
-      .getFriendLinks(this.isHome)
+      .getFriendLinks(this.isHome())
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.friendLinks = res;
+        this.friendLinks.set(res);
       });
   }
 }

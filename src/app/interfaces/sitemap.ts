@@ -1,11 +1,11 @@
+import { CategoryVo } from './category';
 import { ArchiveData } from './common';
-import { PostEntity } from './post';
-import { TagEntity } from './tag';
-import { TaxonomyEntity } from './taxonomy';
+import { PostModel } from './post';
+import { TagVo } from './tag';
 
 export interface SitemapData {
-  posts: PostEntity[];
+  posts: PostModel[];
   postArchives: ArchiveData[];
-  taxonomies: TaxonomyEntity[];
-  tags: TagEntity[];
+  categories: CategoryVo[];
+  tags: TagVo[];
 }

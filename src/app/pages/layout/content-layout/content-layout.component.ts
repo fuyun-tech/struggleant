@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SiderComponent } from 'src/app/components/sider/sider.component';
 import { UserAgentService } from 'src/app/services/user-agent.service';
@@ -10,9 +10,7 @@ import { UserAgentService } from 'src/app/services/user-agent.service';
   styleUrl: './content-layout.component.less'
 })
 export class ContentLayoutComponent {
-  isMobile = false;
+  private readonly uaService = inject(UserAgentService);
 
-  constructor(private readonly userAgentService: UserAgentService) {
-    this.isMobile = this.userAgentService.isMobile;
-  }
+  readonly isMobile = this.uaService.isMobile;
 }

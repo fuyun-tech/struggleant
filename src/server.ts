@@ -7,20 +7,18 @@ import {
 } from '@angular/ssr/node';
 import { Feed } from '@fuyun/feed';
 import { environment } from 'env/environment';
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { uniq } from 'lodash';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { EnumChangefreq, SitemapItemLoose, SitemapStream, streamToPromise } from 'sitemap';
 import { ApiUrl } from 'src/app/config/api-url';
 import { Message } from 'src/app/config/message.enum';
-import { Post } from 'src/app/interfaces/post';
+import { PostVo } from 'src/app/interfaces/post';
 import { SitemapData } from 'src/app/interfaces/sitemap';
 import { simpleRequest } from 'src/app/utils/helper';
 import { Readable } from 'stream';
 
-const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-const browserDistFolder = resolve(serverDistFolder, '../browser');
+const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine({
@@ -28,7 +26,7 @@ const angularApp = new AngularNodeAppEngine({
   trustProxyHeaders: environment.trustProxies
 });
 
-app.get('/rss.xml', async (req: Request, res: Response) => {
+app.get('/rss.xml', async (req, res) => {
   try {
     const { page, size, detail } = req.query;
     const { data: appInfo } = await simpleRequest({
@@ -48,42 +46,41 @@ app.get('/rss.xml', async (req: Request, res: Response) => {
         page: Number(page) || 1,
         size: Math.min(Number(size) || 10, 100),
         detail: showDetail ? 1 : 0,
-        sticky: 0
+        isPinned: 0
       },
       appId: environment.appId,
       apiBase: environment.apiBase
     });
-    const posts: Post[] = postList.list || [];
+    const posts: PostVo[] = postList.list || [];
     const feed = new Feed({
-      title: appInfo.appName,
-      description: appInfo.appDescription,
+      title: appInfo.name,
+      description: appInfo.description,
       language: 'zh-cn',
       dcExtension: true,
       id: environment.appUrl,
       link: environment.appUrl,
-      image: appInfo.appLogoUrl,
-      favicon: appInfo.appFaviconUrl,
-      copyright: `2024-${new Date().getFullYear()} ${appInfo.appDomain}`,
+      image: appInfo.logoUrl,
+      favicon: appInfo.faviconUrl,
+      copyright: `2024-${new Date().getFullYear()} ${appInfo.domain}`,
       updated: new Date(),
-      generator: appInfo.appDomain,
+      generator: appInfo.domain,
       feedLinks: {
         rss: `${environment.appUrl}/rss.xml`
       },
       webMaster: options['site_author']
     });
 
-    posts.forEach((item) => {
-      const post = item.post;
+    posts.forEach((post) => {
       feed.addItem({
-        title: post.postTitle,
-        id: post.postId,
-        link: environment.appUrl + post.postGuid,
-        description: post.postExcerpt,
-        content: showDetail ? post.postContent : post.postExcerpt,
-        creator: item.meta['post_author'] || post.owner.userNickname,
-        category: item.categories.map((category) => ({ name: category.taxonomySlug })),
-        date: new Date(post.postDate),
-        image: post.cover
+        title: post.title,
+        id: post.id,
+        link: environment.appUrl + post.url,
+        description: post.summary,
+        content: showDetail ? post.content : post.summary,
+        creator: post.author || post.creator.nickname,
+        category: post.categories.map((category) => ({ name: category.category.slug })),
+        date: new Date(post.publishedAt),
+        image: post.coverUrl
       });
     });
 
@@ -93,7 +90,7 @@ app.get('/rss.xml', async (req: Request, res: Response) => {
     res.status(HttpStatusCode.InternalServerError).send(Message.ERROR_500);
   }
 });
-app.get('/sitemap.xml', async (req: Request, res: Response) => {
+app.get('/sitemap.xml', async (req, res) => {
   try {
     const postList: SitemapData = (
       await simpleRequest({
@@ -131,10 +128,10 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
       }
     ];
     const posts: SitemapItemLoose[] = postList.posts.map((item) => ({
-      url: environment.appUrl + item.postGuid,
+      url: environment.appUrl + item.url,
       changefreq: EnumChangefreq.ALWAYS,
       priority: 1,
-      lastmod: new Date(item.postModified).toString()
+      lastmod: new Date(item.updatedAt).toString()
     }));
     const postArchivesByMonth: SitemapItemLoose[] = postList.postArchives.map((item) => ({
       url: `${environment.appUrl}/archive/${item.dateValue}`,
@@ -148,26 +145,26 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
-    const taxonomies: SitemapItemLoose[] = postList.taxonomies.map((item) => ({
-      url: `${environment.appUrl}/category/${item.taxonomySlug}`,
+    const categories: SitemapItemLoose[] = postList.categories.map((item) => ({
+      url: `${environment.appUrl}/category/${item.slug}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
     const tags: SitemapItemLoose[] = postList.tags.map((item) => ({
-      url: `${environment.appUrl}/tag/${item.tagName}`,
+      url: `${environment.appUrl}/tag/${item.name}`,
       changefreq: EnumChangefreq.DAILY,
       priority: 0.7
     }));
     const pages: SitemapItemLoose[] = pageList.posts.map((item) => ({
-      url: environment.appUrl + item.postGuid,
+      url: environment.appUrl + item.url,
       changefreq: EnumChangefreq.DAILY,
       priority: 1,
-      lastmod: new Date(item.postModified).toString()
+      lastmod: new Date(item.updatedAt).toString()
     }));
 
     streamToPromise(
       <Readable>(
-        Readable.from(links.concat(pages, posts, taxonomies, tags, postArchivesByYear, postArchivesByMonth)).pipe(
+        Readable.from(links.concat(pages, posts, categories, tags, postArchivesByYear, postArchivesByMonth)).pipe(
           sitemapStream
         )
       )
@@ -192,7 +189,7 @@ app.use(
 /**
  * Handle all other requests by rendering the Angular application.
  */
-app.use('/**', (req, res, next) => {
+app.use((req, res, next) => {
   angularApp
     .handle(req)
     .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
@@ -200,14 +197,16 @@ app.use('/**', (req, res, next) => {
 });
 
 /**
- * Start the server if this module is the main entry point.
+ * Start the server if this module is the main entry point, or it is ran via PM2.
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- *
- * pm2 环境下 isMainModule(import.meta.url) 始终为 false，因此需要额外判断路径
  */
-if (isMainModule(import.meta.url) || !import.meta.url.includes('/.angular/')) {
+if (isMainModule(import.meta.url) || process.env['pm_id']) {
   const port = environment.port || 4000;
-  app.listen(port, () => {
+  app.listen(port, (error) => {
+    if (error) {
+      throw error;
+    }
+
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }

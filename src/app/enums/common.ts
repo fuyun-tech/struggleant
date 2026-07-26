@@ -12,3 +12,8 @@ export enum SwitchValue {
   YES = 1,
   NO = 0
 }
+
+export enum CommonStatus {
+  NORMAL = 1,
+  TRASHED = 2
+}

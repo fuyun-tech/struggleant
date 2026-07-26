@@ -1,13 +1,24 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  viewChild
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { environment } from 'env/environment';
 import { isEmpty } from 'lodash';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { skipWhile, takeUntil } from 'rxjs';
-import { BookEntity } from '../../interfaces/book';
+import { IconCalendarDateComponent } from 'src/app/icons/icon-calendar-date.component';
+import { BookVo } from '../../interfaces/book';
 import { ArchiveData, PageIndexInfo } from '../../interfaces/common';
 import { OptionEntity } from '../../interfaces/option';
-import { PostEntity } from '../../interfaces/post';
+import { PostEntity, PostVo } from '../../interfaces/post';
 import { BookService } from '../../services/book.service';
 import { CommonService } from '../../services/common.service';
 import { DestroyService } from '../../services/destroy.service';
@@ -18,45 +29,42 @@ import { AdsenseComponent } from '../adsense/adsense.component';
 
 @Component({
   selector: 'app-sider',
-  imports: [RouterLink, NzIconModule, AdsenseComponent],
+  imports: [RouterLink, NzIconModule, AdsenseComponent, IconCalendarDateComponent],
   providers: [DestroyService],
   templateUrl: './sider.component.html',
   styleUrl: './sider.component.less'
 })
 export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('siderEle') siderEle!: ElementRef;
+  private readonly destroy$ = inject(DestroyService);
+  private readonly platform = inject(PlatformService);
+  private readonly commonService = inject(CommonService);
+  private readonly optionService = inject(OptionService);
+  private readonly postService = inject(PostService);
+  private readonly bookService = inject(BookService);
+
+  readonly siderEle = viewChild<ElementRef<HTMLElement>>('siderEle');
 
   readonly adsPlaceholder = true;
+  readonly indexInfo = signal<PageIndexInfo | null>(null);
+  readonly hotPosts = signal<PostEntity[]>([]);
+  readonly randomPosts = signal<PostEntity[]>([]);
+  readonly postArchives = signal<ArchiveData[]>([]);
+  readonly bookPosts = signal<PostVo[]>([]);
+  readonly activeBook = signal<BookVo | null>(null);
+  readonly bookName = computed(() => {
+    return this.bookService.getBookName(this.activeBook()!).fullName;
+  });
+  readonly adsVisible = computed(() => {
+    const options = this.options();
 
-  indexInfo?: PageIndexInfo;
-  hotPosts: PostEntity[] = [];
-  randomPosts: PostEntity[] = [];
-  postArchives: ArchiveData[] = [];
-  bookPosts: PostEntity[] = [];
-  activeBook?: BookEntity;
-
-  get bookName() {
-    return this.bookService.getBookName(this.activeBook).fullName;
-  }
-
-  get adsVisible() {
     return (
-      (environment.production && ['1', '0'].includes(this.options['ads_flag'])) ||
-      (!environment.production && ['2', '0'].includes(this.options['ads_flag']))
+      (environment.production && ['1', '0'].includes(options['ads_flag'])) ||
+      (!environment.production && ['2', '0'].includes(options['ads_flag']))
     );
-  }
+  });
 
-  private options: OptionEntity = {};
-  private pageIndex = '';
-
-  constructor(
-    private readonly destroy$: DestroyService,
-    private readonly platform: PlatformService,
-    private readonly commonService: CommonService,
-    private readonly optionService: OptionService,
-    private readonly postService: PostService,
-    private readonly bookService: BookService
-  ) {}
+  private readonly options = signal<OptionEntity>({});
+  private readonly pageIndex = signal('');
 
   ngOnInit(): void {
     this.optionService.options$
@@ -65,17 +73,19 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe((options) => {
-        this.options = options;
+        this.options.set(options);
       });
     this.commonService.pageIndex$
       .pipe(
-        skipWhile((page) => !page),
+        skipWhile((pageIndex) => !pageIndex),
         takeUntil(this.destroy$)
       )
-      .subscribe((page) => {
-        if (this.pageIndex !== page) {
-          this.pageIndex = page;
-          this.indexInfo = this.commonService.getPageIndexInfo(page);
+      .subscribe((pageIndex) => {
+        if (this.pageIndex() !== pageIndex) {
+          const indexInfo = this.commonService.getPageIndexInfo(pageIndex);
+
+          this.pageIndex.set(pageIndex);
+          this.indexInfo.set(indexInfo);
 
           this.getHotPosts();
           this.getPostArchives();
@@ -83,7 +93,7 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     this.postService.activeBook$.pipe(takeUntil(this.destroy$)).subscribe((book) => {
-      this.activeBook = book;
+      this.activeBook.set(book || null);
       if (book) {
         this.getPostsByBookId();
       }
@@ -92,8 +102,8 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     if (this.platform.isBrowser) {
-      window.addEventListener('scroll', this.scrollHandler.bind(this));
-      window.addEventListener('resize', this.scrollHandler.bind(this));
+      window.addEventListener('scroll', this.scrollHandler);
+      window.addEventListener('resize', this.scrollHandler);
     }
   }
 
@@ -106,15 +116,15 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getPostsByBookId() {
     this.postService
-      .getPostsByBookId<{ posts: PostEntity[] }>({
+      .getPostsByBookId({
         page: 1,
         size: 10,
-        bookId: this.activeBook?.bookId,
+        bookId: this.activeBook()?.id,
         simple: 1
       })
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.bookPosts = res.posts || [];
+        this.bookPosts.set(res.posts.list || []);
       });
   }
 
@@ -123,7 +133,7 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
       .getHotPosts()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.hotPosts = res;
+        this.hotPosts.set(res);
       });
   }
 
@@ -132,7 +142,7 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
       .getRandomPosts(10, false)
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.randomPosts = res;
+        this.randomPosts.set(res);
       });
   }
 
@@ -141,25 +151,26 @@ export class SiderComponent implements OnInit, AfterViewInit, OnDestroy {
       .getPostArchives(true, 10)
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.postArchives = res;
+        this.postArchives.set(res);
       });
   }
 
-  private scrollHandler() {
+  private scrollHandler = () => {
     const docEle = document.documentElement;
-    if (this.siderEle && docEle.scrollTop > 0) {
-      if (docEle.scrollTop > this.siderEle.nativeElement.scrollHeight - docEle.clientHeight) {
-        this.siderEle.nativeElement.style.position = 'sticky';
-        if (this.siderEle.nativeElement.scrollHeight < docEle.clientHeight) {
-          this.siderEle.nativeElement.style.top = 0;
+    const siderEle = this.siderEle();
+
+    if (siderEle && docEle.scrollTop > 0) {
+      if (docEle.scrollTop > siderEle.nativeElement.scrollHeight - docEle.clientHeight) {
+        siderEle.nativeElement.style.position = 'sticky';
+        if (siderEle.nativeElement.scrollHeight < docEle.clientHeight) {
+          siderEle.nativeElement.style.top = '0';
         } else {
-          this.siderEle.nativeElement.style.top =
-            docEle.clientHeight - this.siderEle.nativeElement.scrollHeight - 16 + 'px';
+          siderEle.nativeElement.style.top = docEle.clientHeight - siderEle.nativeElement.scrollHeight - 16 + 'px';
         }
       } else {
-        this.siderEle.nativeElement.style.position = 'relative';
-        this.siderEle.nativeElement.style.top = '';
+        siderEle.nativeElement.style.position = 'relative';
+        siderEle.nativeElement.style.top = '';
       }
     }
-  }
+  };
 }

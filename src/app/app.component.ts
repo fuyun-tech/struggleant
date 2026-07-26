@@ -1,36 +1,45 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { environment } from 'env/environment';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzDropdownDirective, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzImageService } from 'ng-zorro-antd/image';
+import { NzMenuDirective, NzMenuItemComponent } from 'ng-zorro-antd/menu';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzTooltipModule } from 'ng-zorro-antd/tooltip';
+import { takeUntil } from 'rxjs';
 import { filter, takeWhile, tap } from 'rxjs/operators';
-import { BotChatComponent } from 'src/app/components/bot-chat/bot-chat.component';
+import { AiChatComponent } from 'src/app/components/ai-chat/ai-chat.component';
 import { FooterComponent } from 'src/app/components/footer/footer.component';
 import { HeaderComponent } from 'src/app/components/header/header.component';
-import { LoginModalComponent } from 'src/app/components/login-modal/login-modal.component';
 import { MSiderComponent } from 'src/app/components/m-sider/m-sider.component';
+import { SigninModalComponent } from 'src/app/components/signin-modal/signin-modal.component';
+import { WallpaperModalComponent } from 'src/app/components/wallpaper-modal/wallpaper-modal.component';
 import { COOKIE_KEY_UV_ID, MEDIA_QUERY_THEME_DARK } from 'src/app/config/common.constant';
 import { ResponseCode } from 'src/app/config/response-code.enum';
 import { Theme } from 'src/app/enums/common';
-import { AdsStatus } from 'src/app/enums/log';
-import { PostScope, PostStatus } from 'src/app/enums/post';
-import { ErrorState, LoginModalOptions, PageIndexInfo } from 'src/app/interfaces/common';
-import { Post } from 'src/app/interfaces/post';
-import { TaxonomyNode } from 'src/app/interfaces/taxonomy';
+import { LogActionType, LogTargetType } from 'src/app/enums/log';
+import { PostStatus, PostVisibility } from 'src/app/enums/post';
+import { IconMagicComponent } from 'src/app/icons/icon-magic.component';
+import { IconRssComponent } from 'src/app/icons/icon-rss.component';
+import { IconStarsComponent } from 'src/app/icons/icon-stars.component';
+import { CategoryNode } from 'src/app/interfaces/category';
+import { ErrorState, PageIndexInfo, SigninModalOptions } from 'src/app/interfaces/common';
+import { PostVo } from 'src/app/interfaces/post';
 import { ForbiddenComponent } from 'src/app/pages/error/forbidden/forbidden.component';
 import { NotFoundComponent } from 'src/app/pages/error/not-found/not-found.component';
 import { ServerErrorComponent } from 'src/app/pages/error/server-error/server-error.component';
 import { AdsService } from 'src/app/services/ads.service';
+import { CategoryService } from 'src/app/services/category.service';
 import { CommonService } from 'src/app/services/common.service';
+import { DestroyService } from 'src/app/services/destroy.service';
 import { ErrorService } from 'src/app/services/error.service';
-import { LogService } from 'src/app/services/log.service';
+import { AdsStatus, LogService } from 'src/app/services/log.service';
 import { OptionService } from 'src/app/services/option.service';
 import { PlatformService } from 'src/app/services/platform.service';
 import { PostService } from 'src/app/services/post.service';
 import { SsrCookieService } from 'src/app/services/ssr-cookie.service';
-import { TaxonomyService } from 'src/app/services/taxonomy.service';
 import { TenantAppService } from 'src/app/services/tenant-app.service';
 import { UrlService } from 'src/app/services/url.service';
 import { UserAgentService } from 'src/app/services/user-agent.service';
@@ -43,77 +52,84 @@ import { generateUid } from 'src/app/utils/helper';
     RouterOutlet,
     HeaderComponent,
     FooterComponent,
+    MSiderComponent,
+    SigninModalComponent,
+    AiChatComponent,
     NotFoundComponent,
     ForbiddenComponent,
     ServerErrorComponent,
-    MSiderComponent,
-    LoginModalComponent,
-    BotChatComponent,
     NzButtonModule,
-    NzTooltipModule,
-    NzIconModule
+    NzIconModule,
+    NzDropdownDirective,
+    NzDropdownMenuComponent,
+    NzMenuDirective,
+    NzMenuItemComponent,
+    IconStarsComponent,
+    IconMagicComponent,
+    IconRssComponent,
+    WallpaperModalComponent,
+    NgOptimizedImage
   ],
-  providers: [],
+  providers: [DestroyService, NzImageService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })
 export class AppComponent implements OnInit, AfterViewInit {
-  isMobile: boolean = false;
-  postTaxonomies: TaxonomyNode[] = [];
-  errorState!: ErrorState;
-  errorPage = false;
-  isBodyCentered = false;
-  siderVisible = false;
-  indexInfo?: PageIndexInfo;
-  post: Post | null = null;
-  chatVisible = false;
-  conversationId = '';
-  chatPrompt = '';
-  loginOptions: LoginModalOptions = {
+  private readonly destroy$ = inject(DestroyService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly message = inject(NzMessageService);
+  private readonly imageService = inject(NzImageService);
+  private readonly platform = inject(PlatformService);
+  private readonly uaService = inject(UserAgentService);
+  private readonly cookieService = inject(SsrCookieService);
+  private readonly commonService = inject(CommonService);
+  private readonly urlService = inject(UrlService);
+  private readonly optionService = inject(OptionService);
+  private readonly errorService = inject(ErrorService);
+  private readonly userService = inject(UserService);
+  private readonly tenantAppService = inject(TenantAppService);
+  private readonly categoryService = inject(CategoryService);
+  private readonly logService = inject(LogService);
+  private readonly postService = inject(PostService);
+  private readonly adsService = inject(AdsService);
+
+  readonly isMobile = this.uaService.isMobile;
+  readonly postCategories = signal<CategoryNode[]>([]);
+  readonly errorState = signal<ErrorState | null>(null);
+  readonly errorPage = signal(false);
+  readonly isBodyCentered = signal(false);
+  readonly siderVisible = signal(false);
+  readonly indexInfo = signal<PageIndexInfo | null>(null);
+  readonly post = signal<PostVo | null>(null);
+  readonly chatVisible = signal(false);
+  readonly conversationId = signal('');
+  readonly chatPrompt = signal('');
+  readonly wallpaperModalVisible = signal(false);
+  readonly signinOptions = signal<SigninModalOptions>({
     visible: false,
     closable: true
-  };
+  });
 
-  private isSignIn = false;
-  private currentUrl = '';
-  private initialized = false;
-  private accessLogId = '';
-  private bodyOffset = 0;
-  private adsStatus: AdsStatus = AdsStatus.UNKNOWN;
-
-  constructor(
-    private readonly router: Router,
-    private readonly route: ActivatedRoute,
-    private readonly cdr: ChangeDetectorRef,
-    private readonly message: NzMessageService,
-    private readonly platform: PlatformService,
-    private readonly userAgentService: UserAgentService,
-    private readonly cookieService: SsrCookieService,
-    private readonly commonService: CommonService,
-    private readonly urlService: UrlService,
-    private readonly optionService: OptionService,
-    private readonly errorService: ErrorService,
-    private readonly userService: UserService,
-    private readonly tenantAppService: TenantAppService,
-    private readonly taxonomyService: TaxonomyService,
-    private readonly logService: LogService,
-    private readonly postService: PostService,
-    private readonly adsService: AdsService
-  ) {
-    this.isMobile = this.userAgentService.isMobile;
-  }
+  private isSignIn = signal(false);
+  private currentUrl = signal('');
+  private initialized = signal(false);
+  private accessLogId = signal('');
+  private bodyOffset = signal(0);
+  private adsStatus = signal(AdsStatus.UNKNOWN);
 
   ngOnInit(): void {
     this.router.events
       .pipe(
         tap((re) => {
           if (re instanceof NavigationStart) {
-            this.errorPage = re.url.startsWith('/error/');
-            if (!this.errorPage) {
+            this.errorPage.set(re.url.startsWith('/error/'));
+            if (!this.errorPage()) {
               this.errorService.hideError();
             }
 
-            this.commonService.updateLoginModalVisible({
+            this.commonService.updateSigninOptions({
               visible: false,
               closable: true
             });
@@ -122,13 +138,13 @@ export class AppComponent implements OnInit, AfterViewInit {
         filter((re) => re instanceof NavigationEnd)
       )
       .subscribe((event) => {
-        this.isBodyCentered = !!this.route.firstChild?.snapshot.data['centered'];
+        this.isBodyCentered.set(!!this.route.firstChild?.snapshot.data['centered']);
 
         let faId = this.cookieService.get(COOKIE_KEY_UV_ID);
         let isNew = false;
         if (!faId) {
           isNew = true;
-          faId = generateUid(this.userAgentService.uaString);
+          faId = generateUid(this.uaService.uaString);
           this.cookieService.set(COOKIE_KEY_UV_ID, faId, {
             path: '/',
             domain: environment.cookie.domain,
@@ -136,86 +152,88 @@ export class AppComponent implements OnInit, AfterViewInit {
           });
         }
 
-        const previous = this.currentUrl.split('#')[0];
+        const previous = this.currentUrl().split('#')[0];
         const current = (event as NavigationEnd).url.split('#')[0];
         if (previous !== current) {
           this.urlService.updateUrlHistory({
-            previous: this.currentUrl,
+            previous: this.currentUrl(),
             current: (event as NavigationEnd).url
           });
           if (this.platform.isBrowser) {
             this.logService
               .logAccess(
-                this.logService.parseAccessLog({
-                  initialized: this.initialized,
-                  referrer: this.currentUrl,
+                this.logService.buildAccessLog({
+                  initialized: this.initialized(),
+                  referrer: this.currentUrl(),
                   isNew,
-                  adsStatus: this.adsStatus,
-                  logId: this.accessLogId
+                  adsStatus: this.adsStatus(),
+                  logId: this.accessLogId()
                 })
               )
               .subscribe((res) => {
                 if (res.code === ResponseCode.SUCCESS) {
-                  const oldAccessLogId = this.accessLogId;
+                  const oldAccessLogId = this.accessLogId();
 
-                  this.accessLogId = res.data.logId || '';
+                  this.accessLogId.set(res.data.logId || '');
                   this.logAdsStatus({
                     oldLogId: oldAccessLogId
                   });
                 }
               });
           }
-          this.currentUrl = (event as NavigationEnd).url;
+          this.currentUrl.set((event as NavigationEnd).url);
         }
-        this.initialized = true;
+        this.initialized.set(true);
       });
 
     this.initTheme();
     this.initThemeListener();
     this.optionService.getOptions().subscribe();
     this.tenantAppService.getAppInfo().subscribe();
-    this.userService.getLoginUser().subscribe((user) => {
-      this.isSignIn = !!user.userId;
+    this.userService.getProfile().subscribe((user) => {
+      this.isSignIn.set(!!user.id);
     });
     this.commonService.siderVisible$.subscribe((visible) => {
       if (this.platform.isBrowser) {
         if (visible) {
-          this.bodyOffset = document.documentElement.scrollTop;
+          this.bodyOffset.set(document.documentElement.scrollTop);
+
           document.documentElement.style.position = 'fixed';
-          document.documentElement.style.top = `-${this.bodyOffset}px`;
+          document.documentElement.style.top = `-${this.bodyOffset()}px`;
         } else {
           document.documentElement.style.position = '';
           document.documentElement.style.top = '';
           window.scrollTo({
-            top: this.bodyOffset,
+            top: this.bodyOffset(),
             behavior: 'instant'
           });
         }
       }
-      this.siderVisible = visible;
+      this.siderVisible.set(visible);
     });
     this.commonService.pageIndex$.subscribe((page) => {
-      this.indexInfo = this.commonService.getPageIndexInfo(page);
+      this.indexInfo.set(this.commonService.getPageIndexInfo(page));
       this.cdr.detectChanges();
     });
-    this.commonService.loginVisible$.subscribe((loginOptions) => {
-      this.loginOptions = loginOptions;
+    this.commonService.signinOptions$.subscribe((signinOptions) => {
+      this.signinOptions.set(signinOptions);
     });
-    this.taxonomyService.getTaxonomies().subscribe((taxonomies) => (this.postTaxonomies = taxonomies));
+    this.categoryService.getCategories().subscribe((categories) => this.postCategories.set(categories));
     this.postService.activePost$.subscribe((post) => {
-      this.post = post;
+      this.post.set(post);
     });
     this.errorService.errorState$.subscribe((state) => {
-      this.errorState = state;
+      this.errorState.set(state);
     });
 
     if (this.platform.isBrowser) {
       this.adsService.adsStatus$
         .pipe(takeWhile((status) => status !== AdsStatus.DISABLED, true))
         .subscribe((status) => {
-          const oldAdsStatus = this.adsStatus;
+          const oldAdsStatus = this.adsStatus();
 
-          this.adsStatus = status;
+          this.adsStatus.set(status);
+
           this.logAdsStatus({
             oldStatus: oldAdsStatus
           });
@@ -226,61 +244,119 @@ export class AppComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     if (this.platform.isBrowser) {
       window.addEventListener('pagehide', () => {
-        this.logService.logLeave({
-          logId: this.accessLogId
-        });
+        this.logService.logLeave(this.accessLogId());
       });
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
-          this.logService.logLeave({
-            logId: this.accessLogId
-          });
+          this.logService.logLeave(this.accessLogId());
         }
       });
     }
   }
 
   closeSider() {
-    this.siderVisible = false;
+    this.siderVisible.set(false);
     this.commonService.updateSiderVisible(false);
   }
 
-  showLoginModal(closable = true) {
-    this.commonService.updateLoginModalVisible({
+  showSigninModal(closable = true) {
+    this.commonService.updateSigninOptions({
       visible: true,
       closable
     });
   }
 
-  closeLoginModal() {
-    this.commonService.updateLoginModalVisible({
+  closeSigninModal() {
+    this.commonService.updateSigninOptions({
       visible: false,
       closable: true
     });
   }
 
+  showRedPacket() {
+    const previewRef = this.imageService.preview([
+      {
+        src: '/assets/images/red-packet.png'
+      }
+    ]);
+    this.commonService.paddingPreview(previewRef.previewInstance.imagePreviewWrapper);
+
+    this.logService
+      .logAction({
+        action: LogActionType.SHOW_RED_PACKET,
+        targetType: LogTargetType.WIDGET
+      })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
+  }
+
+  showWechatCard() {
+    this.imageService.preview([
+      {
+        src: '/assets/images/wechat-qrcode.jpg'
+      }
+    ]);
+
+    this.logService
+      .logAction({
+        action: LogActionType.SHOW_WECHAT_CARD,
+        targetType: LogTargetType.WIDGET
+      })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
+  }
+
+  showWallpaperModal() {
+    this.wallpaperModalVisible.set(true);
+
+    this.logService
+      .logAction({
+        action: LogActionType.SHOW_WALLPAPER_MODAL,
+        targetType: LogTargetType.WIDGET
+      })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
+  }
+
+  closeWallpaperModal() {
+    this.wallpaperModalVisible.set(false);
+  }
+
+  openRSS() {
+    this.logService
+      .logAction({
+        action: LogActionType.OPEN_POST_RSS,
+        targetType: LogTargetType.WIDGET
+      })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
+
+    window.open('/rss.xml');
+  }
+
   showChat() {
-    if (!this.isSignIn) {
-      this.showLoginModal();
+    if (!this.isSignIn()) {
+      this.showSigninModal();
       return;
     }
-    if (!this.post) {
+    const post = this.post();
+    if (!post) {
       return;
     }
-    if (!!this.post.post.postLoginFlag || !!this.post.post.postPayFlag) {
+    if (post.visibility === PostVisibility.LOGIN_USER || !!post.isPaid) {
       this.message.warning('会员或付费文章无法使用 AI 阅读助手功能');
       return;
     }
-    if (this.post.post.postStatus !== PostStatus.PUBLISH || this.post.post.postScope !== PostScope.PUBLIC) {
+    if (post.status !== PostStatus.PUBLISHED || post.visibility !== PostVisibility.PUBLIC) {
       this.message.warning('非公开文章无法使用 AI 阅读助手功能');
       return;
     }
-    this.chatVisible = true;
+    this.chatVisible.set(true);
   }
 
   closeChat() {
-    this.chatPrompt = '';
-    this.chatVisible = false;
+    this.chatPrompt.set('');
+    this.chatVisible.set(false);
   }
 
   checkAdsStatus(isLoaded: boolean) {
@@ -291,14 +367,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     const { oldLogId, oldStatus } = param;
 
     // 同应用异步跳转直接合并在日志请求，无需额外请求
-    if (!oldLogId && this.accessLogId && this.adsStatus && this.adsStatus !== oldStatus) {
-      this.logService.logAdsStatus(this.accessLogId, this.adsStatus).subscribe(() => {});
+    if (!oldLogId && this.accessLogId() && this.adsStatus() && this.adsStatus() !== oldStatus) {
+      this.logService.logAdsStatus(this.accessLogId(), this.adsStatus()).subscribe(() => {});
     }
   }
 
   private initTheme() {
-    const theme = this.commonService.getTheme();
-    this.commonService.setTheme(theme);
+    this.commonService.setTheme(this.commonService.getTheme());
   }
 
   private initThemeListener() {

@@ -1,48 +1,53 @@
-import { WallpaperLang, WallpaperPlatform } from '../enums/wallpaper';
-import { QueryParam } from './common';
+import { WallpaperLang } from 'src/app/enums/wallpaper';
+import { QueryParam } from 'src/app/interfaces/common';
 
 export interface WallpaperQueryParam extends QueryParam {
   lang?: WallpaperLang | WallpaperLang[];
   year?: string;
   month?: string;
-  resolution?: string;
+  future?: 0 | 1;
+}
+
+export interface WallpaperStatVo {
+  viewCount: number;
+  downloadCount: number;
+  likeCount: number;
+  commentCount: number;
+  favoriteCount: number;
+  playCount: number;
 }
 
 export interface Wallpaper {
-  wallpaperId: string;
+  id: string;
   bingIdPrefix: string;
   bingIdCn: string;
   bingIdEn: string;
-  wallpaperDate: Date;
-  wallpaperTitle: string;
-  wallpaperTitleEn: string;
-  wallpaperDescription?: string;
-  wallpaperCaption?: string;
-  wallpaperUrl: string;
-  wallpaperUrl2: string;
-  wallpaperThumbUrl: string;
-  wallpaperUrlBase: string;
-  wallpaperImageFormat: string;
-  wallpaperPlatform: WallpaperPlatform;
-  wallpaperQuiz: string;
-  wallpaperCopyright: string;
-  wallpaperCopyrightEn: string;
-  wallpaperCopyrightLink: string;
-  wallpaperCopyrightLinkEn: string;
-  wallpaperCopyrightAuthor: string;
-  wallpaperStoryTitle: string;
-  wallpaperStoryTitleEn: string;
-  wallpaperStory: string;
-  wallpaperStoryEn: string;
-  wallpaperLocation: string;
-  wallpaperLocationEn: string;
-  wallpaperViews: number;
-  wallpaperDownloads: number;
-  wallpaperLikes: number;
-  wallpaperComments: number;
-  wallpaperFavorites: number;
-  wallpaperPlays: number;
-  wallpaperModified: number;
+  bingDate: Date;
+  title: string;
+  titleEn: string;
+  description?: string;
+  caption?: string;
+  url: string;
+  url2: string;
+  thumbUrl: string;
+  urlBase: string;
+  imageFormat: string;
+  quiz: string;
+  copyright: string;
+  copyrightEn: string;
+  copyrightUrl: string;
+  copyrightUrlEn: string;
+  copyrightAuthor: string;
+  storyTitle: string;
+  storyTitleEn: string;
+  story: string;
+  storyEn: string;
+  fact: string;
+  factEn: string;
+  location: string;
+  locationEn: string;
+  wallpaperStat: WallpaperStatVo;
+  updatedAt: number;
   hasTranslation: boolean;
   isCn: boolean;
   isEn: boolean;
@@ -52,14 +57,14 @@ export interface Wallpaper {
 
 export interface HotWallpaper {
   wallpaperId: string;
-  wallpaperTitle: string;
-  wallpaperTitleCn: string;
-  wallpaperTitleEn: string;
-  wallpaperCopyright: string;
-  wallpaperCopyrightCn: string;
-  wallpaperCopyrightEn: string;
-  wallpaperUrl: string;
-  wallpaperThumbUrl: string;
+  title: string;
+  titleCn: string;
+  titleEn: string;
+  copyright: string;
+  copyrightCn: string;
+  copyrightEn: string;
+  url: string;
+  thumbUrl: string;
   score: number;
   isCn: boolean;
   isEn: boolean;

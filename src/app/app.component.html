@@ -1,65 +1,61 @@
-@if (!errorPage) {
-  @if (!errorState || !errorState.visible) {
+@let es = errorState();
+@let ii = indexInfo();
+@if (!errorPage()) {
+  @if (!es || !es.visible) {
     @if (!isMobile) {
-      <app-header [postTaxonomies]="postTaxonomies"></app-header>
+      <app-header [categories]="postCategories()"></app-header>
       <div class="body-wrap">
-        <div class="body" [class.body-center]="isBodyCentered">
+        <div class="body" [class.body-center]="isBodyCentered()">
           <router-outlet/>
         </div>
       </div>
       <app-footer></app-footer>
-      @if (indexInfo?.isPost && indexInfo?.isDetail) {
-        <div class="ai-widget">
-          <button nz-button
-                  nz-tooltip
-                  nzType="primary"
-                  nzShape="circle"
-                  nzSize="large"
-                  nzTooltipTitle="AI 阅读助手"
-                  nzTooltipPlacement="topRight"
-                  (click)="showChat()"><nz-icon nzType="comment"/></button>
-        </div>
+      <div class="tool-widget" nz-dropdown nzTrigger="hover" nzPlacement="topRight" [nzDropdownMenu]="toolMenu">
+        <button nz-button nzType="primary" nzShape="circle" nzSize="large"><fi-stars/></button>
+      </div>
+      @if (chatVisible()) {
+        <app-ai-chat [conversationId]="conversationId()"
+                     [prompt]="chatPrompt()"
+                     [post]="post()"
+                     (closeDrawer)="closeChat()"/>
       }
-      @if (chatVisible) {
-        <app-bot-chat [conversationId]="conversationId"
-                      [prompt]="chatPrompt"
-                      [post]="post"
-                      (closeDrawer)="closeChat()"></app-bot-chat>
-      }
+      <app-wallpaper-modal [visible]="wallpaperModalVisible()" (close)="closeWallpaperModal()"/>
     } @else {
-      <div class="m-body-wrap" [class.open]="siderVisible">
-        <app-header [postTaxonomies]="postTaxonomies"></app-header>
+      <div class="m-body-wrap" [class.open]="siderVisible()">
+        <app-header [categories]="postCategories()"></app-header>
         <div class="m-body">
-          <main class="m-main" [class.m-main-center]="isBodyCentered">
+          <main class="m-main" [class.m-main-center]="isBodyCentered()">
             <router-outlet/>
           </main>
           <app-footer></app-footer>
         </div>
-        @if (siderVisible) {
+        @if (siderVisible()) {
           <div class="m-mask m-mask-sider" (click)="closeSider()"></div>
         }
       </div>
       <app-m-sider></app-m-sider>
     }
-    @if (loginOptions.visible) {
-      <app-login-modal [closable]="loginOptions.closable" (close)="closeLoginModal()"></app-login-modal>
+    @if (signinOptions().visible) {
+      <app-signin-modal [closable]="signinOptions().closable" (close)="closeSigninModal()"></app-signin-modal>
     }
-    <img src="/assets/images/adimage.gif"
+    <img ngSrc="/assets/images/adimage.gif"
          [style.display]="'none'"
          (load)="checkAdsStatus(true)"
          (error)="checkAdsStatus(false)"
-         alt="">
+         alt=""
+         height="1"
+         width="1"/>
   } @else {
     <!--global errors-->
-    @switch (errorState.code) {
+    @switch (es.code) {
       @case (403) {
-        <app-forbidden [errorState]="errorState"></app-forbidden>
+        <app-forbidden [errorState]="es"/>
       }
       @case (404) {
-        <app-not-found [errorState]="errorState"></app-not-found>
+        <app-not-found [errorState]="es"/>
       }
       @default {
-        <app-server-error [errorState]="errorState"></app-server-error>
+        <app-server-error [errorState]="es"/>
       }
     }
   }
@@ -67,3 +63,24 @@
   <!--error pages-->
   <router-outlet/>
 }
+<nz-dropdown-menu #toolMenu="nzDropdownMenu">
+  <ul nz-menu [nzSelectable]="false">
+    <li nz-menu-item class="tool-item tool-red-packet" (click)="showRedPacket()" title="支付宝扫码领红包">
+      <nz-icon nzType="red-envelope"/><span>支付宝每日红包</span>
+    </li>
+    <li nz-menu-item class="tool-item tool-wechat" (click)="showWechatCard()" title="微信公众号">
+      <nz-icon nzType="wechat"/><span>微信公众号</span>
+    </li>
+    <li nz-menu-item class="tool-item tool-wallpaper" (click)="showWallpaperModal()" title="高清壁纸">
+      <nz-icon nzType="picture"/><span>高清壁纸</span>
+    </li>
+    <li nz-menu-item class="tool-item tool-rss" (click)="openRSS()" title="RSS 订阅">
+      <fi-rss class="fi"/><span>RSS 订阅</span>
+    </li>
+    @if (ii?.isPost && ii?.isDetail) {
+      <li nz-menu-item class="tool-item tool-ai" (click)="showChat()">
+        <fi-magic class="fi"/><span>AI 阅读助手</span>
+      </li>
+    }
+  </ul>
+</nz-dropdown-menu>

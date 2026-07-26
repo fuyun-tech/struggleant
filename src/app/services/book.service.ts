@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiUrl } from 'src/app/config/api-url';
-import { APP_ID } from 'src/app/config/common.constant';
 import { ApiService } from 'src/app/services/api.service';
 import { BookType } from '../enums/book';
-import { BookEntity } from '../interfaces/book';
+import { BookVo } from '../interfaces/book';
 
 @Injectable({
   providedIn: 'root'
@@ -12,16 +11,11 @@ import { BookEntity } from '../interfaces/book';
 export class BookService {
   constructor(private readonly apiService: ApiService) {}
 
-  getBookById(bookId: string): Observable<BookEntity> {
-    return this.apiService
-      .httpGet(ApiUrl.BOOK, {
-        bookId,
-        appId: APP_ID
-      })
-      .pipe(map((res) => res?.data || {}));
+  getBookById(id: string): Observable<BookVo> {
+    return this.apiService.httpGet(ApiUrl.BOOK, { id }).pipe(map((res) => res?.data || {}));
   }
 
-  getBookName(book?: BookEntity, withMark = true) {
+  getBookName(book?: BookVo | null, withMark = true) {
     let shortName = '';
     let fullName = '';
 
@@ -31,15 +25,15 @@ export class BookService {
         fullName
       };
     }
-    if ([BookType.BOOK, BookType.OTHER].includes(book.bookType)) {
-      shortName = fullName = withMark ? `《${book.bookName}》` : book.bookName;
+    if ([BookType.BOOK, BookType.OTHER].includes(book.bookMeta.type)) {
+      shortName = fullName = withMark ? `《${book.bookMeta.name}》` : book.bookMeta.name;
     }
     if (withMark) {
-      fullName = `《${book.bookName}》${book.bookIssue ? '（' + book.bookIssue + '）' : ''}`;
+      fullName = `《${book.bookMeta.name}》${book.issue ? '（' + book.issue + '）' : ''}`;
     } else {
-      fullName = `${book.bookName}${book.bookIssue ? '（' + book.bookIssue + '）' : ''}`;
+      fullName = `${book.bookMeta.name}${book.issue ? '（' + book.issue + '）' : ''}`;
     }
-    shortName = book.bookIssue || book.bookName;
+    shortName = book.issue || book.bookMeta.name;
 
     return {
       shortName,

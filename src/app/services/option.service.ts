@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { Carousel } from 'src/app/interfaces/carousel';
+import { OptionEntity } from 'src/app/interfaces/option';
 import { ApiUrl } from '../config/api-url';
-import { APP_ID } from '../config/common.constant';
-import { Carousel, OptionEntity, OptionModel } from '../interfaces/option';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -15,32 +15,15 @@ export class OptionService {
   constructor(private readonly apiService: ApiService) {}
 
   getOptions(): Observable<OptionEntity> {
-    return this.apiService
-      .httpGet(ApiUrl.OPTION_FRONTEND, {
-        appId: APP_ID
+    return this.apiService.httpGet(ApiUrl.OPTION_FRONTEND, {}).pipe(
+      map((res) => res?.data || {}),
+      tap((options) => {
+        this.options.next(options);
       })
-      .pipe(
-        map((res) => res?.data || {}),
-        tap((options) => {
-          this.options.next(options);
-        })
-      );
-  }
-
-  getOptionByKey(key: string): Observable<OptionModel> {
-    return this.apiService
-      .httpGet(ApiUrl.OPTION, {
-        key,
-        appId: APP_ID
-      })
-      .pipe(map((res) => res?.data || {}));
+    );
   }
 
   getCarousels(): Observable<Carousel[]> {
-    return this.apiService
-      .httpGet(ApiUrl.OPTION_CAROUSELS, {
-        appId: APP_ID
-      })
-      .pipe(map((res) => res?.data || []));
+    return this.apiService.httpGet(ApiUrl.OPTION_CAROUSELS, {}).pipe(map((res) => res?.data || []));
   }
 }

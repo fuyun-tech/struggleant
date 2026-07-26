@@ -10,8 +10,8 @@ import {
 } from '../config/common.constant';
 import { Message } from '../config/message.enum';
 import { Theme } from '../enums/common';
-import { LoginModalOptions, PageIndexInfo } from '../interfaces/common';
-import { CustomError } from '../interfaces/custom-error';
+import { SigninModalOptions, PageIndexInfo } from '../interfaces/common';
+import { CustomError } from '../core/custom-error';
 import { PlatformService } from './platform.service';
 import { SsrCookieService } from './ssr-cookie.service';
 
@@ -28,11 +28,11 @@ export class CommonService {
   private darkMode: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public darkMode$: Observable<boolean> = this.darkMode.asObservable();
 
-  private loginVisible: BehaviorSubject<LoginModalOptions> = new BehaviorSubject<LoginModalOptions>({
+  private signinOptions: BehaviorSubject<SigninModalOptions> = new BehaviorSubject<SigninModalOptions>({
     visible: false,
     closable: true
   });
-  public loginVisible$: Observable<LoginModalOptions> = this.loginVisible.asObservable();
+  public signinOptions$: Observable<SigninModalOptions> = this.signinOptions.asObservable();
 
   constructor(
     @Inject(DOCUMENT) private readonly document: Document,
@@ -67,8 +67,8 @@ export class CommonService {
     this.siderVisible.next(visible);
   }
 
-  updateLoginModalVisible(options: LoginModalOptions) {
-    this.loginVisible.next(options);
+  updateSigninOptions(options: SigninModalOptions) {
+    this.signinOptions.next(options);
   }
 
   getReferrer(onlyPath = false) {
@@ -89,10 +89,6 @@ export class CommonService {
 
   getScreenHeight() {
     return this.platform.isBrowser ? window.screen.height : null;
-  }
-
-  getResolution() {
-    return this.platform.isBrowser ? window.screen.width + 'x' + window.screen.height : '';
   }
 
   getShareURL(userId?: string) {

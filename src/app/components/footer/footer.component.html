@@ -1,17 +1,18 @@
+@let o = options();
 <footer class="footer-wrap" [class.m-footer-wrap]="isMobile" [class.p-footer-wrap]="!isMobile">
   <div class="footer">
     <div class="footer-content">
       <ul class="footer-link">
-        @for (link of footerLinks; track link.linkId) {
+        @for (link of footerLinks(); track link.id) {
           <li>
             @if (link.isExternal) {
-              <a [href]="link.linkUrl"
-                 [target]="link.linkTarget"
-                 [title]="link.linkDescription">{{ link.linkName }}</a>
+              <a [href]="link.url"
+                 [target]="link.target"
+                 [title]="link.description">{{ link.name }}</a>
             } @else {
-              <a [routerLink]="link.linkUrl"
-                 [target]="link.linkTarget"
-                 [title]="link.linkDescription">{{ link.linkName }}</a>
+              <a [routerLink]="link.url"
+                 [target]="link.target"
+                 [title]="link.description">{{ link.name }}</a>
             }
           </li>
         }
@@ -20,29 +21,29 @@
         <div class="friend-link">
           <div class="footer-label">友情链接：</div>
           <ul>
-            @for (link of friendLinks; track link.linkId) {
+            @for (link of friendLinks(); track link.id) {
               <li>
-                <a [href]="link.linkUrl"
-                   [target]="link.linkTarget"
-                   [title]="link.linkDescription">{{ link.linkName }}</a>
+                <a [href]="link.url"
+                   [target]="link.target"
+                   [title]="link.description">{{ link.name }}</a>
               </li>
             }
           </ul>
         </div>
       }
-      <div>{{ copyright }}</div>
+      <div>{{ copyright() }}</div>
       <div>&copy; Powered by <a href="https://www.ireadpay.com" target="_blank">抚云科技</a></div>
       @if (!isMobile) {
         <ul class="beian-link">
-          <li><a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">{{ options['icp_code'] }}</a></li>
-          @if (options['record_code']) {
-            <li><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode={{ recordCode }}"
+          <li><a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">{{ o['icp_code'] }}</a></li>
+          @if (o['record_code']) {
+            <li><a href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode={{ recordCode() }}"
                    target="_blank"
-                   rel="nofollow">{{ options['record_code'] }}</a></li>
+                   rel="nofollow">{{ o['record_code'] }}</a></li>
           }
         </ul>
       } @else {
-        <div><a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">{{ options['icp_code'] }}</a></div>
+        <div><a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">{{ o['icp_code'] }}</a></div>
       }
     </div>
     @if (!isMobile) {

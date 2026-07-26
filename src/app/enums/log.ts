@@ -1,25 +1,16 @@
-export enum AdsStatus {
-  UNKNOWN = 0,
-  ENABLED = 1,
-  DISABLED = 2,
-  BLOCKED = 3,
-  ERROR = 4
-}
-
-export enum ActionObjectType {
+export enum LogTargetType {
   POST = 'post',
-  WALLPAPER = 'wallpaper',
   SEARCH = 'search',
-  TOOL_LIST = 'tool_list',
   COMMENT = 'comment',
   USER = 'user',
   HEADER = 'header',
   SIDER = 'sider',
+  WIDGET = 'widget',
   CAROUSEL = 'carousel',
   ADS = 'ads'
 }
 
-export enum ActionType {
+export enum LogActionType {
   // post
   COPY_CODE = 'copy_code',
   // widget

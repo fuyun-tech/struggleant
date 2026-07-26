@@ -1,19 +1,16 @@
-import { BookStatus, BookType } from '../enums/book';
+import { BookType } from 'src/app/enums/book';
 
-export interface BookEntity {
-  bookId: string;
-  bookMetaId: string;
-  bookName: string;
-  bookAuthor?: string;
-  bookTranslator?: string;
-  bookPress?: string;
-  bookEdition?: string;
-  bookIsbn: string;
-  bookIssueCode?: string;
-  bookIssueCodeForeign?: string;
-  bookIssue?: string;
-  bookIssueTotal?: number;
-  bookPrice: number;
-  bookType: BookType;
-  bookStatus: BookStatus;
+export interface BookMetaVo {
+  id: string;
+  name: string;
+  author: string;
+  translator: string;
+  type: BookType;
+}
+
+export interface BookVo {
+  id: string;
+  issue: string;
+  issueTotal: number;
+  bookMeta: BookMetaVo;
 }

@@ -1,12 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty } from 'lodash';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
 import { BreadcrumbComponent } from 'src/app/components/breadcrumb/breadcrumb.component';
 import { ArchiveDataMap } from 'src/app/interfaces/common';
-import { HTMLMetaData } from 'src/app/interfaces/meta';
 import { OptionEntity } from 'src/app/interfaces/option';
-import { TenantAppModel } from 'src/app/interfaces/tenant-app';
+import { TenantAppVo } from 'src/app/interfaces/tenant-app';
 import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { CommonService } from 'src/app/services/common.service';
 import { DestroyService } from 'src/app/services/destroy.service';
@@ -20,31 +19,26 @@ import { UserAgentService } from 'src/app/services/user-agent.service';
   selector: 'app-post-archive',
   imports: [RouterLink, BreadcrumbComponent],
   providers: [DestroyService],
-  templateUrl: './post-archive.component.html',
-  styleUrl: './post-archive.component.less'
+  templateUrl: './post-archive.component.html'
 })
 export class PostArchiveComponent implements OnInit {
-  isMobile = false;
-  dateList!: ArchiveDataMap;
-  yearList: string[] = [];
+  private readonly destroy$ = inject(DestroyService);
+  private readonly uaService = inject(UserAgentService);
+  private readonly commonService = inject(CommonService);
+  private readonly metaService = inject(MetaService);
+  private readonly breadcrumbService = inject(BreadcrumbService);
+  private readonly tenantAppService = inject(TenantAppService);
+  private readonly optionService = inject(OptionService);
+  private readonly postService = inject(PostService);
 
-  protected pageIndex = 'post-archive';
+  readonly isMobile = this.uaService.isMobile;
+  readonly dateList = signal<ArchiveDataMap>({});
+  readonly yearList = signal<string[]>([]);
 
-  private appInfo!: TenantAppModel;
-  private options: OptionEntity = {};
+  protected readonly pageIndex = 'post-archive';
 
-  constructor(
-    private readonly destroy$: DestroyService,
-    private readonly userAgentService: UserAgentService,
-    private readonly commonService: CommonService,
-    private readonly metaService: MetaService,
-    private readonly breadcrumbService: BreadcrumbService,
-    private readonly tenantAppService: TenantAppService,
-    private readonly optionService: OptionService,
-    private readonly postService: PostService
-  ) {
-    this.isMobile = this.userAgentService.isMobile;
-  }
+  private readonly appInfo = signal<TenantAppVo | null>(null);
+  private readonly options = signal<OptionEntity>({});
 
   ngOnInit(): void {
     this.updatePageIndex();
@@ -57,8 +51,8 @@ export class PostArchiveComponent implements OnInit {
         takeUntil(this.destroy$)
       )
       .subscribe(([appInfo, options]) => {
-        this.appInfo = appInfo;
-        this.options = options;
+        this.appInfo.set(appInfo);
+        this.options.set(options);
 
         this.updatePageInfo();
       });
@@ -73,21 +67,22 @@ export class PostArchiveComponent implements OnInit {
       .getPostArchives(true, 0)
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        const { dateList, yearList } = this.postService.transformArchives(res);
-        this.dateList = dateList;
-        this.yearList = yearList;
+        const { dateList, yearList } = this.postService.buildArchiveList(res);
+        this.dateList.set(dateList);
+        this.yearList.set(yearList);
       });
   }
 
   private updatePageInfo() {
-    const titles = ['归档', '期刊', this.appInfo.appName];
-    const metaData: HTMLMetaData = {
+    const appInfo = this.appInfo()!;
+    const titles = ['归档', '期刊', appInfo.name];
+
+    this.metaService.updateHTMLMeta({
       title: titles.join(' - '),
-      description: `${this.appInfo.appName}期刊归档。${this.appInfo.appDescription}`,
-      keywords: this.appInfo.appKeywords,
-      author: this.options['site_author']
-    };
-    this.metaService.updateHTMLMeta(metaData);
+      description: `${appInfo.name}期刊归档。${appInfo.description}`,
+      keywords: appInfo.keywords,
+      author: this.options()['site_author']
+    });
   }
 
   private updateBreadcrumbs(): void {

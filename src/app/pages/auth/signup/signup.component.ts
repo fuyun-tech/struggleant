@@ -1,12 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators
-} from '@angular/forms';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { isEmpty } from 'lodash';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -14,9 +7,9 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
-import { BaseComponent } from 'src/app/base.component';
+import { BaseComponent } from 'src/app/core/base.component';
 import { OptionEntity } from 'src/app/interfaces/option';
-import { TenantAppModel } from 'src/app/interfaces/tenant-app';
+import { TenantAppVo } from 'src/app/interfaces/tenant-app';
 import { AuthService } from 'src/app/services/auth.service';
 import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { CommonService } from 'src/app/services/common.service';
@@ -38,58 +31,52 @@ import {
   templateUrl: './signup.component.html'
 })
 export class SignupComponent extends BaseComponent implements OnInit {
+  private readonly destroy$ = inject(DestroyService);
+  private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly commonService = inject(CommonService);
+  private readonly metaService = inject(MetaService);
+  private readonly breadcrumbService = inject(BreadcrumbService);
+  private readonly tenantAppService = inject(TenantAppService);
+  private readonly optionService = inject(OptionService);
+  private readonly authService = inject(AuthService);
+
   readonly maxEmailLength = USER_EMAIL_LENGTH;
   readonly minPasswordLength = USER_PASSWORD_MIN_LENGTH;
   readonly maxPasswordLength = USER_PASSWORD_MAX_LENGTH;
 
-  signupForm!: FormGroup;
-  passwordVisible = false;
-  signupLoading = false;
+  readonly signupForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email, Validators.maxLength(this.maxEmailLength)]],
+    password: [
+      null,
+      [
+        (control: AbstractControl): ValidationErrors | null => {
+          const password = control.value;
+
+          if (!password) {
+            return { required: true };
+          }
+          if (!USER_PASSWORD_PATTERN.test(password)) {
+            return { pattern: true };
+          }
+          if (password.length < this.minPasswordLength) {
+            return { minlength: true };
+          }
+          if (password.length > this.maxPasswordLength) {
+            return { maxlength: true };
+          }
+          return null;
+        }
+      ]
+    ]
+  });
+  readonly signupLoading = signal(false);
 
   protected pageIndex = 'auth-signup';
 
-  private appInfo!: TenantAppModel;
-  private options: OptionEntity = {};
-
-  constructor(
-    private readonly destroy$: DestroyService,
-    private readonly fb: FormBuilder,
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly commonService: CommonService,
-    private readonly metaService: MetaService,
-    private readonly breadcrumbService: BreadcrumbService,
-    private readonly tenantAppService: TenantAppService,
-    private readonly optionService: OptionService,
-    private readonly authService: AuthService
-  ) {
-    super();
-    this.signupForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(this.maxEmailLength)]],
-      password: [
-        null,
-        [
-          (control: AbstractControl): ValidationErrors | null => {
-            const password = control.value;
-
-            if (!password) {
-              return { required: true };
-            }
-            if (!USER_PASSWORD_PATTERN.test(password)) {
-              return { pattern: true };
-            }
-            if (password.length < this.minPasswordLength) {
-              return { minlength: true };
-            }
-            if (password.length > this.maxPasswordLength) {
-              return { maxlength: true };
-            }
-            return null;
-          }
-        ]
-      ]
-    });
-  }
+  private readonly appInfo = signal<TenantAppVo | null>(null);
+  private readonly options = signal<OptionEntity>({});
 
   ngOnInit(): void {
     this.updatePageIndex();
@@ -101,8 +88,8 @@ export class SignupComponent extends BaseComponent implements OnInit {
         takeUntil(this.destroy$)
       )
       .subscribe(([appInfo, options]) => {
-        this.appInfo = appInfo;
-        this.options = options;
+        this.appInfo.set(appInfo);
+        this.options.set(options);
 
         this.updatePageInfo();
       });
@@ -114,21 +101,23 @@ export class SignupComponent extends BaseComponent implements OnInit {
       return;
     }
     const { email, password } = value;
-    this.signupLoading = true;
+    this.signupLoading.set(true);
+
     this.authService
       .signup({
-        userEmail: email,
-        userPassword: password,
-        userNickname: email.split('@')[0]
+        email,
+        password: password,
+        nickname: email.split('@')[0]
       })
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.signupLoading = false;
-        if (res.userId) {
-          this.router.navigate(['../confirm'], {
+        this.signupLoading.set(false);
+
+        if (res.id) {
+          this.router.navigate(['/user/confirm'], {
             relativeTo: this.route,
             queryParams: {
-              userId: res.userId
+              userId: res.id
             }
           });
         }
@@ -140,11 +129,13 @@ export class SignupComponent extends BaseComponent implements OnInit {
   }
 
   private updatePageInfo() {
+    const appInfo = this.appInfo()!;
+
     this.metaService.updateHTMLMeta({
-      title: ['注册', this.appInfo.appName].join(' - '),
-      description: this.appInfo.appDescription,
-      author: this.options['site_author'],
-      keywords: this.appInfo.appKeywords
+      title: ['注册', appInfo.name].join(' - '),
+      description: appInfo.description,
+      author: this.options()['site_author'],
+      keywords: appInfo.keywords
     });
   }
 

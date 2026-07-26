@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty } from 'lodash';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzImageService } from 'ng-zorro-antd/image';
 import { skipWhile, takeUntil } from 'rxjs';
+import { IconCalendarDateComponent } from 'src/app/icons/icon-calendar-date.component';
 import { ADMIN_URL_PARAM, APP_ID } from '../../config/common.constant';
 import { ResponseCode } from '../../config/response-code.enum';
-import { ActionObjectType, ActionType } from '../../enums/log';
+import { LogActionType, LogTargetType } from '../../enums/log';
 import { PageIndexInfo } from '../../interfaces/common';
-import { TenantAppModel } from '../../interfaces/tenant-app';
+import { TenantAppVo } from '../../interfaces/tenant-app';
 import { AuthService } from '../../services/auth.service';
 import { CommonService } from '../../services/common.service';
 import { DestroyService } from '../../services/destroy.service';
@@ -19,28 +20,26 @@ import { format } from '../../utils/helper';
 
 @Component({
   selector: 'app-m-sider',
-  imports: [RouterLink, NzIconModule],
+  imports: [RouterLink, NzIconModule, IconCalendarDateComponent],
   providers: [DestroyService, NzImageService],
   templateUrl: './m-sider.component.html',
   styleUrl: './m-sider.component.less'
 })
 export class MSiderComponent implements OnInit {
-  siderVisible = false;
-  isSignIn = false;
-  indexInfo?: PageIndexInfo;
-  appInfo?: TenantAppModel;
+  private readonly destroy$ = inject(DestroyService);
+  private readonly imageService = inject(NzImageService);
+  private readonly commonService = inject(CommonService);
+  private readonly tenantAppService = inject(TenantAppService);
+  private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
+  private readonly logService = inject(LogService);
 
-  private adminUrl = '';
+  readonly siderVisible = signal(false);
+  readonly isSignIn = signal(false);
+  readonly indexInfo = signal<PageIndexInfo | null>(null);
+  readonly appInfo = signal<TenantAppVo | null>(null);
 
-  constructor(
-    private readonly destroy$: DestroyService,
-    private readonly imageService: NzImageService,
-    private readonly commonService: CommonService,
-    private readonly tenantAppService: TenantAppService,
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-    private readonly logService: LogService
-  ) {}
+  private readonly adminUrl = signal('');
 
   ngOnInit(): void {
     this.tenantAppService.appInfo$
@@ -49,29 +48,31 @@ export class MSiderComponent implements OnInit {
         takeUntil(this.destroy$)
       )
       .subscribe((appInfo) => {
-        this.appInfo = appInfo;
-
         const urlParam = format(ADMIN_URL_PARAM, this.authService.getToken(), APP_ID);
-        this.adminUrl = this.appInfo.appAdminUrl + '?' + urlParam;
+
+        this.appInfo.set(appInfo);
+        this.adminUrl.set(appInfo.adminUrl + '?' + urlParam);
       });
     this.commonService.siderVisible$.subscribe((visible) => {
-      this.siderVisible = visible;
+      this.siderVisible.set(visible);
     });
     this.commonService.pageIndex$.pipe(takeUntil(this.destroy$)).subscribe((page) => {
-      this.indexInfo = this.commonService.getPageIndexInfo(page);
+      this.indexInfo.set(this.commonService.getPageIndexInfo(page));
     });
     this.userService.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
-      this.isSignIn = !!user.userId;
+      this.isSignIn.set(!!user.id);
     });
   }
 
   closeSider() {
-    this.siderVisible = false;
+    this.siderVisible.set(false);
+
     this.commonService.updateSiderVisible(false);
   }
 
   showWechatCard() {
-    this.siderVisible = false;
+    this.siderVisible.set(false);
+
     this.commonService.updateSiderVisible(false);
     this.imageService.preview([
       {
@@ -81,20 +82,20 @@ export class MSiderComponent implements OnInit {
 
     this.logService
       .logAction({
-        action: ActionType.SHOW_WECHAT_CARD,
-        objectType: ActionObjectType.SIDER
+        action: LogActionType.SHOW_WECHAT_CARD,
+        targetType: LogTargetType.SIDER
       })
       .pipe(takeUntil(this.destroy$))
       .subscribe();
   }
 
   gotoAdmin() {
-    window.open(this.adminUrl);
+    window.open(this.adminUrl());
   }
 
-  logout() {
+  signout() {
     this.authService
-      .logout()
+      .signout()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
         if (res.code === ResponseCode.SUCCESS) {

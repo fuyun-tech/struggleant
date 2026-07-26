@@ -1,28 +1,29 @@
+@let b = book();
 <app-breadcrumb></app-breadcrumb>
 <div class="catalog" [class.p-catalog]="!isMobile" [class.m-catalog]="isMobile">
-  @if (book) {
+  @if (b) {
     <header class="catalog-header">
       <h1>
-        <a [routerLink]="['/journal', book.bookMetaId, book.bookId]"
-           [title]="book.bookName + (book.bookIssue ? ' · ' + book.bookIssue : '')"
-           rel="bookmark">{{ book.bookName }}{{ book.bookIssue ? ' · ' + book.bookIssue : '' }}</a>
+        <a [routerLink]="['/journal', b.bookMeta.id, b.id]"
+           [title]="b.bookMeta.name + (b.issue ? ' · ' + b.issue : '')"
+           rel="bookmark">{{ b.bookMeta.name }}{{ b.issue ? ' · ' + b.issue : '' }}</a>
       </h1>
     </header>
     <div class="divider"></div>
     <div class="catalog-body">
-      @for (catalog of catalogs; track catalog.bookColumnId) {
+      @for (catalog of catalogs(); track catalog.id) {
         <h2>
-          @if (catalog.bookColumnId) {
-            <a [routerLink]="['/journal', book.bookMetaId, book.bookId, 'section', catalog.bookColumnSlug]">{{ catalog.bookColumnName }}</a>
+          @if (catalog.id) {
+            <a [routerLink]="['/journal', b.bookMeta.id, b.id, 'section', catalog.slug]">{{ catalog.name }}</a>
           } @else {
-            <span>{{ catalog.bookColumnName }}</span>
+            <span>{{ catalog.name }}</span>
           }
         </h2>
         @if (catalog.posts.length > 0) {
           <ul>
-            @for (post of catalog.posts; track post.postId; let i = $index) {
+            @for (post of catalog.posts; track post.id; let i = $index) {
               <li>
-                <span>{{ i + 1 }}</span><a [routerLink]="post.postGuid" [title]="post.postTitle" rel="bookmark">{{ post.postTitle }}</a>
+                <span>{{ i + 1 }}</span><a [routerLink]="post.url" [title]="post.title" rel="bookmark">{{ post.title }}</a>
               </li>
             }
           </ul>

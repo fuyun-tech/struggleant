@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { skipWhile, takeUntil } from 'rxjs';
-import { PostType } from '../../enums/post';
-import { PostEntity } from '../../interfaces/post';
+import { ContentType } from '../../enums/post';
+import { PostModel } from '../../interfaces/post';
 import { DestroyService } from '../../services/destroy.service';
 import { PostService } from '../../services/post.service';
 import { UserAgentService } from '../../services/user-agent.service';
@@ -14,21 +14,17 @@ import { UserAgentService } from '../../services/user-agent.service';
   templateUrl: './post-prev-next.component.html'
 })
 export class PostPrevNextComponent implements OnInit {
-  isMobile = false;
-  isChanged = false;
-  prevPost?: PostEntity;
-  nextPost?: PostEntity;
+  private readonly destroy$ = inject(DestroyService);
+  private readonly uaService = inject(UserAgentService);
+  private readonly postService = inject(PostService);
 
-  private postId = '';
-  private isLoaded = false;
+  readonly isMobile = this.uaService.isMobile;
+  readonly isChanged = signal(false);
+  readonly prevPost = signal<PostModel | null>(null);
+  readonly nextPost = signal<PostModel | null>(null);
 
-  constructor(
-    private readonly destroy$: DestroyService,
-    private readonly userAgentService: UserAgentService,
-    private readonly postService: PostService
-  ) {
-    this.isMobile = this.userAgentService.isMobile;
-  }
+  private readonly postId = signal('');
+  private readonly isLoaded = signal(false);
 
   ngOnInit(): void {
     this.postService.activePostId$
@@ -37,11 +33,12 @@ export class PostPrevNextComponent implements OnInit {
         takeUntil(this.destroy$)
       )
       .subscribe((postId) => {
-        this.isChanged = this.postId !== postId;
-        this.postId = postId;
-        if (!this.isLoaded || this.isChanged) {
+        this.isChanged.set(this.postId() !== postId);
+        this.postId.set(postId);
+
+        if (!this.isLoaded() || this.isChanged()) {
           this.getPostsOfPrevAndNext();
-          this.isLoaded = true;
+          this.isLoaded.set(true);
         }
       });
   }
@@ -49,13 +46,13 @@ export class PostPrevNextComponent implements OnInit {
   private getPostsOfPrevAndNext(): void {
     this.postService
       .getPostsOfPrevAndNext({
-        postId: this.postId,
-        postType: PostType.POST
+        id: this.postId(),
+        contentType: ContentType.POST
       })
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.prevPost = res.prevPost;
-        this.nextPost = res.nextPost;
+        this.prevPost.set(res.prevPost);
+        this.nextPost.set(res.nextPost);
       });
   }
 }

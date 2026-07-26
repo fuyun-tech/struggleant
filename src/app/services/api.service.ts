@@ -1,7 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from 'env/environment';
 import { catchError, Observable, of } from 'rxjs';
+import { APP_ID } from '../config/common.constant';
 import { Message } from '../config/message.enum';
 import { HttpResponseEntity } from '../interfaces/http-response';
 import { MessageService } from './message.service';
@@ -10,10 +11,8 @@ import { MessageService } from './message.service';
   providedIn: 'root'
 })
 export class ApiService {
-  constructor(
-    private readonly http: HttpClient,
-    private readonly message: MessageService
-  ) {}
+  private readonly http = inject(HttpClient);
+  private readonly message = inject(MessageService);
 
   getApiUrl(path: string): string {
     return `${environment.apiBase}${path}`;
@@ -27,7 +26,10 @@ export class ApiService {
     return this.http
       .get<T>(this.getApiUrl(url), {
         params: new HttpParams({
-          fromObject: param
+          fromObject: {
+            ...param,
+            appId: APP_ID
+          }
         }),
         observe: 'body'
       })
@@ -39,6 +41,11 @@ export class ApiService {
     body: Record<string, any> | FormData = {},
     showMessage = true
   ): Observable<T> {
+    if (body instanceof FormData) {
+      body.append('appId', APP_ID);
+    } else {
+      body['appId'] = APP_ID;
+    }
     return this.http
       .post<T>(this.getApiUrl(url), body, {
         observe: 'body'

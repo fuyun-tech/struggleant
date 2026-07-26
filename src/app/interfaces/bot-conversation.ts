@@ -3,22 +3,17 @@ import { UserModel } from 'src/app/interfaces/user';
 import { Bot } from './bot';
 
 export interface BotConversationEntity {
-  conversationId: string;
-  conversationTitle: string;
+  id: string;
+  title: string;
   botId: string;
 }
 
 export interface BotConversationModel extends BotConversationEntity {
   userId: string;
-  conversationStatus: ConversationStatus;
-  conversationCreated?: number;
-  conversationModified?: number;
+  status: ConversationStatus;
+  createdAt?: number;
+  updatedAt?: number;
   bot?: Bot;
   user?: UserModel;
   messageCount?: number;
-}
-
-export interface AskAIParam {
-  objectId: string;
-  objectType: 'post' | 'wallpaper';
 }

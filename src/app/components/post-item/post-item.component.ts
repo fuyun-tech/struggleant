@@ -1,25 +1,36 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { Post } from '../../interfaces/post';
+import { IconCalendarDateComponent } from 'src/app/icons/icon-calendar-date.component';
+import { IconChatSquareDotsComponent } from 'src/app/icons/icon-chat-square-dots.component';
+import { IconChatSquareComponent } from 'src/app/icons/icon-chat-square.component';
+import { IconPencilComponent } from 'src/app/icons/icon-pencil.component';
+import { PostVo } from '../../interfaces/post';
 import { NumberViewPipe } from '../../pipes/number-view.pipe';
 import { UserAgentService } from '../../services/user-agent.service';
 
 @Component({
   selector: 'app-post-item',
-  imports: [RouterLink, NzIconModule, DatePipe, NumberViewPipe],
+  imports: [
+    RouterLink,
+    NzIconModule,
+    DatePipe,
+    NumberViewPipe,
+    IconPencilComponent,
+    IconChatSquareDotsComponent,
+    IconChatSquareComponent,
+    IconCalendarDateComponent
+  ],
   templateUrl: './post-item.component.html',
   styleUrl: './post-item.component.less'
 })
 export class PostItemComponent {
-  @Input() post!: Post;
-  @Input() index!: number;
-  @Input() fromSection!: boolean;
+  private readonly uaService = inject(UserAgentService);
 
-  isMobile = false;
+  readonly post = input.required<PostVo>();
+  readonly index = input.required<number>();
+  readonly fromSection = input.required<boolean>();
 
-  constructor(private readonly userAgentService: UserAgentService) {
-    this.isMobile = this.userAgentService.isMobile;
-  }
+  readonly isMobile = this.uaService.isMobile;
 }

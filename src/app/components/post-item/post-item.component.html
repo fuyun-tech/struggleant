@@ -1,77 +1,78 @@
+@let p = post();
 @if (!isMobile) {
   <article class="post-item">
     <div class="post-item-body">
       <div class="post-item-content">
         <header>
-          @if (post.post.postSticky) {
+          @if (p.isPinned) {
             <span class="meta-tag meta-tag-sticky">置顶</span>
           }
-          @if (post.post.postOriginal === 1) {
+          @if (p.isOriginal === 1) {
             <span class="meta-tag meta-tag-original">原创</span>
           }
-          @if (post.post.postPayFlag) {
+          @if (p.isPaid) {
             <span class="meta-tag meta-tag-pay">付费</span>
           }
-          @if (post.post.postLoginFlag) {
+          @if (p.visibility === 3) {
             <span class="meta-tag meta-tag-vip">会员</span>
           }
-          <h2><a [routerLink]="post.post.postGuid"
-                 [title]="post.post.postTitle"
-                 rel="bookmark">{{ post.post.postTitle }}</a></h2>
+          <h2>
+            <a [routerLink]="p.url" [title]="p.title" rel="bookmark">{{ p.title }}</a>
+          </h2>
         </header>
         <div class="post-item-meta">
-          <div class="auto-fit" title="作者: {{ post.post.postAuthor || post.post.owner.userNickname }}">
-            <nz-icon nzType="user"/><span>{{ post.post.postAuthor || post.post.owner.userNickname }}</span>
+          <div class="auto-fit" title="作者: {{ p.author || p.creator.nickname }}">
+            <nz-icon nzType="user"/><span>{{ p.author || p.creator.nickname }}</span>
           </div>
-          @if (post.book) {
-            <div [title]="post.book.bookName">
-              <nz-icon nzType="folder"/><span>{{ post.book.bookName }}</span>
+          @if (p.book) {
+            <div [title]="p.book.bookMeta.name">
+              <nz-icon nzType="folder"/><span>{{ p.book.bookMeta.name }}</span>
             </div>
-            @if (post.book.bookIssue) {
-              <a [routerLink]="['/journal', post.book.bookMetaId, post.book.bookId]" [title]="post.book.bookIssue">
-                <nz-icon nzType="book"/><span>{{ post.book.bookIssue }}</span>
+            @if (p.book.issue) {
+              <a [routerLink]="['/journal', p.book.bookMeta.id, p.book.id]" [title]="p.book.issue">
+                <nz-icon nzType="book"/><span>{{ p.book.issue }}</span>
               </a>
             }
           }
           <div>
-            <nz-icon nzType="eye"/><span>{{ post.post.postViews | numberView: 'K' }}</span>
+            <nz-icon nzType="eye"/><span>{{ p.postStat.viewCount | numberView: 'K' }}</span>
           </div>
-          @if (post.post.commentFlag !== 'closed') {
-            <a [routerLink]="post.post.postGuid" fragment="comments" title="《{{ post.post.postTitle }}》评论">
-              @if (post.post.postComments > 0) {
-                <span class="fi fi-chat-square-dots"></span><span>{{ post.post.postComments | numberView: 'K' }}</span>
+          @if (p.commentStatus !== 2) {
+            <a [routerLink]="p.url" fragment="comments" title="《{{ p.title }}》评论">
+              @if (p.postStat.commentCount > 0) {
+                <fi-chat-square-dots class="fi"/><span>{{ p.postStat.commentCount | numberView: 'K' }}</span>
               } @else {
-                <span class="fi fi-chat-square"></span><span>0</span>
+                <fi-chat-square class="fi"/><span>0</span>
               }
             </a>
           }
         </div>
-        <div class="post-item-excerpt">
-          <span [innerHTML]="post.post.postExcerpt"></span>
+        <div class="post-item-summary">
+          <span [innerHTML]="p.summary"></span>
         </div>
       </div>
       <div class="post-item-cover">
-        <a [routerLink]="post.post.postGuid" [title]="post.post.postTitle">
-          @if (index > 3) {
-            <span class="post-item-cover-img lazyload" [attr.data-bg]="post.post.cover"></span>
+        <a [routerLink]="p.url" [title]="p.title">
+          @if (index() > 3) {
+            <span class="post-item-cover-img lazyload" [attr.data-bg]="p.coverUrl"></span>
           } @else {
-            <span class="post-item-cover-img" [style.background-image]="'url(' + post.post.cover + ')'"></span>
+            <span class="post-item-cover-img" [style.background-image]="'url(' + p.coverUrl + ')'"></span>
           }
           <span class="overlay"></span>
         </a>
       </div>
     </div>
-    @if (post.bookColumn || post.tags.length > 0) {
+    @if (p.bookColumn || p.tags.length > 0) {
       <div class="post-item-meta-footer">
         <div>
           <div class="post-item-meta-row">
-            <div class="post-item-meta-icon"><span class="fi fi-calendar-date"></span></div>
-            <div title="发布: {{ post.post.postDate | date:'yyyy-MM-dd' }}">
-              <span>{{ post.post.postDate | date:'yyyy-MM-dd' }}</span>
+            <div class="post-item-meta-icon"><fi-calendar-date class="fi"/></div>
+            <div title="发布: {{ p.publishedAt | date:'yyyy-MM-dd' }}">
+              <span>{{ p.publishedAt | date:'yyyy-MM-dd' }}</span>
             </div>
           </div>
         </div>
-        @if (post.bookColumn) {
+        @if (p.bookColumn) {
           <div>
             <div>
               <div class="post-item-meta-icon">
@@ -79,32 +80,32 @@
               </div>
               <ul>
                 <li>
-                  @if (fromSection) {
-                    @if (post.book) {
-                      <a [routerLink]="['/journal', post.book.bookMetaId, post.post.bookId, 'section', post.bookColumn.bookColumnSlug]"
-                         [title]="post.bookColumn.bookColumnName"
-                         rel="category">{{ post.bookColumn.bookColumnName }}</a>
+                  @if (fromSection()) {
+                    @if (p.book) {
+                      <a [routerLink]="['/journal', p.book.bookMeta.id, p.id, 'section', p.bookColumn.slug]"
+                         [title]="p.bookColumn.name"
+                         rel="category">{{ p.bookColumn.name }}</a>
                     }
                   } @else {
-                    <a [routerLink]="['/column', post.bookColumn.bookColumnId]"
-                       [title]="post.bookColumn.bookColumnName"
-                       rel="category">{{ post.bookColumn.bookColumnName }}</a>
+                    <a [routerLink]="['/column', p.bookColumn.id]"
+                       [title]="p.bookColumn.name"
+                       rel="category">{{ p.bookColumn.name }}</a>
                   }
                 </li>
               </ul>
             </div>
           </div>
         }
-        @if (post.tags.length > 0) {
+        @if (p.tags.length > 0) {
           <div>
             <div>
               <div class="post-item-meta-icon">
                 <nz-icon nzType="tag"/>
               </div>
               <ul>
-                @for (tag of post.tags; track tag.tagId) {
+                @for (tag of p.tags; track tag.tag.id) {
                   <li>
-                    <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
+                    <a [routerLink]="['/tag', tag.tag.name]" [title]="tag.tag.name" rel="category">{{ tag.tag.name }}</a>
                   </li>
                 }
               </ul>
@@ -118,103 +119,101 @@
   <article class="m-post-item">
     <header>
       <h2>
-        @if (post.post.postSticky) {
+        @if (p.isPinned) {
           <span class="m-meta-tag meta-tag-sticky"><nz-icon nzType="vertical-align-top"/></span>
         }
-        @if (post.post.postPayFlag) {
+        @if (p.isPaid) {
           <span class="m-meta-tag meta-tag-pay"><nz-icon nzType="lock"/></span>
         }
-        @if (post.post.postLoginFlag) {
+        @if (p.visibility === 3) {
           <span class="m-meta-tag meta-tag-vip"><nz-icon nzType="user-add"/></span>
         }
-        <a [routerLink]="post.post.postGuid" [title]="post.post.postTitle" rel="bookmark">{{ post.post.postTitle }}</a>
+        <a [routerLink]="p.url" [title]="p.title" rel="bookmark">{{ p.title }}</a>
       </h2>
       <div class="m-post-item-stat">
-        <span><nz-icon nzType="eye"/><span>{{ post.post.postViews | numberView: 'K' }}</span></span>
-        @if (post.post.commentFlag !== 'closed') {
-          <a [routerLink]="post.post.postGuid" fragment="comments" title="《{{ post.post.postTitle }}》评论">
-            @if (post.post.postComments > 0) {
-              <span class="fi fi-chat-square-dots"></span><span>{{ post.post.postComments | numberView: 'K' }}</span>
+        <span><nz-icon nzType="eye"/><span>{{ p.postStat.viewCount | numberView: 'K' }}</span></span>
+        @if (p.commentStatus !== 2) {
+          <a [routerLink]="p.url" fragment="comments" title="《{{ p.title }}》评论">
+            @if (p.postStat.commentCount > 0) {
+              <fi-chat-square-dots class="fi"/><span>{{ p.postStat.commentCount | numberView: 'K' }}</span>
             } @else {
-              <span class="fi fi-chat-square"></span><span>0</span>
+              <fi-chat-square class="fi"/><span>0</span>
             }
           </a>
         }
       </div>
     </header>
     <div class="m-post-item-meta">
-      <span class="auto-fit" title="作者: {{ post.post.postAuthor || post.post.owner.userNickname }}">
-        <nz-icon nzType="user"/><span>{{ post.post.postAuthor || post.post.owner.userNickname }}</span>
+      <span class="auto-fit" title="作者: {{ p.author || p.creator.nickname }}">
+        <nz-icon nzType="user"/><span>{{ p.author || p.creator.nickname }}</span>
       </span>
-      @if (post.book) {
-        <span [title]="post.book.bookName">
-          <nz-icon nzType="folder"/><span>{{ post.book.bookName }}</span>
+      @if (p.book) {
+        <span [title]="p.book.bookMeta.name">
+          <nz-icon nzType="folder"/><span>{{ p.book.bookMeta.name }}</span>
         </span>
-        @if (post.book.bookIssue) {
-          <a [routerLink]="['/journal', post.book.bookMetaId, post.book.bookId]" [title]="post.book.bookIssue">
-            <nz-icon nzType="book"/><span>{{ post.book.bookIssue }}</span>
+        @if (p.book.issue) {
+          <a [routerLink]="['/journal', p.book.bookMeta.id, p.book.id]" [title]="p.book.issue">
+            <nz-icon nzType="book"/><span>{{ p.book.issue }}</span>
           </a>
         }
       }
-      @if (post.post.postOriginal === 1) {
-        <span title="{{ post.post.owner.userNickname }}原创">
-          <span class="fi fi-pencil"></span><span>原创</span>
-        </span>
+      @if (p.isOriginal === 1) {
+        <span title="{{ p.creator.nickname }}原创"><fi-pencil class="fi"/><span>原创</span></span>
       }
     </div>
-    @if (post.post.cover) {
+    @if (p.coverUrl) {
       <div class="m-post-item-cover">
-        <a [routerLink]="post.post.postGuid" [title]="post.post.postTitle">
-          @if (index > 3) {
-            <span class="m-post-item-cover-img lazyload" [attr.data-bg]="post.post.cover"></span>
+        <a [routerLink]="p.url" [title]="p.title">
+          @if (index() > 3) {
+            <span class="m-post-item-cover-img lazyload" [attr.data-bg]="p.coverUrl"></span>
           } @else {
-            <span class="m-post-item-cover-img" [style.background-image]="'url(' + post.post.cover + ')'"></span>
+            <span class="m-post-item-cover-img" [style.background-image]="'url(' + p.coverUrl + ')'"></span>
           }
           <span class="overlay"></span>
         </a>
       </div>
     }
-    <div class="m-post-item-excerpt">
-      <span [innerHTML]="post.post.postExcerpt"></span>
+    <div class="m-post-item-summary">
+      <span [innerHTML]="p.summary"></span>
     </div>
     <div class="m-post-item-meta-footer">
       <div class="m-post-item-meta-row">
-        <div class="m-post-item-meta-icon"><span class="fi fi-calendar-date"></span></div>
-        <div title="发布: {{ post.post.postDate | date:'yyyy-MM-dd' }}">
-          <span>{{ post.post.postDate | date:'yyyy-MM-dd' }}</span>
+        <div class="m-post-item-meta-icon"><fi-calendar-date class="fi"/></div>
+        <div title="发布: {{ p.publishedAt | date:'yyyy-MM-dd' }}">
+          <span>{{ p.publishedAt | date:'yyyy-MM-dd' }}</span>
         </div>
       </div>
-      @if (post.bookColumn) {
+      @if (p.bookColumn) {
         <div>
           <div class="m-post-item-meta-icon">
             <nz-icon nzType="partition"/>
           </div>
           <ul>
             <li>
-              @if (fromSection) {
-                @if (post.book) {
-                  <a [routerLink]="['/journal', post.book.bookMetaId, post.post.bookId, 'section', post.bookColumn.bookColumnSlug]"
-                     [title]="post.bookColumn.bookColumnName"
-                     rel="category">{{ post.bookColumn.bookColumnName }}</a>
+              @if (fromSection()) {
+                @if (p.book) {
+                  <a [routerLink]="['/journal', p.book.bookMeta.id, p.id, 'section', p.bookColumn.slug]"
+                     [title]="p.bookColumn.name"
+                     rel="category">{{ p.bookColumn.name }}</a>
                 }
               } @else {
-                <a [routerLink]="['/column', post.bookColumn.bookColumnId]"
-                   [title]="post.bookColumn.bookColumnName"
-                   rel="category">{{ post.bookColumn.bookColumnName }}</a>
+                <a [routerLink]="['/column', p.bookColumn.id]"
+                   [title]="p.bookColumn.name"
+                   rel="category">{{ p.bookColumn.name }}</a>
               }
             </li>
           </ul>
         </div>
       }
-      @if (post.tags.length > 0) {
+      @if (p.tags.length > 0) {
         <div>
           <div class="m-post-item-meta-icon">
             <nz-icon nzType="tag"/>
           </div>
           <ul>
-            @for (tag of post.tags; track tag.tagId) {
+            @for (tag of p.tags; track tag.tag.id) {
               <li>
-                <a [routerLink]="['/tag', tag.tagName]" [title]="tag.tagName" rel="category">{{ tag.tagName }}</a>
+                <a [routerLink]="['/tag', tag.tag.name]" [title]="tag.tag.name" rel="category">{{ tag.tag.name }}</a>
               </li>
             }
           </ul>

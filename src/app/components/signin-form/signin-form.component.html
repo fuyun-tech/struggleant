@@ -1,0 +1,77 @@
+<form nz-form nzLayout="vertical" class="auth-form" [class.auth-form-padding]="padding()" [formGroup]="signinForm">
+  <nz-form-item>
+    <nz-form-label>用户名或邮箱</nz-form-label>
+    <nz-form-control [nzErrorTip]="nameErrorTpl">
+      <input nz-input type="text" formControlName="name" [maxlength]="maxNameLength" placeholder="用户名或邮箱地址"/>
+      <ng-template #nameErrorTpl let-control>
+        @if (control.hasError('required')) {
+          请输入用户名或邮箱
+        }
+        @if (control.hasError('maxlength')) {
+          用户名或邮箱最大长度为 {{ maxNameLength }} 位
+        }
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <nz-form-label>密码</nz-form-label>
+    <nz-form-control [nzErrorTip]="confirmErrorTpl">
+      <nz-input-password>
+        <input nz-input
+               formControlName="password"
+               [maxlength]="maxPasswordLength"
+               autocomplete="off"
+               placeholder="用户密码"/>
+      </nz-input-password>
+      <ng-template #confirmErrorTpl let-control>
+        @if (control.hasError('required')) {
+          请输入密码
+        }
+        @if (control.hasError('maxlength')) {
+          密码最大长度为 {{ maxPasswordLength }} 位
+        }
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+  <nz-form-item>
+    <div class="auth-actions">
+      <div>
+        @if (isSignupEnable()) {
+          <span class="auth-action">
+            <a class="auth-link" routerLink="/user/signup" title="立即注册"><nz-icon nzType="user-add"/>立即注册</a>
+          </span>
+        }
+        <span class="auth-action">
+          <a class="auth-link" routerLink="/user/forgot" title="忘记密码"><nz-icon nzType="key"/>忘记密码</a>
+        </span>
+      </div>
+      <button nz-button type="submit" nzType="primary" (click)="signin()" [nzLoading]="signinLoading()">登录</button>
+    </div>
+  </nz-form-item>
+  @if (isOauthEnable()) {
+    @let o = oauthMap();
+    <nz-divider class="separator" nzText="其他登录方式"/>
+    <div class="auth-type">
+      <nz-icon nzType="wechat"
+               class="auth-type-wechat"
+               [class.disabled]="!o['wechat']"
+               (click)="oauthSignin('wechat')"/>
+      <nz-icon nzType="qq"
+               class="auth-type-qq"
+               [class.disabled]="!o['qq']"
+               (click)="oauthSignin('qq')"/>
+      <nz-icon nzType="alipay"
+               class="auth-type-alipay"
+               [class.disabled]="!o['alipay']"
+               (click)="oauthSignin('alipay')"/>
+      <nz-icon nzType="weibo"
+               class="auth-type-weibo"
+               [class.disabled]="!o['weibo']"
+               (click)="oauthSignin('weibo')"/>
+      <nz-icon nzType="github"
+               class="auth-type-github"
+               [class.disabled]="!o['github']"
+               (click)="oauthSignin('github')"/>
+    </div>
+  }
+</form>

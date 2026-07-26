@@ -5,13 +5,14 @@ export enum ApiUrl {
   OPTION = '/options/option',
   OPTION_FRONTEND = '/options/frontend',
   OPTION_CAROUSELS = '/options/carousels',
-  // util
+  // sitemap
   SITEMAP_POST = '/posts/post-sitemap',
   SITEMAP_PAGE = '/posts/page-sitemap',
   // post
   POSTS = '/posts',
   POST = '/posts/post',
   POST_HOT = '/posts/hot',
+  POST_LATEST = '/posts/latest',
   POST_RANDOM = '/posts/random',
   POST_RELATED = '/posts/related',
   POST_LIST_BY_BOOK = '/posts/list-by-book',
@@ -19,8 +20,8 @@ export enum ApiUrl {
   POST_LIST_FOR_RSS = '/posts/list-for-rss',
   POST_PREV_AND_NEXT = '/posts/prev-and-next',
   POST_ARCHIVES = '/posts/archives',
-  // taxonomy
-  TAXONOMY_TREE = '/taxonomies/taxonomy-tree',
+  // category
+  CATEGORY_TREE = '/categories/category-tree',
   // book
   BOOK = '/books/book',
   // link
@@ -33,15 +34,15 @@ export enum ApiUrl {
   // vote
   VOTE = '/votes/vote',
   // auth
-  AUTH_LOGIN = '/auth/login',
-  AUTH_LOGOUT = '/auth/logout',
+  AUTH_SIGNIN = '/auth/signin',
+  AUTH_SIGNOUT = '/auth/signout',
   AUTH_SIGNUP = '/auth/signup',
   AUTH_SEND_CODE = '/auth/send-code',
   AUTH_VERIFY = '/auth/verify',
-  AUTH_THIRD_LOGIN = '/auth/third-login',
+  AUTH_OAUTH = '/auth/oauth',
   AUTH_RESET_PASSWORD = '/auth/reset-password',
   // user
-  USER_LOGIN_INFO = '/users/login-user',
+  USER_PROFILE = '/users/profile',
   USER_SIGNUP_INFO = '/users/signup-user',
   // favorite
   FAVORITE = '/favorites/favorite',

@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { isEmpty, uniq } from 'lodash';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -8,9 +8,12 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
 import { CarouselComponent } from 'src/app/components/carousel/carousel.component';
 import { PostItemComponent } from 'src/app/components/post-item/post-item.component';
+import { IconCalendarDateComponent } from 'src/app/icons/icon-calendar-date.component';
+import { IconChatSquareDotsComponent } from 'src/app/icons/icon-chat-square-dots.component';
+import { IconChatSquareComponent } from 'src/app/icons/icon-chat-square.component';
 import { OptionEntity } from 'src/app/interfaces/option';
-import { Post, PostEntity } from 'src/app/interfaces/post';
-import { TenantAppModel } from 'src/app/interfaces/tenant-app';
+import { PostEntity, PostModel, PostVo } from 'src/app/interfaces/post';
+import { TenantAppVo } from 'src/app/interfaces/tenant-app';
 import { NumberViewPipe } from 'src/app/pipes/number-view.pipe';
 import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { CommonService } from 'src/app/services/common.service';
@@ -31,35 +34,34 @@ import { UserAgentService } from 'src/app/services/user-agent.service';
     NzEmptyComponent,
     CarouselComponent,
     NumberViewPipe,
-    PostItemComponent
+    PostItemComponent,
+    IconChatSquareDotsComponent,
+    IconChatSquareComponent,
+    IconCalendarDateComponent
   ],
   providers: [DestroyService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.less'
 })
 export class HomeComponent implements OnInit {
-  isMobile = false;
-  hotPosts: PostEntity[] = [];
-  latestPosts: Post[] = [];
-  randomPosts: PostEntity[] = [];
+  private readonly destroy$ = inject(DestroyService);
+  private readonly uaService = inject(UserAgentService);
+  private readonly commonService = inject(CommonService);
+  private readonly metaService = inject(MetaService);
+  private readonly breadcrumbService = inject(BreadcrumbService);
+  private readonly tenantAppService = inject(TenantAppService);
+  private readonly optionService = inject(OptionService);
+  private readonly postService = inject(PostService);
 
-  protected pageIndex = 'index';
+  readonly isMobile = this.uaService.isMobile;
+  readonly hotPosts = signal<PostEntity[]>([]);
+  readonly latestPosts = signal<PostVo[]>([]);
+  readonly randomPosts = signal<PostModel[]>([]);
 
-  private appInfo!: TenantAppModel;
-  private options: OptionEntity = {};
+  protected readonly pageIndex = 'index';
 
-  constructor(
-    private readonly destroy$: DestroyService,
-    private readonly userAgentService: UserAgentService,
-    private readonly commonService: CommonService,
-    private readonly metaService: MetaService,
-    private readonly breadcrumbService: BreadcrumbService,
-    private readonly tenantAppService: TenantAppService,
-    private readonly optionService: OptionService,
-    private readonly postService: PostService
-  ) {
-    this.isMobile = this.userAgentService.isMobile;
-  }
+  private readonly appInfo = signal<TenantAppVo | null>(null);
+  private readonly options = signal<OptionEntity>({});
 
   ngOnInit(): void {
     this.updatePageIndex();
@@ -71,8 +73,8 @@ export class HomeComponent implements OnInit {
         takeUntil(this.destroy$)
       )
       .subscribe(([appInfo, options]) => {
-        this.appInfo = appInfo;
-        this.options = options;
+        this.appInfo.set(appInfo);
+        this.options.set(options);
 
         this.updatePageInfo();
         this.getLatestPosts();
@@ -89,14 +91,10 @@ export class HomeComponent implements OnInit {
 
   private getLatestPosts() {
     this.postService
-      .getPosts({
-        page: 1,
-        size: this.isMobile ? 10 : 8,
-        sticky: 0
-      })
+      .getLatestPosts(this.isMobile ? 10 : 8)
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.latestPosts = res.posts?.list || [];
+        this.latestPosts.set(res || []);
       });
   }
 
@@ -105,7 +103,7 @@ export class HomeComponent implements OnInit {
       .getRandomPosts(8, true)
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.randomPosts = res || [];
+        this.randomPosts.set(res || []);
       });
   }
 
@@ -114,14 +112,15 @@ export class HomeComponent implements OnInit {
       .getHotPosts()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        this.hotPosts = res;
+        this.hotPosts.set(res);
       });
   }
 
   private updatePageInfo() {
-    const titles = [this.appInfo.appSlogan || '首页', this.appInfo.appName];
-    const description = this.appInfo.appDescription;
-    const keywords: string[] = [...this.appInfo.keywords];
+    const appInfo = this.appInfo()!;
+    const titles = [appInfo.slogan || '首页', appInfo.name];
+    const description = appInfo.description;
+    const keywords: string[] = [...appInfo.keywordList];
 
     this.metaService.updateHTMLMeta({
       title: titles.join(' - '),
@@ -129,7 +128,7 @@ export class HomeComponent implements OnInit {
       keywords: uniq(keywords)
         .filter((item) => !!item)
         .join(','),
-      author: this.options['site_author']
+      author: this.options()['site_author']
     });
   }
 

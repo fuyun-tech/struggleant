@@ -1,36 +1,38 @@
-<div class="m-sider" [class.open]="siderVisible">
+@let ai = appInfo();
+@let ii = indexInfo();
+<div class="m-sider" [class.open]="siderVisible()">
   <aside class="m-sider-body">
     <div class="m-sider-info">
       <div class="m-sider-info-logo">
-        <img src="/favicon.png" [alt]="appInfo?.appName"/>
+        <img src="/favicon.png" [alt]="ai?.name"/>
       </div>
       <div class="m-sider-info-profile">
-        <h2 class="m-sider-info-profile-name">{{ appInfo?.appName }}</h2>
-        @if (appInfo?.appSlogan) {
-          <div class="m-sider-info-profile-slogan">{{ appInfo?.appSlogan }}</div>
+        <h2 class="m-sider-info-profile-name">{{ ai?.name }}</h2>
+        @if (ai?.slogan) {
+          <div class="m-sider-info-profile-slogan">{{ ai?.slogan }}</div>
         }
       </div>
     </div>
     <div class="m-sider-tool">
       <div title="深色模式: 关闭">
-        <nz-icon nzType="sun" theme="fill"/>
+        <nz-icon nzType="sun" nzTheme="fill"/>
       </div>
     </div>
     <nav class="m-sider-nav">
       <ul class="m-sider-nav-list">
-        <li [class.active]="indexInfo?.isHome">
+        <li [class.active]="ii?.isHome">
           <a routerLink="/" (click)="closeSider()"><nz-icon nzType="home"/><span>首页</span></a>
         </li>
-        <li [class.active]="indexInfo?.isPost && indexInfo?.subPage !== 'archive'">
+        <li [class.active]="ii?.isPost && ii?.subPage !== 'archive'">
           <a routerLink="/posts" title="期刊" (click)="closeSider()"><nz-icon nzType="form"/><span>期刊</span></a>
         </li>
-        <li [class.active]="indexInfo?.subPage === 'about'">
+        <li [class.active]="ii?.subPage === 'about'">
           <a routerLink="/about" title="关于" (click)="closeSider()"><nz-icon nzType="info-circle"/><span>关于</span></a>
         </li>
-        <li [class.active]="indexInfo?.fullPage === 'post-archive'">
+        <li [class.active]="ii?.fullPage === 'post-archive'">
           <a routerLink="/archive"
              title="期刊归档"
-             (click)="closeSider()"><span class="fi fi-calendar-date"></span><span>期刊归档</span></a>
+             (click)="closeSider()"><fi-calendar-date class="fi"/><span>期刊归档</span></a>
         </li>
         <div class="m-separator"></div>
         <li>
@@ -41,12 +43,12 @@
              title="Follow us on GitHub" target="_blank"><nz-icon nzType="github"/><span>GitHub</span></a>
         </li>
         <div class="m-separator"></div>
-        @if (isSignIn) {
+        @if (isSignIn()) {
           <li><a (click)="gotoAdmin()"><nz-icon nzType="dashboard"/><span>个人中心</span></a></li>
-          <li><a (click)="logout()"><nz-icon nzType="logout"/><span>退出登录</span></a></li>
+          <li><a (click)="signout()"><nz-icon nzType="logout"/><span>退出登录</span></a></li>
         } @else {
           <li>
-            <a routerLink="/user/login" title="登录" (click)="closeSider()"><nz-icon nzType="login"/><span>登录</span></a>
+            <a routerLink="/user/signin" title="登录" (click)="closeSider()"><nz-icon nzType="login"/><span>登录</span></a>
           </li>
         }
       </ul>

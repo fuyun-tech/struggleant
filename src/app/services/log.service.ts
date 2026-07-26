@@ -1,12 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CommonService } from 'src/app/services/common.service';
+import { APP_ID } from 'src/app/config/common.constant';
 import { ApiUrl } from '../config/api-url';
-import { APP_ID } from '../config/common.constant';
-import { AdsStatus } from '../enums/log';
 import { HttpResponseEntity } from '../interfaces/http-response';
-import { AccessLog, ActionLog, LeaveLog } from '../interfaces/log';
+import { AccessLog, ActionLog } from '../interfaces/log';
 import { ApiService } from './api.service';
+import { CommonService } from './common.service';
+
+export enum AdsStatus {
+  UNKNOWN = 0,
+  ENABLED = 1,
+  DISABLED = 2,
+  BLOCKED = 3,
+  ERROR = 4
+}
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +24,7 @@ export class LogService {
     private readonly commonService: CommonService
   ) {}
 
-  parseAccessLog(param: {
+  buildAccessLog(param: {
     initialized: boolean;
     referrer: string;
     isNew: boolean;
@@ -36,8 +43,7 @@ export class LogService {
       sw: this.commonService.getScreenWidth(),
       sh: this.commonService.getScreenHeight(),
       cd: window.screen.colorDepth.toString(),
-      ia: initialized ? 1 : 0,
-      appId: APP_ID
+      ia: initialized ? 1 : 0
     };
   }
 
@@ -45,24 +51,12 @@ export class LogService {
     return this.apiService.httpPost(ApiUrl.ACCESS_LOG, log, false);
   }
 
-  logAdsStatus(logId: string, status: AdsStatus): Observable<HttpResponseEntity> {
-    return this.apiService.httpPost(
-      ApiUrl.ACCESS_LOG_PLUGIN,
-      {
-        logId,
-        status,
-        appId: APP_ID
-      },
-      false
-    );
-  }
-
-  logLeave(log: Omit<LeaveLog, 'appId'>): void {
-    if (log.logId) {
+  logLeave(logId: string): void {
+    if (logId) {
       navigator.sendBeacon(
         this.apiService.getApiUrl(ApiUrl.ACCESS_LOG_LEAVE),
         JSON.stringify({
-          ...log,
+          logId,
           appId: APP_ID
         })
       );
@@ -74,9 +68,18 @@ export class LogService {
       ApiUrl.ACTION_LOG,
       {
         ...log,
-        ref: location.href,
-        site: 'web',
-        appId: APP_ID
+        ref: location.href
+      },
+      false
+    );
+  }
+
+  logAdsStatus(logId: string, status: AdsStatus): Observable<HttpResponseEntity> {
+    return this.apiService.httpPost(
+      ApiUrl.ACCESS_LOG_PLUGIN,
+      {
+        logId,
+        status
       },
       false
     );

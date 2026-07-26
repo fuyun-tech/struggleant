@@ -1,22 +1,17 @@
-import { Inject, Injectable, Optional, REQUEST } from '@angular/core';
-import { IBrowser, ICPU, IDevice, IEngine, IOS, IResult, UAParser } from 'ua-parser-js';
-import { UserAgentInfo } from '../interfaces/common';
+import { inject, Injectable, REQUEST } from '@angular/core';
+import { IBrowser, ICPU, IDevice, IEngine, IOS, UAParser } from 'ua-parser-js';
 import { PlatformService } from './platform.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserAgentService {
-  private readonly _uaResult!: IResult;
-  private readonly _uaString: string;
-
-  constructor(
-    private readonly platform: PlatformService,
-    @Optional() @Inject(REQUEST) private readonly request: Request
-  ) {
-    this._uaString = this.platform.isBrowser ? navigator.userAgent : this.request?.headers.get('user-agent') || '';
-    this._uaResult = UAParser(this._uaString);
-  }
+  private readonly platform = inject(PlatformService);
+  private readonly request = inject(REQUEST);
+  private readonly _uaString = this.platform.isBrowser
+    ? navigator.userAgent
+    : this.request?.headers.get('user-agent') || '';
+  private readonly _uaResult = UAParser(this._uaString);
 
   get browser(): IBrowser {
     return this._uaResult.browser;
@@ -44,22 +39,6 @@ export class UserAgentService {
 
   get uaString() {
     return this._uaString;
-  }
-
-  get uaInfo(): UserAgentInfo {
-    return {
-      os: this.os.name || '',
-      osVersion: this.os.version || '',
-      architecture: this.cpu.architecture || '',
-      browser: this.browser.name || '',
-      browserVersion: this.browser.version || '',
-      engine: this.engine.name || '',
-      engineVersion: this.engine.version || '',
-      isMobile: this.isMobile,
-      isDesktop: this.isDesktop,
-      isCrawler: this.isCrawler,
-      userAgent: this._uaString
-    };
   }
 
   get isIE() {
@@ -104,16 +83,6 @@ export class UserAgentService {
 
   get isDesktop() {
     return !this.isMobile;
-  }
-
-  get isCrawler() {
-    return (
-      !this.os.name ||
-      !this.browser.name ||
-      /spider|googlebot|bingbot|applebot|amazonbot|crawler|robot/i.test(this._uaString) ||
-      /Mediapartners-Google|APIs-Google|AdsBot-Google|GoogleAdSenseInfeed/i.test(this._uaString) ||
-      /Storebot-Google|Google-InspectionTool|GoogleOther/i.test(this._uaString)
-    );
   }
 
   private checkBrowser(browserNames: string[]) {

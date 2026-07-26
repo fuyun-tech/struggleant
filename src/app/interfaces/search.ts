@@ -1,4 +1,4 @@
-import { Post } from './post';
+import { PostVo } from './post';
 
 export interface SearchParam {
   keyword: string;
@@ -6,6 +6,6 @@ export interface SearchParam {
   size?: number;
 }
 
-export interface SearchResponse extends Post {
+export interface SearchResponse extends PostVo {
   score: number;
 }
