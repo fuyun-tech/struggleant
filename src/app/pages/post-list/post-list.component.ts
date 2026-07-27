@@ -221,7 +221,7 @@ export class PostListComponent implements OnInit {
     const postBook = this.postBook();
     const postBookColumn = this.postBookColumn();
     const titles: string[] = [appInfo.name];
-    const keywords: string[] = [...appInfo.keywords];
+    const keywords: string[] = [...appInfo.keywordList];
     let description = '';
 
     if (this.category() && breadcrumbData.length > 0) {

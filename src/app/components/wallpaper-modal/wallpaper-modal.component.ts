@@ -54,7 +54,7 @@ export class WallpaperModalComponent implements OnChanges {
   }
 
   gotoWallpaper() {
-    window.open(`${environment.wallpaperHost}/detail?ref=sa_modal`);
+    window.open(`${environment.wallpaperHost}/list?ref=sa_modal`);
   }
 
   closeModal() {
