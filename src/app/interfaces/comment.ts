@@ -1,5 +1,4 @@
 import { CommentStatus, CommentTargetType } from '../enums/comment';
-import { IPInfo } from './common';
 import { UserModel } from './user';
 
 export interface CommentDto {
@@ -21,13 +20,16 @@ export interface CommentModel extends CommentDto {
   userEmailHash: string;
   userHomepage: string;
   userIp: string;
+  ipCountry: string;
+  ipProvince: string;
+  ipCity: string;
+  ipIsp: string;
   userAgent: string;
   parentId: string;
   userId: string;
   likes: number;
   dislikes: number;
   user?: UserModel;
-  ipInfo: IPInfo;
   userLocation: string;
   liked?: boolean;
   disliked?: boolean;

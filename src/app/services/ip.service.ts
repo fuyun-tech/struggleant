@@ -9,12 +9,23 @@ export class IpService {
     if (!ipInfo) {
       return '未知地区';
     }
+    const location: string[] = [];
     if (ipInfo.city) {
-      return ipInfo.province + ' · ' + ipInfo.city;
+      location.push(ipInfo.city);
+
+      if (ipInfo.province) {
+        location.unshift(ipInfo.province);
+      }
+      return location.join(' · ');
     }
     if (ipInfo.province) {
-      return ipInfo.country + ' · ' + ipInfo.province;
+      location.push(ipInfo.province);
+
+      if (ipInfo.country) {
+        location.unshift(ipInfo.country);
+      }
+      return location.join(' · ');
     }
-    return ipInfo.country;
+    return ipInfo.country || '未知地区';
   }
 }
