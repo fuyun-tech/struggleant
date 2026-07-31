@@ -97,7 +97,7 @@ export class SignupComponent extends BaseComponent implements OnInit {
 
   signup() {
     const { value, valid } = this.validateForm(this.signupForm);
-    if (!valid) {
+    if (this.signupLoading() || !valid) {
       return;
     }
     const { email, password } = value;
