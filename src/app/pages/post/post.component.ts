@@ -103,7 +103,9 @@ export class PostComponent implements OnInit {
     return this.contentType() === ContentType.POST ? CommentTargetType.POST : CommentTargetType.PAGE;
   });
   readonly isMobile = this.uaService.isMobile;
-  readonly isArticle = this.contentType() === ContentType.POST;
+  readonly isArticle = computed(() => {
+    return this.contentType() === ContentType.POST;
+  });
   readonly isSignIn = signal(false);
   readonly post = signal<PostModel | null>(null);
   readonly postMeta = signal<Record<string, any>>({});
@@ -368,11 +370,12 @@ export class PostComponent implements OnInit {
     this.postTags.set(post.tags);
     this.isFavorite.set(post.isFavorite);
     this.isVoted.set(post.isVoted);
-    this.pageIndex.set(this.isArticle ? 'post-detail' : 'page-' + post.slug);
+    this.pageIndex.set(this.isArticle() ? 'post-detail' : 'page-' + post.slug);
 
     this.postService.updateActivePostId(post.id);
     this.postService.updateActivePost(post);
     this.postService.updateActiveBook(post.book);
+
     this.updateBreadcrumbs();
     this.updatePageIndex();
     this.updatePageInfo();

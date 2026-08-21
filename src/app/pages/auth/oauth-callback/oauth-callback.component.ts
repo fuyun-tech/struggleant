@@ -3,10 +3,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { isEmpty } from 'lodash';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
 import { ADMIN_URL_PARAM, APP_ID } from 'src/app/config/common.constant';
 import { ResponseCode } from 'src/app/config/response-code.enum';
 import { CustomError } from 'src/app/core/custom-error';
+import { UserSource } from 'src/app/enums/user';
 import { SigninResponse } from 'src/app/interfaces/auth';
 import { OptionEntity } from 'src/app/interfaces/option';
 import { TenantAppVo } from 'src/app/interfaces/tenant-app';
@@ -38,12 +40,13 @@ export class OauthCallbackComponent implements OnInit {
   private readonly tenantAppService = inject(TenantAppService);
   private readonly optionService = inject(OptionService);
   private readonly authService = inject(AuthService);
+  private readonly message = inject(NzMessageService);
 
   protected readonly pageIndex = 'auth-signin';
 
   private appInfo = signal<TenantAppVo | null>(null);
   private options = signal<OptionEntity>({});
-  private source = signal('');
+  private source = signal<UserSource | null>(null);
   private authCode = signal('');
   private scope = signal('');
   private errorCode = signal('');
@@ -62,7 +65,7 @@ export class OauthCallbackComponent implements OnInit {
       .subscribe(([appInfo, options, qp]) => {
         this.appInfo.set(appInfo);
         this.options.set(options);
-        this.source.set(qp.get('from')?.trim() || '');
+        this.source.set(<UserSource>parseInt(qp.get('from')?.trim() || '', 10));
         this.authCode.set(qp.get('auth_code')?.trim() || qp.get('code')?.trim() || '');
         this.scope.set(qp.get('scope')?.trim() || '');
         this.errorCode.set(qp.get('error_code')?.trim() || qp.get('error')?.trim() || '');
@@ -80,7 +83,7 @@ export class OauthCallbackComponent implements OnInit {
 
         try {
           const decodedState = JSON.parse(atob(this.state()));
-          if (this.source() === 'github' && decodedState.ref) {
+          if (this.source() === UserSource.GITHUB && decodedState.ref) {
             this.ref.set(decodeURIComponent(decodedState.ref));
           } else {
             this.ref.set(decodeURIComponent(this.ref()));
@@ -99,29 +102,49 @@ export class OauthCallbackComponent implements OnInit {
   }
 
   private signin() {
-    if (this.source() === 'weibo' && this.errorCode() === '21330') {
-      // cancel
-      this.router.navigate(['/user/signin'], {
-        replaceUrl: true,
-        queryParams: {
-          ref: this.ref() ? encodeURIComponent(this.ref()) : null
-        }
-      });
+    const source = this.source();
+    if (!source) {
+      this.message.error('登录方式不支持');
+      this.router
+        .navigate(['/user/signin'], {
+          replaceUrl: true,
+          queryParams: {
+            ref: this.ref() ? encodeURIComponent(this.ref()) : null
+          }
+        })
+        .then();
+
       return;
     }
-    if (this.source() === 'github' && this.errorCode() === 'access_denied') {
+    if (source === UserSource.WEIBO && this.errorCode() === '21330') {
       // cancel
-      this.router.navigate(['/user/signin'], {
-        replaceUrl: true,
-        queryParams: {
-          ref: this.ref() ? encodeURIComponent(this.ref()) : null
-        }
-      });
+      this.router
+        .navigate(['/user/signin'], {
+          replaceUrl: true,
+          queryParams: {
+            ref: this.ref() ? encodeURIComponent(this.ref()) : null
+          }
+        })
+        .then();
+
+      return;
+    }
+    if (source === UserSource.GITHUB && this.errorCode() === 'access_denied') {
+      // cancel
+      this.router
+        .navigate(['/user/signin'], {
+          replaceUrl: true,
+          queryParams: {
+            ref: this.ref() ? encodeURIComponent(this.ref()) : null
+          }
+        })
+        .then();
+
       return;
     }
 
     this.authService
-      .oauthSignin(this.authCode(), this.source())
+      .oauthSignin(this.authCode(), source)
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
         const authInfo: SigninResponse = res.data || {};

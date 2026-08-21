@@ -1,11 +1,12 @@
+@let ia = isArticle();
 @let p = post();
 @let c = postBookColumn();
-@if (isArticle) {
+@if (ia) {
   <app-breadcrumb></app-breadcrumb>
 }
 @if (p) {
   <div class="post" [class.p-post]="!isMobile" [class.m-post]="isMobile">
-    @if (isArticle && p.isOriginal === 1) {
+    @if (ia && p.isOriginal === 1) {
       <div class="original-sign">原创</div>
     }
     <header class="post-header">
@@ -51,7 +52,7 @@
     }
     <footer class="post-footer">
       <div>
-        @if (isArticle && postCategories().length > 0) {
+        @if (ia && postCategories().length > 0) {
           <div class="post-meta">
             <div class="post-meta-icon">
               <nz-icon nzType="folder"/>
@@ -105,7 +106,7 @@
             </div>
           </div>
         }
-        @if (isArticle) {
+        @if (ia) {
           <div class="post-meta">
             <div class="post-meta-icon">
               <nz-icon nzType="book"/>
@@ -158,7 +159,7 @@
             <span class="parkinson-mask"><nz-icon nzType="like" nzTheme="fill"/></span>
           </button>
           <button (click)="showReward()" title="打赏"><nz-icon nzType="heart" nzTheme="fill"/></button>
-          @if (isArticle) {
+          @if (ia) {
             <button [class.liked]="isFavorite()"
                     (click)="addFavorite()"
                     [title]="isFavorite() ? '已收藏' : '收藏'"><nz-icon nzType="star" nzTheme="fill"/></button>
@@ -169,16 +170,16 @@
         </div>
       </div>
     </footer>
-    @if (isArticle) {
-      <app-post-prev-next></app-post-prev-next>
+    @if (ia) {
+      <app-post-prev-next/>
     }
   </div>
-  @if (isArticle) {
-    <app-post-related></app-post-related>
+  @if (ia) {
+    <app-post-related/>
   }
-  <app-make-money></app-make-money>
-  <app-comment [targetType]="commentType()"></app-comment>
+  <app-make-money/>
+  <app-comment [targetType]="commentType()"/>
   @if (shareVisible()) {
-    <app-share-modal [shareUrl]="shareUrl()" (close)="closeShareQrcode()"></app-share-modal>
+    <app-share-modal [shareUrl]="shareUrl()" (close)="closeShareQrcode()"/>
   }
 }

@@ -9,6 +9,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { combineLatest, skipWhile, takeUntil } from 'rxjs';
+import { UserSource } from 'src/app/enums/user';
 import { SigninResponse } from 'src/app/interfaces/auth';
 import { ADMIN_URL_PARAM, APP_ID } from '../../config/common.constant';
 import { ResponseCode } from '../../config/response-code.enum';
@@ -60,12 +61,12 @@ export class SigninFormComponent extends BaseComponent implements OnInit {
     password: [null, [Validators.required, Validators.maxLength(this.maxPasswordLength)]]
   });
   readonly signinLoading = signal(false);
-  readonly oauthMap = signal<Record<string, boolean>>({
-    wechat: false,
-    qq: false,
-    alipay: false,
-    weibo: false,
-    github: false
+  readonly oauthMap = signal<Record<number, boolean>>({
+    [UserSource.ALIPAY]: false,
+    [UserSource.WECHAT]: false,
+    [UserSource.QQ]: false,
+    [UserSource.WEIBO]: false,
+    [UserSource.GITHUB]: false
   });
   readonly isSignupEnable = computed(() => {
     return this.options()['open_signup'] === '1';
@@ -73,7 +74,13 @@ export class SigninFormComponent extends BaseComponent implements OnInit {
   readonly isOauthEnable = computed(() => {
     const oauthMap = this.oauthMap();
 
-    return oauthMap['wechat'] || oauthMap['qq'] || oauthMap['alipay'] || oauthMap['weibo'] || oauthMap['github'];
+    return (
+      oauthMap[UserSource.ALIPAY] ||
+      oauthMap[UserSource.WECHAT] ||
+      oauthMap[UserSource.QQ] ||
+      oauthMap[UserSource.WEIBO] ||
+      oauthMap[UserSource.GITHUB]
+    );
   });
 
   private readonly isMobile = this.uaService.isMobile;
@@ -92,9 +99,9 @@ export class SigninFormComponent extends BaseComponent implements OnInit {
         this.options.set(options);
         this.oauthMap.update((data) => ({
           ...data,
-          alipay: !!options['open_alipay_app_id'],
-          weibo: !!options['open_weibo_app_key'],
-          github: !!options['open_github_client_id']
+          [UserSource.ALIPAY]: !!options['open_alipay_app_id'],
+          [UserSource.WEIBO]: !!options['open_weibo_app_key'],
+          [UserSource.GITHUB]: !!options['open_github_client_id']
         }));
 
         const ref = qp.get('ref')?.trim() || '';
@@ -167,13 +174,13 @@ export class SigninFormComponent extends BaseComponent implements OnInit {
       });
   }
 
-  oauthSignin(type: string): void {
-    if (!this.oauthMap()[type]) {
+  oauthSignin(source: UserSource): void {
+    if (!this.oauthMap()[source]) {
       this.message.warning('Sorry, we are stepping up our efforts to launch this feature, please wait...');
       return;
     }
     const url = this.authService.getOauthURL({
-      type,
+      source,
       options: this.options(),
       callbackUrl: this.appInfo()?.callbackUrl || '',
       ref: '',

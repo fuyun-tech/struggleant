@@ -13,6 +13,6 @@ export enum CommentStatus {
 }
 
 export enum CommentTargetType {
-  POST = 'post',
-  PAGE = 'page'
+  POST = 1,
+  PAGE = 2
 }

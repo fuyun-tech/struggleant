@@ -43,7 +43,7 @@ export const appConfig: ApplicationConfig = {
     provideNzI18n(zh_CN),
     importProvidersFrom(FormsModule),
     provideNzIcons(icons),
-    provideNzDateFnsAdapter(),
-    provideNzNoAnimation()
+    provideNzNoAnimation(),
+    provideNzDateFnsAdapter()
   ]
 };

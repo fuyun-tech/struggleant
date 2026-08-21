@@ -130,6 +130,7 @@ export class CommentComponent extends BaseComponent implements OnInit {
       return;
     }
     this.saveLoading.set(true);
+
     this.commentService
       .saveComment({
         targetId: this.targetId(),
@@ -141,6 +142,7 @@ export class CommentComponent extends BaseComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
         this.saveLoading.set(false);
+
         if (res.code === ResponseCode.SUCCESS) {
           this.resetCommentForm(form);
           this.cancelReply();
@@ -188,8 +190,8 @@ export class CommentComponent extends BaseComponent implements OnInit {
         });
 
         if (res.code === ResponseCode.SUCCESS) {
-          comment.likes = res.data.likeCount;
-          comment.dislikes = res.data.dislikeCount;
+          comment.likeCount = res.data.likeCount;
+          comment.dislikeCount = res.data.dislikeCount;
           comment.liked = like;
           comment.disliked = !like;
         }
