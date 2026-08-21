@@ -66,8 +66,7 @@ export class AiChatService {
             try {
               const errData = JSON.parse(msg.data);
               errMsg = errData.message || Message.DEFAULT_CHAT_ERROR_MESSAGE;
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            } catch (e) {
+            } catch {
               errMsg = Message.DEFAULT_CHAT_ERROR_MESSAGE;
             }
             subscriber.next({
@@ -110,8 +109,7 @@ export class AiChatService {
 
                 messageId = finishMsg.messageId;
               }
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            } catch (e) {
+            } catch {
               messageId = '';
             }
             subscriber.next({

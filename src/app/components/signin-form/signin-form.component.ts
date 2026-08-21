@@ -107,8 +107,7 @@ export class SigninFormComponent extends BaseComponent implements OnInit {
         const ref = qp.get('ref')?.trim() || '';
         try {
           this.referrer.set(decodeURIComponent(ref));
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (e) {
+        } catch {
           this.referrer.set(ref);
         }
         if (ref === 'signout') {
@@ -124,6 +123,7 @@ export class SigninFormComponent extends BaseComponent implements OnInit {
     }
     const { name, password } = value;
     this.signinLoading.set(true);
+
     this.authService
       .signin({
         name,
@@ -132,6 +132,7 @@ export class SigninFormComponent extends BaseComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
         this.signinLoading.set(false);
+
         const authInfo: SigninResponse = res.data || {};
 
         if (authInfo.token?.token) {

@@ -85,8 +85,7 @@ app.get('/rss.xml', async (req, res) => {
     });
 
     res.type('application/rss+xml').send(feed.rss2());
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e: any) {
+  } catch {
     res.status(HttpStatusCode.InternalServerError).send(Message.ERROR_500);
   }
 });
@@ -169,8 +168,7 @@ app.get('/sitemap.xml', async (req, res) => {
         )
       )
     ).then((data) => res.type('application/xml').send(data.toString()));
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e: any) {
+  } catch {
     res.status(HttpStatusCode.InternalServerError).send(Message.ERROR_500);
   }
 });

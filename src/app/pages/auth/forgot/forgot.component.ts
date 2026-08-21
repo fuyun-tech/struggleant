@@ -119,7 +119,6 @@ export class ForgotComponent extends BaseComponent implements OnInit, AfterViewI
     if (!emailCtrl || !emailCtrl.valid) {
       return;
     }
-    this.countdown.set(60);
     this.startCountdown();
     this.authService
       .sendCode({
@@ -142,6 +141,7 @@ export class ForgotComponent extends BaseComponent implements OnInit, AfterViewI
     }
     const { email, code, password } = value;
     this.resetLoading.set(true);
+
     this.authService
       .resetPassword({
         email,
@@ -163,6 +163,7 @@ export class ForgotComponent extends BaseComponent implements OnInit, AfterViewI
   }
 
   private startCountdown() {
+    this.countdown.set(60);
     this.sendTimer.set(
       window.setInterval(() => {
         this.countdown.update((data) => data - 1);
